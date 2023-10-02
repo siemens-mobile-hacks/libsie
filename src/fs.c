@@ -1,8 +1,8 @@
 #include <swilib.h>
 #include <stdlib.h>
-#include "include/sie/files.h"
+#include "include/sie/fs.h"
 
-SIE_FILE *Sie_Files_Find(const char *mask) {
+SIE_FILE *Sie_FS_FindFiles(const char *mask) {
     SIE_FILE *top = NULL;
     SIE_FILE *current = NULL;
     SIE_FILE *prev = NULL;
@@ -35,7 +35,7 @@ SIE_FILE *Sie_Files_Find(const char *mask) {
     return top;
 }
 
-void Sie_Files_Destroy(SIE_FILE *top) {
+void Sie_FS_DestroyFiles(SIE_FILE *top) {
     SIE_FILE *p = top;
     while (p) {
         SIE_FILE *next = p->next;
@@ -45,7 +45,7 @@ void Sie_Files_Destroy(SIE_FILE *top) {
     }
 }
 
-unsigned int Sie_Files_GetCount(SIE_FILE *top) {
+unsigned int Sie_FS_GetFilesCount(SIE_FILE *top) {
     unsigned int count = 0;
     while (top) {
         top = top->next;
@@ -54,7 +54,7 @@ unsigned int Sie_Files_GetCount(SIE_FILE *top) {
     return count;
 }
 
-SIE_FILE *Sie_Files_GetFileByID(SIE_FILE *top, unsigned int id) {
+SIE_FILE *Sie_FS_GetFileByID(SIE_FILE *top, unsigned int id) {
     SIE_FILE *file = NULL;
     unsigned int i = 0;
     while (top) {
@@ -68,7 +68,7 @@ SIE_FILE *Sie_Files_GetFileByID(SIE_FILE *top, unsigned int id) {
     return file;
 }
 
-SIE_FILE *Sie_Files_GetFileByFileName(SIE_FILE *top, const char *file_name) {
+SIE_FILE *Sie_FS_GetFileByFileName(SIE_FILE *top, const char *file_name) {
     SIE_FILE *file = NULL;
     while (top) {
         if (strcmp(top->file_name, file_name) == 0) {
@@ -80,7 +80,7 @@ SIE_FILE *Sie_Files_GetFileByFileName(SIE_FILE *top, const char *file_name) {
     return file;
 }
 
-void Sie_Files_DeleteElement(SIE_FILE *top, SIE_FILE *element) {
+void Sie_FS_DeleteFilesElement(SIE_FILE *top, SIE_FILE *element) {
     SIE_FILE *p = top;
     while (p) {
         if (p == element) {
@@ -99,7 +99,7 @@ void Sie_Files_DeleteElement(SIE_FILE *top, SIE_FILE *element) {
     }
 }
 
-SIE_FILE *Sie_Files_Sort(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int keep_folders_on_top) {
+SIE_FILE *Sie_FS_SortFiles(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int keep_folders_on_top) {
     SIE_FILE *new_top = NULL;
     SIE_FILE *prev = NULL;
     SIE_FILE *current = NULL;
@@ -119,7 +119,7 @@ SIE_FILE *Sie_Files_Sort(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int keep_
         }
         current = malloc(sizeof(SIE_FILE));
         memcpy(current, found, sizeof(SIE_FILE));
-        Sie_Files_DeleteElement(p, found);
+        Sie_FS_DeleteFilesElement(p, found);
         if (found == p) {
             p = p->next;
         }
@@ -144,7 +144,7 @@ SIE_FILE *Sie_Files_Sort(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int keep_
             if (p->file_attr & FA_DIRECTORY) {
                 SIE_FILE *current_dir = malloc(sizeof(SIE_FILE));
                 memcpy(current_dir, p, sizeof(SIE_FILE));
-                Sie_Files_DeleteElement(p, p);
+                Sie_FS_DeleteFilesElement(p, p);
                 current_dir->next = NULL;
                 current_dir->prev = last_dir;
                 if (!last_dir) {
@@ -156,7 +156,7 @@ SIE_FILE *Sie_Files_Sort(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int keep_
             } else {
                 SIE_FILE *current_file = malloc(sizeof(SIE_FILE));
                 memcpy(current_file, p, sizeof(SIE_FILE));
-                Sie_Files_DeleteElement(p, p);
+                Sie_FS_DeleteFilesElement(p, p);
                 current_file->next = NULL;
                 current_file->prev = last_file;
                 if (!last_file) {
@@ -180,9 +180,9 @@ SIE_FILE *Sie_Files_Sort(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int keep_
     return new_top;
 }
 
-SIE_FILE *Sie_Files_SortByName(SIE_FILE *top, int keep_folders_on_top) {
+SIE_FILE *Sie_FS_SortFilesByName(SIE_FILE *top, int keep_folders_on_top) {
     int cmp(SIE_FILE *f1, SIE_FILE *f2) {
         return (strcmpi(f1->file_name, f2->file_name) < 0);
     }
-    return Sie_Files_Sort(top, cmp, keep_folders_on_top);
+    return Sie_FS_SortFiles(top, cmp, keep_folders_on_top);
 }

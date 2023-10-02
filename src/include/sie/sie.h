@@ -2,7 +2,7 @@
 #define __SIE_H__
 
 #include "gui.h"
-#include "files.h"
+#include "fs.h"
 #include "strings.h"
 #include "settings.h"
 #include "resources.h"
