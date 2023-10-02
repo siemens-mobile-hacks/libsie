@@ -79,27 +79,24 @@ void Sie_GUI_DrawIconBar() {
 
     Sie_GUI_DrawIMGHDR(SIE_RES_IMG_WALLPAPER, 0, 0, ScreenW(), YDISP);
 
-
-    char str[64];
     int x = 0, y = 0;
     unsigned int w = 0, h = 0;
     WSHDR *ws = AllocWS(64);
-    // заряд аккумулятора
+    // battery capacity
     wsprintf(ws, "%d%%", *RamCap());
     Sie_FT_GetStringSize(ws, FONT_SIZE_ICONBAR, &w, &h);
     x = SCREEN_X2 - PADDING_ICONBAR - w;
     y = 0 + (YDISP - h) / 2;
     Sie_FT_DrawString(ws, x, y, FONT_SIZE_ICONBAR, NULL);
-    // часы
+    // clock
     TTime time;
     GetDateTime(NULL, &time);
     wsprintf(ws, "%02d:%02d", time.hour, time.min);
     Sie_FT_GetStringSize(ws, FONT_SIZE_ICONBAR, &w, &h);
     x = x - PADDING_ICONBAR - (int)w;
     Sie_FT_DrawString(ws,  x, y, FONT_SIZE_ICONBAR, NULL);
-    // другая инфа
-    sprintf(str, "%d Б", GetFreeRamAvail());
-    utf8_2ws(ws, str, 64);
+    // other info
+    wsprintf(ws, "%d %t", GetFreeRamAvail(), "Б");
     Sie_FT_DrawString(ws,
                       0 + PADDING_ICONBAR,
                       0 + (YDISP - Sie_FT_GetMaxHeight(FONT_SIZE_ICONBAR)) / 2,

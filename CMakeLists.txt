@@ -17,6 +17,7 @@ include_directories(${INCLUDE_DIR})
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msoft-float -fshort-wchar -marm -mlittle-endian -mcpu=arm926ej-s")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -nostdlib -pipe -fno-exceptions -fdata-sections -ffunction-sections")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99 -Wall -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -finput-charset=UTF-8 -fexec-charset=cp1251")
 
 push_library(libcrt.a)
 push_library(libcrt_helper.so)

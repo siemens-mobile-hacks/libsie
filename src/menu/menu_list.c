@@ -113,10 +113,8 @@ void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
 void Sie_Menu_List_DrawEmpty() {
     Sie_GUI_DrawBleedIMGHDR(SIE_RES_IMG_WALLPAPER, 0, YDISP, SCREEN_X2, SCREEN_Y2, 0, YDISP);
 
-    char *str = "<Пусто>";
-    size_t len = strlen(str);
-    WSHDR *ws = AllocWS((int)(len + 1));
-    utf8_2ws(ws, str, len);
+    WSHDR *ws = AllocWS(16);
+    wsprintf(ws, "%t", "<Пусто>");
     unsigned int w = 0, h = 0;
     Sie_FT_GetStringSize(ws, FONT_SIZE_EMPTY, &w, &h);
     const int x = ScreenW() / 2 - (int)w / 2;
