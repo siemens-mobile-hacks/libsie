@@ -22,7 +22,21 @@ SIE_GUI_SURFACE *Sie_GUI_Surface_Init(int type, int (*OnKey)(void *data, GUI_MSG
 
 void Sie_GUI_Surface_Destroy(SIE_GUI_SURFACE *surface) {
     FreeWS(surface->ws_hdr);
+    if (surface->scrot.bitmap) {
+        mfree(surface->scrot.bitmap);
+    }
     mfree(surface);
+}
+
+void Sie_GUI_Surface_DoScrot(SIE_GUI_SURFACE *surface) {
+    LockSched();
+    size_t size = ScreenW() * ScreenH() * 2;
+    surface->scrot.w = ScreenW();
+    surface->scrot.h = ScreenH();
+    surface->scrot.bpnum = 8;
+    surface->scrot.bitmap = malloc(size);
+    memcpy(surface->scrot.bitmap, RamScreenBuffer(), size);
+    UnlockSched();
 }
 
 void Sie_GUI_Surface_Draw(const SIE_GUI_SURFACE *surface) {
@@ -52,6 +66,13 @@ int Sie_GUI_Surface_OnKey(SIE_GUI_SURFACE *surface, void *data, GUI_MSG *msg) {
 }
 
 /**********************************************************************************************************************/
+
+void Sie_GUI_InitCanvas(RECT *canvas) {
+    canvas->x = 0;
+    canvas->y = 0;
+    canvas->x2 = SCREEN_X2;
+    canvas->y2 = SCREEN_Y2;
+}
 
 void Sie_GUI_DrawIMGHDR(IMGHDR *img, int x, int y, int w, int h) {
     RECT rc;

@@ -10,10 +10,12 @@ typedef struct {
     int type;
     int (*OnKey)(void *data, GUI_MSG *msg);
     WSHDR *ws_hdr;
+    IMGHDR scrot;
 } SIE_GUI_SURFACE;
 
 SIE_GUI_SURFACE *Sie_GUI_Surface_Init(int type, int (*OnKey)(void *data, GUI_MSG *msg));
 void Sie_GUI_Surface_Destroy(SIE_GUI_SURFACE *surface);
+void Sie_GUI_Surface_DoScrot(SIE_GUI_SURFACE *surface);
 void Sie_GUI_Surface_Draw(const SIE_GUI_SURFACE *surface);
 void Sie_GUI_Surface_OnFocus();
 void Sie_GUI_Surface_OnUnFocus();
@@ -25,6 +27,7 @@ int Sie_GUI_Surface_OnKey(SIE_GUI_SURFACE *surface, void *data, GUI_MSG *msg);
 #define PADDING_ICONBAR 5
 #define PADDING_HEADER 5
 
+void Sie_GUI_InitCanvas(RECT *canvas);
 void Sie_GUI_DrawIMGHDR(IMGHDR *img, int x, int y, int w, int h);
 void Sie_GUI_DrawBleedIMGHDR(IMGHDR  *img, int x, int y, int x2, int y2, int bleed_x, int bleed_y);
 void Sie_GUI_DrawIconBar();
