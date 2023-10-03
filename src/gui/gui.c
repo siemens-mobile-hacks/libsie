@@ -44,14 +44,14 @@ void Sie_GUI_Surface_Draw(const SIE_GUI_SURFACE *surface) {
     Sie_GUI_DrawHeader(surface->ws_hdr);
 }
 
-void Sie_GUI_Surface_OnFocus() {
+void Sie_GUI_Surface_OnFocus(SIE_GUI_SURFACE *surface) {
 #ifdef ELKA
     DisableIconBar(1);
 #endif
     GBS_StartTimerProc(&TIMER_DRAW_ICONBAR, 216, Sie_GUI_DrawIconBar);
 }
 
-void Sie_GUI_Surface_OnUnFocus() {
+void Sie_GUI_Surface_OnUnFocus(SIE_GUI_SURFACE *surface) {
 #ifdef ELKA
     DisableIconBar(0);
 #endif

@@ -17,8 +17,8 @@ SIE_GUI_SURFACE *Sie_GUI_Surface_Init(int type, int (*OnKey)(void *data, GUI_MSG
 void Sie_GUI_Surface_Destroy(SIE_GUI_SURFACE *surface);
 void Sie_GUI_Surface_DoScrot(SIE_GUI_SURFACE *surface);
 void Sie_GUI_Surface_Draw(const SIE_GUI_SURFACE *surface);
-void Sie_GUI_Surface_OnFocus();
-void Sie_GUI_Surface_OnUnFocus();
+void Sie_GUI_Surface_OnFocus(SIE_GUI_SURFACE *surface);
+void Sie_GUI_Surface_OnUnFocus(SIE_GUI_SURFACE *surface);
 int Sie_GUI_Surface_OnKey(SIE_GUI_SURFACE *surface, void *data, GUI_MSG *msg);
 
 #define SCREEN_X2 (ScreenW() - 1)
