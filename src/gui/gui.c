@@ -48,6 +48,7 @@ void Sie_GUI_Surface_OnFocus(SIE_GUI_SURFACE *surface) {
 #ifdef ELKA
     DisableIconBar(1);
 #endif
+    TIMER_DRAW_ICONBAR.param6 = (unsigned int)surface;
     GBS_StartTimerProc(&TIMER_DRAW_ICONBAR, 216, Sie_GUI_DrawIconBar);
 }
 
@@ -55,6 +56,7 @@ void Sie_GUI_Surface_OnUnfocus(SIE_GUI_SURFACE *surface) {
 #ifdef ELKA
     DisableIconBar(0);
 #endif
+    TIMER_DRAW_ICONBAR.param6 = 0;
     GBS_StopTimer(&TIMER_DRAW_ICONBAR);
 }
 
@@ -94,9 +96,16 @@ void Sie_GUI_DrawBleedIMGHDR(IMGHDR *img, int x, int y, int x2, int y2, int blee
 }
 
 void Sie_GUI_DrawIconBar() {
+    const SIE_GUI_SURFACE *surface = NULL;
+    if (TIMER_DRAW_ICONBAR.param6) {
+        surface = (SIE_GUI_SURFACE*)TIMER_DRAW_ICONBAR.param6;
+    }
     if (IsTimerProc(&TIMER_DRAW_ICONBAR)) {
         GBS_StopTimer(&TIMER_DRAW_ICONBAR);
     }
+//    if (surface) {
+//        TIMER_DRAW_ICONBAR.param6 = (unsigned int)surface;
+//    }
 
     Sie_GUI_DrawIMGHDR(SIE_RES_IMG_WALLPAPER, 0, 0, ScreenW(), YDISP);
 
@@ -123,7 +132,11 @@ void Sie_GUI_DrawIconBar() {
                       0 + (YDISP - Sie_FT_GetMaxHeight(FONT_SIZE_ICONBAR)) / 2,
                       FONT_SIZE_ICONBAR, NULL);
     FreeWS(ws);
-
+    if (surface) {
+        if (surface->handlers.OnAfterDrawIconBar) {
+            surface->handlers.OnAfterDrawIconBar();
+        }
+    }
     GBS_StartTimerProc(&TIMER_DRAW_ICONBAR, 216, Sie_GUI_DrawIconBar);
 }
 

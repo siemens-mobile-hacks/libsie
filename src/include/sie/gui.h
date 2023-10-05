@@ -7,6 +7,7 @@
 #define SIE_GUI_SURFACE_TYPE_DEFAULT 0x00
 
 typedef struct {
+    void (*OnAfterDrawIconBar)();
     int (*OnKey)(void *data, GUI_MSG *msg);
 } SIE_GUI_SURFACE_HANDLERS;
 
