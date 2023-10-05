@@ -38,4 +38,10 @@ void Sie_GUI_DrawBleedIMGHDR(IMGHDR  *img, int x, int y, int x2, int y2, int ble
 void Sie_GUI_DrawIconBar();
 void Sie_GUI_DrawHeader(WSHDR *ws);
 
+
+#define MSG_BOX_CALLBACK_NO  0x00
+#define MSG_BOX_CALLBACK_YES 0x01
+
+void Sie_GUI_MsgBoxYesNo(const char *msg, void (*CallBackProc)(int));
+
 #endif
