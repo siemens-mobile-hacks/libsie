@@ -15,7 +15,9 @@ SIE_GUI_SURFACE *Sie_GUI_Surface_Init(int type, const SIE_GUI_SURFACE_HANDLERS *
     SIE_GUI_SURFACE *surface = malloc(sizeof(SIE_GUI_SURFACE));
     zeromem(surface, sizeof(SIE_GUI_SURFACE));
     surface->type = type;
-    memcpy(&(surface->handlers), handlers, sizeof(SIE_GUI_SURFACE_HANDLERS));
+    if (handlers) {
+        memcpy(&(surface->handlers), handlers, sizeof(SIE_GUI_SURFACE_HANDLERS));
+    }
     surface->ws_hdr = AllocWS(128);
     return surface;
 };
