@@ -51,7 +51,7 @@ void Sie_GUI_Surface_OnFocus(SIE_GUI_SURFACE *surface) {
     GBS_StartTimerProc(&TIMER_DRAW_ICONBAR, 216, Sie_GUI_DrawIconBar);
 }
 
-void Sie_GUI_Surface_OnUnFocus(SIE_GUI_SURFACE *surface) {
+void Sie_GUI_Surface_OnUnfocus(SIE_GUI_SURFACE *surface) {
 #ifdef ELKA
     DisableIconBar(0);
 #endif
