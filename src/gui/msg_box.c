@@ -12,7 +12,7 @@
 typedef struct {
     GUI gui;
     SIE_GUI_SURFACE *surface;
-    char *msg;
+    WSHDR *msg_ws;
     void (*CallBackProc)(int);
 } MAIN_GUI;
 
@@ -34,14 +34,13 @@ static void OnRedraw(MAIN_GUI *data) {
     DrawRectangle(20, y, x2, y2, 0,color_border, color_bg);
 
     unsigned int w = 0, h = 0;
-    WSHDR *ws = AllocWS(128);
     // msg
-    wsprintf(ws, "%t", data->msg);
-    Sie_FT_GetStringSize(ws, FONT_SIZE_MSG, &w, &h);
+    Sie_FT_GetStringSize(data->msg_ws, FONT_SIZE_MSG, &w, &h);
     const int x_msg = (ScreenW() / 2) - (int)w / 2;
     const int y_msg = (YDISP + (ScreenH() - YDISP) / 2) - (int)(h / 1.5);
-    Sie_FT_DrawString(ws, x_msg, y_msg, FONT_SIZE_MSG, NULL);
+    Sie_FT_DrawString(data->msg_ws, x_msg, y_msg, FONT_SIZE_MSG, NULL);
     // softkeys
+    WSHDR *ws = AllocWS(128);
     wsprintf(ws, "%t", "Да");
     Sie_FT_GetStringSize(ws, FONT_SIZE_SOFT_KEYS, &w, &h);
     Sie_FT_DrawString(ws, x + 15, y2 - 5 - (int)h, FONT_SIZE_SOFT_KEYS, NULL);
@@ -63,6 +62,7 @@ static void OnCreate(MAIN_GUI *data, void *(*malloc_adr)(int)) {
 
 static void OnClose(MAIN_GUI *data, void (*mfree_adr)(void *)) {
     data->gui.state = 0;
+    FreeWS(data->msg_ws);
     Sie_GUI_Surface_Destroy(data->surface);
 }
 
@@ -113,14 +113,15 @@ static const void *const gui_methods[11] = {
         0
 };
 
-void MsgBox(const char *msg, void(*CallBackProc)(int)) {
+void MsgBox(WSHDR *ws, void(*CallBackProc)(int)) {
     MAIN_GUI *main_gui = malloc(sizeof(MAIN_GUI));
     const SIE_GUI_SURFACE_HANDLERS surface_handlers = {
             OnAfterDrawIconBar,
             NULL
     };
     zeromem(main_gui, sizeof(MAIN_GUI));
-    main_gui->msg = (char*)msg;
+    main_gui->msg_ws = AllocWS(ws->maxlen);
+    wstrcpy(main_gui->msg_ws, ws);
     main_gui->CallBackProc = CallBackProc;
     main_gui->surface = Sie_GUI_Surface_Init(SIE_GUI_SURFACE_TYPE_DEFAULT, &surface_handlers);
 
@@ -134,6 +135,6 @@ void MsgBox(const char *msg, void(*CallBackProc)(int)) {
     UnlockSched();
 }
 
-void Sie_GUI_MsgBoxYesNo(const char *msg, void(*CallBackProc)(int)) {
-    MsgBox(msg, CallBackProc);
+void Sie_GUI_MsgBoxYesNo(WSHDR *ws, void(*CallBackProc)(int)) {
+    MsgBox(ws, CallBackProc);
 }

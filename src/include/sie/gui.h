@@ -14,7 +14,7 @@ typedef struct {
 typedef struct {
     int type;
     SIE_GUI_SURFACE_HANDLERS handlers;
-    WSHDR *ws_hdr;
+    WSHDR *hdr_ws;
     IMGHDR scrot;
 } SIE_GUI_SURFACE;
 
@@ -42,6 +42,6 @@ void Sie_GUI_DrawHeader(WSHDR *ws);
 #define MSG_BOX_CALLBACK_NO  0x00
 #define MSG_BOX_CALLBACK_YES 0x01
 
-void Sie_GUI_MsgBoxYesNo(const char *msg, void (*CallBackProc)(int));
+void Sie_GUI_MsgBoxYesNo(WSHDR *ws, void (*CallBackProc)(int));
 
 #endif
