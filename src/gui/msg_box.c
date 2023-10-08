@@ -82,10 +82,10 @@ static int OnKey(MAIN_GUI *data, GUI_MSG *msg) {
         if (msg->gbsmsg->msg == KEY_DOWN || msg->gbsmsg->msg == LONG_PRESS) {
             switch (msg->gbsmsg->submess) {
                 case LEFT_SOFT:
-                    data->CallBackProc(MSG_BOX_CALLBACK_YES);
+                    data->CallBackProc(SIE_GUI_MSG_BOX_CALLBACK_YES);
                     return 1;
                 case RIGHT_SOFT:
-                    data->CallBackProc(MSG_BOX_CALLBACK_NO);
+                    data->CallBackProc(SIE_GUI_MSG_BOX_CALLBACK_NO);
                     return 1;
             }
         }

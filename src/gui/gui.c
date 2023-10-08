@@ -18,12 +18,12 @@ SIE_GUI_SURFACE *Sie_GUI_Surface_Init(int type, const SIE_GUI_SURFACE_HANDLERS *
     if (handlers) {
         memcpy(&(surface->handlers), handlers, sizeof(SIE_GUI_SURFACE_HANDLERS));
     }
-    surface->ws_hdr = AllocWS(128);
+    surface->hdr_ws = AllocWS(128);
     return surface;
 };
 
 void Sie_GUI_Surface_Destroy(SIE_GUI_SURFACE *surface) {
-    FreeWS(surface->ws_hdr);
+    FreeWS(surface->hdr_ws);
     if (surface->scrot.bitmap) {
         mfree(surface->scrot.bitmap);
     }
@@ -43,7 +43,7 @@ void Sie_GUI_Surface_DoScrot(SIE_GUI_SURFACE *surface) {
 
 void Sie_GUI_Surface_Draw(const SIE_GUI_SURFACE *surface) {
     Sie_GUI_DrawIconBar();
-    Sie_GUI_DrawHeader(surface->ws_hdr);
+    Sie_GUI_DrawHeader(surface->hdr_ws);
 }
 
 void Sie_GUI_Surface_OnFocus(SIE_GUI_SURFACE *surface) {

@@ -39,8 +39,8 @@ void Sie_GUI_DrawIconBar();
 void Sie_GUI_DrawHeader(WSHDR *ws);
 
 
-#define MSG_BOX_CALLBACK_NO  0x00
-#define MSG_BOX_CALLBACK_YES 0x01
+#define SIE_GUI_MSG_BOX_CALLBACK_NO  0x00
+#define SIE_GUI_MSG_BOX_CALLBACK_YES 0x01
 
 void Sie_GUI_MsgBoxYesNo(WSHDR *ws, void (*CallBackProc)(int));
 
