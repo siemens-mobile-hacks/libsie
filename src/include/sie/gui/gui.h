@@ -3,6 +3,7 @@
 
 #include <swilib.h>
 #include <wchar.h>
+#include "stack.h"
 #include "menu/menu.h"
 #include "menu/menu_list.h"
 
