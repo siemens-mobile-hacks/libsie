@@ -1,7 +1,7 @@
 #include <swilib.h>
 #include <stdlib.h>
 #include "../include/sie/freetype/freetype.h"
-#include "../include/sie/gui.h"
+#include "../include/sie/gui/gui.h"
 
 #define FONT_SIZE_ICONBAR 14
 #define FONT_SIZE_HEADER 20

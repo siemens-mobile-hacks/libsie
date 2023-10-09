@@ -3,6 +3,8 @@
 
 #include <swilib.h>
 #include <wchar.h>
+#include "menu/menu.h"
+#include "menu/menu_list.h"
 
 #define SIE_GUI_SURFACE_TYPE_DEFAULT 0x00
 

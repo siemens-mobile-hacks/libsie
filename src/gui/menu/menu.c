@@ -1,7 +1,6 @@
 #include <swilib.h>
 #include <stdlib.h>
-#include "../include/sie/gui.h"
-#include "../include/sie/menu/menu.h"
+#include "../../include/sie/gui/gui.h"
 
 SIE_MENU *Sie_Menu_Init(SIE_MENU_ITEM *items, int n_items, int col, int row) {
     SIE_MENU *menu = malloc(sizeof(SIE_MENU));

@@ -1,6 +1,6 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include "../include/sie/gui.h"
+#include "../include/sie/gui/gui.h"
 #include "../include/sie/freetype/freetype.h"
 #include "../include/sie/freetype/freetype_cache.h"
 

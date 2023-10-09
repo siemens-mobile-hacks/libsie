@@ -1,6 +1,6 @@
 #include <swilib.h>
 #include <stdlib.h>
-#include "../include/sie/gui.h"
+#include "../include/sie/gui/gui.h"
 #include "../include/sie/freetype/freetype.h"
 
 #define FONT_SIZE_MSG 20

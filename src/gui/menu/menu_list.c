@@ -1,8 +1,7 @@
 #include <swilib.h>
 #include <stdlib.h>
-#include "../include/sie/gui.h"
-#include "../include/sie/freetype/freetype.h"
-#include "../include/sie/menu/menu_list.h"
+#include "../../include/sie/gui/gui.h"
+#include "../../include/sie/freetype/freetype.h"
 
 extern IMGHDR *SIE_RES_IMG_WALLPAPER;
 
