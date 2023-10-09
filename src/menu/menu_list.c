@@ -89,6 +89,7 @@ void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
 
         char *color_text = NULL;
         int text_x = x + 8;
+        int text_x2 = x2 - 8;
         int icon_x = 0;
         float icon_y = 0;
         if (i == (menu->row - menu->offset)) {
@@ -103,7 +104,7 @@ void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
             icon_y = y + (item_h - (float)img->h) / 2;
             Sie_GUI_DrawIMGHDR(img, icon_x, (int)icon_y, img->w, img->h);
         }
-        Sie_FT_DrawString(ws, text_x, (int)text_y, FONT_SIZE, color_text);
+        Sie_FT_DrawBoundingString(ws, text_x, (int)text_y, text_x2, 0, FONT_SIZE, SIE_FT_TEXT_ALIGN_LEFT, color_text);
     }
     if (show_indicator) {
         Sie_Menu_List_DrawIndicator(menu);

@@ -1,8 +1,7 @@
-#include <wchar.h>
-#include <swilib.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include "../include/sie/gui.h"
+#include "../include/sie/freetype/freetype.h"
 #include "../include/sie/freetype/freetype_cache.h"
 
 FT_Library *FT_LIBRARY = NULL;
@@ -98,4 +97,28 @@ void Sie_FT_DrawString(WSHDR *ws, int x, int y, int font_size, const char *rgb) 
         mfree(img.bitmap);
         x += ft_cc_cache->h_advance;
     }
+}
+
+void Sie_FT_DrawBoundingString(WSHDR *ws, int x, int y, int x2, int y2, int font_size, int attr, const char *rgb) {
+    int len = wstrlen(ws);
+    WSHDR *copy_ws = AllocWS(len);
+    wstrcpy(copy_ws, ws);
+    if (attr & SIE_FT_TEXT_ALIGN_LEFT) {
+        unsigned int w = 0, h = 0;
+        while (1) {
+            if (len <= 1) {
+                break;
+            }
+            else {
+                Sie_FT_GetStringSize(copy_ws, font_size, &w, &h);
+                if (w > x2 - x) {
+                    wsRemoveChars(copy_ws, len - 1, len);
+                    len -= 1;
+                }
+                else break;
+            }
+        }
+    }
+    Sie_FT_DrawString(copy_ws, x, y, font_size, rgb);
+    FreeWS(copy_ws);
 }
