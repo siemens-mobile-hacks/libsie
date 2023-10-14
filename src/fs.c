@@ -15,10 +15,13 @@ SIE_FILE *Sie_FS_FindFiles(const char *mask) {
 
             current = malloc(sizeof(SIE_FILE));
             zeromem(current, sizeof(SIE_FILE));
-
+            // dir_name
+            len = strlen(de.folder_name);
+            current->dir_name = malloc(len + 1 + 1);
+            sprintf(current->dir_name, "%s\\", de.folder_name);
             // file_name
             len = strlen(de.file_name);
-            current->file_name = malloc(sizeof(char) * (len + 1));
+            current->file_name = malloc(len + 1);
             strcpy(current->file_name, de.file_name);
             // file_attr
             current->file_attr = de.file_attr;

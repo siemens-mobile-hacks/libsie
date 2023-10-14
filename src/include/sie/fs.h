@@ -4,6 +4,7 @@
 typedef struct {
     void *prev;
     void *next;
+    char *dir_name;
     char *file_name;
     short file_attr;
 } SIE_FILE;
