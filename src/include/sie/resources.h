@@ -4,7 +4,11 @@
 #include <swilib.h>
 
 typedef struct {
-    char ext[16];
+    void *prev;
+    void *next;
+    char *type;
+    char *name;
+    unsigned int size;
     IMGHDR *icon;
 } SIE_RESOURCES_EXT;
 
@@ -13,6 +17,6 @@ void Sie_Resources_Destroy();
 
 void Sie_Resources_SetWallpaper(WSHDR *ws);
 
-SIE_RESOURCES_EXT *Sie_Resources_ExtLoad(const char *file_name, const char *ext);
+SIE_RESOURCES_EXT *Sie_Resources_LoadImage(const char *type, const char *name, unsigned int size);
 
 #endif

@@ -5,7 +5,6 @@
 
 IMGHDR *SIE_RES_IMG_WALLPAPER;
 SIE_RESOURCES_EXT *SIE_RES_EXT;
-unsigned int SIE_RES_EXT_COUNT;
 unsigned int SIE_RES_CLIENTS;
 
 void Sie_Resources_Init() {
@@ -34,11 +33,17 @@ void Sie_Resources_Destroy() {
             mfree(SIE_RES_IMG_WALLPAPER);
         }
         SIE_RES_IMG_WALLPAPER = NULL;
-        for (unsigned int i = 0; i < SIE_RES_EXT_COUNT; i++) {
-            SIE_RESOURCES_EXT *res_ext = &(SIE_RES_EXT[i]);
-            mfree(res_ext->icon->bitmap);
-            mfree(res_ext->icon);
+        SIE_RESOURCES_EXT *p = SIE_RES_EXT;
+        while (p) {
+            SIE_RESOURCES_EXT *prev = p->prev;
+            mfree(p->type);
+            mfree(p->name);
+            mfree(p->icon->bitmap);
+            mfree(p->icon);
+            mfree(p);
+            p = prev;
         }
+        SIE_RES_EXT = NULL;
     }
 }
 
@@ -60,30 +65,44 @@ void Sie_Resources_SetWallpaper(WSHDR *ws) {
 
 /**********************************************************************************************************************/
 
-SIE_RESOURCES_EXT *Sie_Resources_ExtGet(const char *ext) {
-    SIE_RESOURCES_EXT *res_ext = NULL;
-    for (unsigned int i = 0; i < SIE_RES_EXT_COUNT; i++) {
-        if (strcmp(SIE_RES_EXT[i].ext, ext) == 0) {
-            res_ext = &(SIE_RES_EXT)[i];
+SIE_RESOURCES_EXT *Sie_Resources_GetImage(const char *type, const char *name, unsigned int size) {
+    SIE_RESOURCES_EXT *p = SIE_RES_EXT;
+    while (p) {
+        if (strcmp(p->type, type) == 0 && p->size == size && strcmp(p->name, name) == 0) {
+            return p;
         }
+        p = p->prev;
     }
-    return res_ext;
+    return NULL;
 }
 
-SIE_RESOURCES_EXT *Sie_Resources_ExtLoad(const char *file_name, const char *ext) {
-    const char *dir = "0:\\zbin\\img\\libsie\\ext\\";
-    SIE_RESOURCES_EXT *res_ext = Sie_Resources_ExtGet(ext);
+SIE_RESOURCES_EXT *Sie_Resources_LoadImage(const char *type, const char *name, unsigned int size) {
+    const char *dir = "0:\\zbin\\img";
+    SIE_RESOURCES_EXT *res_ext = Sie_Resources_GetImage(type, name, size);
     if (!res_ext) {
-        char *path = malloc(strlen(dir) + strlen(file_name) + 1);
-        sprintf(path, "%s%s", dir, file_name);
+        size_t len_type = strlen(type);
+        size_t len_name = strlen(name);
+
+        char *path = malloc(strlen(dir) + len_type + 16 + len_name + 3 + 1);
+        sprintf(path, "%s\\%s\\%d\\%s.png", dir, type, size, name);
         IMGHDR *img = CreateIMGHDRFromPngFile(path, 0);
         mfree(path);
         if (img) {
-            SIE_RES_EXT = realloc(SIE_RES_EXT, sizeof(SIE_RESOURCES_EXT) * (SIE_RES_EXT_COUNT + 1));
-            res_ext = &(SIE_RES_EXT[SIE_RES_EXT_COUNT]);
-            strcpy(res_ext->ext, ext);
+            res_ext = malloc(sizeof(SIE_RESOURCES_EXT));
+            zeromem(res_ext, sizeof(SIE_RESOURCES_EXT));
+            res_ext->type = malloc(len_type);
+            res_ext->name = malloc(len_name);
+            strcpy(res_ext->type, type);
+            strcpy(res_ext->name, name);
+            res_ext->size = size;
             res_ext->icon = img;
-            SIE_RES_EXT_COUNT++;
+            if (!SIE_RES_EXT) {
+                SIE_RES_EXT = res_ext;
+            } else {
+                SIE_RES_EXT->next = res_ext;
+                res_ext->prev = SIE_RES_EXT;
+                SIE_RES_EXT = res_ext;
+            }
         }
     }
     return res_ext;
