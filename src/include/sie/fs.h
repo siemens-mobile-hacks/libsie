@@ -26,7 +26,7 @@ SIE_FILE *Sie_FS_SortFilesByName(SIE_FILE *top, int keep_folders_on_top);
 
 int Sie_FS_FileExists(const char *path);
 
-unsigned int Sie_FS_CopyFile(const char *dest, const char *src);
+unsigned int Sie_FS_CopyFile(const char *src, const char *dest);
 int Sie_FS_RemoveDirRecursive(const char *dir);
 
 #endif

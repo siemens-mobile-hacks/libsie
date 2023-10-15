@@ -254,7 +254,7 @@ int Sie_FS_FileExists(const char *path) {
     return exists;
 }
 
-unsigned int Sie_FS_CopyFile(const char *dest, const char *src) {
+unsigned int Sie_FS_CopyFile(const char *src, const char *dest) {
     int in = 0, out = 0;
     unsigned int err = 0, err2 = 0;
     unsigned int wb = 0;
