@@ -147,33 +147,35 @@ void Sie_Menu_List_Draw(SIE_MENU_LIST *menu) {
 
 void Sie_Menu_List_OnKey(SIE_MENU_LIST *menu, GUI_MSG *msg) {
     if (msg->gbsmsg->msg == KEY_DOWN || msg->gbsmsg->msg == LONG_PRESS) {
-        switch (msg->gbsmsg->submess) {
-            case SIE_MENU_LIST_KEY_PREV:
-                if (menu->row != 0) {
-                    menu->row--;
-                } else {
-                    menu->row = menu->n_items - 1;
-                }
-                Sie_Menu_List_Refresh(menu);
-                Sie_Menu_List_Draw(menu);
-                break;
-            case SIE_MENU_LIST_KEY_NEXT:
-                menu->row++;
-                if (menu->row >= menu->n_items) {
-                    menu->row = 0;
-                }
-                Sie_Menu_List_Refresh(menu);
-                Sie_Menu_List_Draw(menu);
-                break;
-            case SIE_MENU_LIST_KEY_ENTER:
-                if (menu->n_items) {
-                    void (*proc)();
-                    proc = menu->items[menu->row].proc;
-                    if (proc) {
-                        proc();
+        if (menu->n_items) {
+            switch (msg->gbsmsg->submess) {
+                case SIE_MENU_LIST_KEY_PREV:
+                    if (menu->row != 0) {
+                        menu->row--;
+                    } else {
+                        menu->row = menu->n_items - 1;
                     }
-                }
-                break;
+                    Sie_Menu_List_Refresh(menu);
+                    Sie_Menu_List_Draw(menu);
+                    break;
+                case SIE_MENU_LIST_KEY_NEXT:
+                    menu->row++;
+                    if (menu->row >= menu->n_items) {
+                        menu->row = 0;
+                    }
+                    Sie_Menu_List_Refresh(menu);
+                    Sie_Menu_List_Draw(menu);
+                    break;
+                case SIE_MENU_LIST_KEY_ENTER:
+                    if (menu->n_items) {
+                        void (*proc)();
+                        proc = menu->items[menu->row].proc;
+                        if (proc) {
+                            proc();
+                        }
+                    }
+                    break;
+            }
         }
     }
 }
