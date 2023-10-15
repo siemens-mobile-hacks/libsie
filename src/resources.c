@@ -36,7 +36,6 @@ void Sie_Resources_Destroy() {
         SIE_RESOURCES_EXT *p = SIE_RES_EXT;
         while (p) {
             SIE_RESOURCES_EXT *prev = p->prev;
-            mfree(p->type);
             mfree(p->name);
             mfree(p->icon->bitmap);
             mfree(p->icon);
@@ -65,10 +64,10 @@ void Sie_Resources_SetWallpaper(WSHDR *ws) {
 
 /**********************************************************************************************************************/
 
-SIE_RESOURCES_EXT *Sie_Resources_GetImage(const char *type, const char *name, unsigned int size) {
+SIE_RESOURCES_EXT *Sie_Resources_GetImage(unsigned int type, unsigned int size, const char *name) {
     SIE_RESOURCES_EXT *p = SIE_RES_EXT;
     while (p) {
-        if (strcmp(p->type, type) == 0 && p->size == size && strcmp(p->name, name) == 0) {
+        if (p->type == type && p->size == size && strcmp(p->name, name) == 0) {
             return p;
         }
         p = p->prev;
@@ -76,25 +75,36 @@ SIE_RESOURCES_EXT *Sie_Resources_GetImage(const char *type, const char *name, un
     return NULL;
 }
 
-SIE_RESOURCES_EXT *Sie_Resources_LoadImage(const char *type, const char *name, unsigned int size) {
+SIE_RESOURCES_EXT *Sie_Resources_LoadImage(unsigned int type, unsigned int size, const char *name) {
+    char _type[32];
     const char *dir = "0:\\zbin\\img";
-    SIE_RESOURCES_EXT *res_ext = Sie_Resources_GetImage(type, name, size);
+    switch (type) {
+        case SIE_RESOURCES_TYPE_EXT:
+            strcpy(_type, "ext");
+            break;
+        case SIE_RESOURCES_TYPE_PLACES:
+            strcpy(_type, "places");
+            break;
+        default:
+            strcpy(_type, "apps");
+    }
+
+    SIE_RESOURCES_EXT *res_ext = Sie_Resources_GetImage(type, size, name);
     if (!res_ext) {
-        size_t len_type = strlen(type);
+        size_t len_type = strlen(_type);
         size_t len_name = strlen(name);
 
         char *path = malloc(strlen(dir) + len_type + 16 + len_name + 3 + 1);
-        sprintf(path, "%s\\%s\\%d\\%s.png", dir, type, size, name);
+        sprintf(path, "%s\\%s\\%d\\%s.png", dir, _type, size, name);
         IMGHDR *img = CreateIMGHDRFromPngFile(path, 0);
         mfree(path);
         if (img) {
             res_ext = malloc(sizeof(SIE_RESOURCES_EXT));
             zeromem(res_ext, sizeof(SIE_RESOURCES_EXT));
-            res_ext->type = malloc(len_type);
-            res_ext->name = malloc(len_name);
-            strcpy(res_ext->type, type);
-            strcpy(res_ext->name, name);
+            res_ext->type = type;
             res_ext->size = size;
+            res_ext->name = malloc(len_name);
+            strcpy(res_ext->name, name);
             res_ext->icon = img;
             if (!SIE_RES_EXT) {
                 SIE_RES_EXT = res_ext;
