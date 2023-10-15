@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "include/sie/fs.h"
 
+#define COPY_BUFFER_SIZE 4096
+
 SIE_FILE *Sie_FS_FindFiles(const char *mask) {
     SIE_FILE *top = NULL;
     SIE_FILE *current = NULL;
@@ -124,6 +126,18 @@ char *Sie_FS_GetPathByFile(SIE_FILE *file) {
     return path;
 }
 
+SIE_FILE *Sie_FS_CopyFileElement(SIE_FILE *file) {
+    SIE_FILE *top = malloc(sizeof(SIE_FILE));
+    memcpy(top, file, sizeof(SIE_FILE));
+    top->prev = NULL;
+    top->next = NULL;
+    top->dir_name = malloc(strlen(file->dir_name) + 1);
+    strcpy(top->dir_name, file->dir_name);
+    top->file_name = malloc(strlen(file->file_name) + 1);
+    strcpy(top->file_name, file->file_name);
+    return top;
+}
+
 void Sie_FS_DeleteFilesElement(SIE_FILE *top, SIE_FILE *element) {
     SIE_FILE *p = top;
     while (p) {
@@ -229,6 +243,70 @@ SIE_FILE *Sie_FS_SortFilesByName(SIE_FILE *top, int keep_folders_on_top) {
         return (strcmpi(f1->file_name, f2->file_name) < 0);
     }
     return Sie_FS_SortFiles(top, cmp, keep_folders_on_top);
+}
+
+int Sie_FS_FileExists(const char *path) {
+    size_t len = strlen(path);
+    WSHDR *ws = AllocWS((ssize_t)len);
+    str_2ws(ws, path, len);
+    int exists = fexists(ws);
+    FreeWS(ws);
+    return exists;
+}
+
+unsigned int Sie_FS_CopyFile(const char *dest, const char *src) {
+    int in = 0, out = 0;
+    unsigned int err = 0, err2 = 0;
+    unsigned int wb = 0;
+    unsigned int result = 0;
+
+    if ((in = _open(src, A_ReadOnly, P_READ, &err)) == -1) {
+        goto EXIT;
+    }
+    if ((out = _open(dest, A_Create + A_WriteOnly + A_Append, P_WRITE, &err)) == -1) {
+        goto EXIT;
+    }
+
+    FSTATS fstats_in, fstats_out;
+    GetFileStats(src, &fstats_in, &err);
+    if (err) {
+        goto EXIT;
+    }
+    GetFileStats(dest, &fstats_out, &err);
+    if (fstats_out.size || err) {
+        goto EXIT;
+    }
+
+    char buffer[COPY_BUFFER_SIZE];
+    unsigned int offset = 0;
+    do {
+        _lseek(in, offset, SEEK_SET, &err, &err2);
+        if (err || err2) {
+            break;
+        }
+        int rb = _read(in, &buffer, COPY_BUFFER_SIZE, &err);
+        if (err) {
+            break;
+        }
+        offset += rb;
+        wb += _write(out, buffer, rb, &err);
+        if (err) {
+            break;
+        }
+    } while (wb < fstats_in.size);
+
+    EXIT:
+        result = 0;
+        if (!err) {
+            result = wb;
+        }
+        if (in) {
+            _close(in, &err);
+        }
+        if (out) {
+            _close(out, &err);
+        }
+        return result;
 }
 
 int Sie_FS_RemoveDirRecursive(const char *dir) {

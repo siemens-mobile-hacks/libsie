@@ -60,7 +60,6 @@ void Sie_Menu_List_DrawIndicator(SIE_MENU_LIST *menu) {
 
 void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
 #define show_indicator (menu->n_items > SIE_MENU_LIST_MAX_ITEMS)
-
     const char color_select_bg[] = COLOR_SELECT_BG;
     const char color_select_text[] = COLOR_SELECT_TEXT;
 
