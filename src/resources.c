@@ -1,11 +1,14 @@
 #include <swilib.h>
 #include <stdlib.h>
+#include "include/sie/ext.h"
 #include "include/sie/settings.h"
 #include "include/sie/resources.h"
 
 IMGHDR *SIE_RES_IMG_WALLPAPER;
 SIE_RESOURCES_EXT *SIE_RES_EXT;
 unsigned int SIE_RES_CLIENTS;
+
+IMGHDR *Sie_Resources_CreateIMGHDRFromImgFile(const char *path, int width, int height);
 
 void Sie_Resources_Init() {
     if (!SIE_RES_IMG_WALLPAPER) {
@@ -17,7 +20,7 @@ void Sie_Resources_Init() {
         path = malloc(len + 1);
         ws_2str(ws, path, len);
         FreeWS(ws);
-        SIE_RES_IMG_WALLPAPER = CreateIMGHDRFromPngFile(path, 0);
+        SIE_RES_IMG_WALLPAPER = Sie_Resources_CreateIMGHDRFromImgFile(path, ScreenW(), ScreenH());
         mfree(path);
     }
     SIE_RES_CLIENTS++;
@@ -58,7 +61,7 @@ void Sie_Resources_SetWallpaper(WSHDR *ws) {
     size_t len = wstrlen(ws);
     char *path = malloc(len + 1);
     ws_2str(ws, path, len);
-    SIE_RES_IMG_WALLPAPER = CreateIMGHDRFromPngFile(path, 0);
+    SIE_RES_IMG_WALLPAPER = Sie_Resources_CreateIMGHDRFromImgFile(path, ScreenW(), ScreenH());
     mfree(path);
 }
 
@@ -116,4 +119,57 @@ SIE_RESOURCES_EXT *Sie_Resources_LoadImage(unsigned int type, unsigned int size,
         }
     }
     return res_ext;
+}
+
+
+IMGHDR *Sie_Resources_CreateIMGHDRFromImgFile(const char *path, int width, int height) {
+    HObj obj;
+    IMGHDR *img = NULL;
+    unsigned int err = 0;
+
+    size_t len = strlen(path);
+    WSHDR *ws = AllocWS(len);
+    str_2ws(ws, path, len);
+    int uid = GetExtUidByFileName_ws(ws);
+    if (!uid) {
+        FreeWS(ws);
+        return img;
+    }
+    obj = Obs_CreateObject(uid, 0x2D, 0x02, 0x80A8, 1, 1, &err);
+    if (err) {
+        FreeWS(ws);
+        return img;
+    }
+    err = Obs_SetInput_File(obj, 0, ws);
+    FreeWS(ws);
+    if (err) {
+        goto EXIT;
+    }
+    if (width && height) {
+        err = Obs_SetOutputImageSize(obj, (short)width, (short)height);
+        if (err) {
+            goto EXIT;
+        }
+        err = Obs_SetScaling(obj, 5);
+        if (err) {
+            goto EXIT;
+        }
+    }
+    err = Obs_Start(obj);
+    if (err) {
+        goto EXIT;
+    }
+    IMGHDR *tmp;
+    err = Obs_Output_GetPictstruct(obj, &tmp);
+    if (err) {
+        goto EXIT;
+    }
+    size_t size = CalcBitmapSize((short)width, (short)height, tmp->bpnum);
+    img = malloc(sizeof(IMGHDR));
+    memcpy(img, tmp, sizeof(IMGHDR));
+    img->bitmap = malloc(size);
+    memcpy(img->bitmap, tmp->bitmap, size);
+    EXIT:
+    Obs_DestroyObject(obj);
+    return img;
 }

@@ -1,4 +1,5 @@
 #include <swilib.h>
+#include <stdlib.h>
 
 char *Sie_Ext_GetExtByFileName(const char *file_name) {
     char *p = strrchr(file_name, '.');
@@ -13,4 +14,13 @@ char *Sie_Ext_GetExtByFileName(const char *file_name) {
         }
     }
     return NULL;
+}
+
+int Sie_Ext_GetExtUidByFileName(const char *file_name) {
+    size_t len = strlen(file_name);
+    WSHDR *ws = AllocWS(len);
+    str_2ws(ws, file_name, len);
+    int uid = GetExtUidByFileName_ws(ws);
+    FreeWS(ws);
+    return uid;
 }
