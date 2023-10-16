@@ -1,5 +1,5 @@
-#ifndef __SIE_FILES_H__
-#define __SIE_FILES_H__
+#ifndef __SIE_FS_H__
+#define __SIE_FS_H__
 
 typedef struct {
     void *prev;

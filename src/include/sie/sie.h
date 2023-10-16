@@ -2,6 +2,7 @@
 #define __SIE_H__
 
 #include "fs.h"
+#include "ext.h"
 #include "strings.h"
 #include "settings.h"
 #include "resources.h"
