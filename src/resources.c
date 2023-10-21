@@ -8,7 +8,6 @@ IMGHDR *SIE_RES_IMG_WALLPAPER;
 SIE_RESOURCES_EXT *SIE_RES_EXT;
 unsigned int SIE_RES_CLIENTS;
 
-IMGHDR *Sie_Resources_CreateIMGHDRFromImgFile(const char *path, int width, int height);
 
 void Sie_Resources_Init() {
     if (!SIE_RES_IMG_WALLPAPER) {
@@ -20,7 +19,13 @@ void Sie_Resources_Init() {
         path = malloc(len + 1);
         ws_2str(ws, path, len);
         FreeWS(ws);
-        SIE_RES_IMG_WALLPAPER = Sie_Resources_CreateIMGHDRFromImgFile(path, ScreenW(), ScreenH());
+
+        HObj hobj = Sie_Resources_CreateHObjFromImgFile(path);
+        if (hobj) {
+            SIE_RES_IMG_WALLPAPER = Sie_Resources_HObj2IMGHDR(hobj, ScreenW(), ScreenH());
+            Obs_DestroyObject(hobj);
+        }
+
         mfree(path);
     }
     SIE_RES_CLIENTS++;
@@ -61,7 +66,11 @@ void Sie_Resources_SetWallpaper(WSHDR *ws) {
     size_t len = wstrlen(ws);
     char *path = malloc(len + 1);
     ws_2str(ws, path, len);
-    SIE_RES_IMG_WALLPAPER = Sie_Resources_CreateIMGHDRFromImgFile(path, ScreenW(), ScreenH());
+    HObj hobj = Sie_Resources_CreateHObjFromImgFile(path);
+    if (hobj) {
+        SIE_RES_IMG_WALLPAPER = Sie_Resources_HObj2IMGHDR(hobj, ScreenW(), ScreenH());
+        Obs_DestroyObject(hobj);
+    }
     mfree(path);
 }
 
@@ -121,10 +130,8 @@ SIE_RESOURCES_EXT *Sie_Resources_LoadImage(unsigned int type, unsigned int size,
     return res_ext;
 }
 
-
-IMGHDR *Sie_Resources_CreateIMGHDRFromImgFile(const char *path, int width, int height) {
-    HObj obj;
-    IMGHDR *img = NULL;
+HObj Sie_Resources_CreateHObjFromImgFile(const char *path) {
+    HObj hobj = 0;
     unsigned int err = 0;
 
     size_t len = strlen(path);
@@ -133,43 +140,49 @@ IMGHDR *Sie_Resources_CreateIMGHDRFromImgFile(const char *path, int width, int h
     int uid = GetExtUidByFileName_ws(ws);
     if (!uid) {
         FreeWS(ws);
-        return img;
+        return hobj;
     }
-    obj = Obs_CreateObject(uid, 0x2D, 0x02, 0x80A8, 1, 1, &err);
+    hobj = Obs_CreateObject(uid, 0x2D, 0x02, 0x80A8, 1, 1, &err);
     if (err) {
         FreeWS(ws);
-        return img;
+        return hobj;
     }
-    err = Obs_SetInput_File(obj, 0, ws);
+    err = Obs_SetInput_File(hobj, 0, ws);
     FreeWS(ws);
-    if (err) {
-        goto EXIT;
+    return hobj;
+}
+
+void Sie_Resources_DestroyHObj(HObj hobj) {
+    if (hobj) {
+        Obs_DestroyObject(hobj);
     }
+}
+
+
+IMGHDR *Sie_Resources_HObj2IMGHDR(HObj hobj, int width, int height) {
+    IMGHDR *img = NULL;
+    unsigned int err = 0;
     if (width && height) {
-        err = Obs_SetOutputImageSize(obj, (short)width, (short)height);
+        err = Obs_SetOutputImageSize(hobj, (short)width, (short)height);
         if (err) {
-            goto EXIT;
+            return img;
         }
-        err = Obs_SetScaling(obj, 5);
+        err = Obs_SetScaling(hobj, 5);
         if (err) {
-            goto EXIT;
+            return img;
         }
     }
-    err = Obs_Start(obj);
-    if (err) {
-        goto EXIT;
+    err = Obs_Start(hobj);
+    if (!err) {
+        IMGHDR *tmp = NULL;
+        err = Obs_Output_GetPictstruct(hobj, &tmp);
+        if (!err) {
+            size_t size = CalcBitmapSize((short) tmp->w, (short) tmp->h, tmp->bpnum);
+            img = malloc(sizeof(IMGHDR));
+            memcpy(img, tmp, sizeof(IMGHDR));
+            img->bitmap = malloc(size);
+            memcpy(img->bitmap, tmp->bitmap, size);
+        }
     }
-    IMGHDR *tmp;
-    err = Obs_Output_GetPictstruct(obj, &tmp);
-    if (err) {
-        goto EXIT;
-    }
-    size_t size = CalcBitmapSize((short)width, (short)height, tmp->bpnum);
-    img = malloc(sizeof(IMGHDR));
-    memcpy(img, tmp, sizeof(IMGHDR));
-    img->bitmap = malloc(size);
-    memcpy(img->bitmap, tmp->bitmap, size);
-    EXIT:
-    Obs_DestroyObject(obj);
     return img;
 }
