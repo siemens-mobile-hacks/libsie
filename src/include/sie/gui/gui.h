@@ -4,6 +4,7 @@
 #include <swilib.h>
 #include <wchar.h>
 #include "stack.h"
+#include "msg_box.h"
 #include "menu/menu.h"
 #include "menu/menu_list.h"
 
@@ -40,11 +41,5 @@ void Sie_GUI_DrawIMGHDR(IMGHDR *img, int x, int y, int w, int h);
 void Sie_GUI_DrawBleedIMGHDR(IMGHDR  *img, int x, int y, int x2, int y2, int bleed_x, int bleed_y);
 void Sie_GUI_DrawIconBar();
 void Sie_GUI_DrawHeader(WSHDR *ws);
-
-
-#define SIE_GUI_MSG_BOX_CALLBACK_NO  0x00
-#define SIE_GUI_MSG_BOX_CALLBACK_YES 0x01
-
-void Sie_GUI_MsgBoxYesNo(WSHDR *ws, void (*CallBackProc)(int));
 
 #endif
