@@ -19,7 +19,9 @@ SIE_FILE *Sie_FS_GetFileByFileName(SIE_FILE *top, const char *file_name);
 SIE_FILE *Sie_FS_GetLastFile(SIE_FILE *top);
 char *Sie_FS_GetPathByFile(SIE_FILE *file);
 
+void Sie_FS_DestroyFileElement(SIE_FILE *file);
 SIE_FILE *Sie_FS_CopyFileElement(SIE_FILE *file);
+SIE_FILE *Sie_FS_DeleteFileElement(SIE_FILE *top, SIE_FILE *element);
 
 SIE_FILE *Sie_FS_SortFiles(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int keep_folders_on_top);
 SIE_FILE *Sie_FS_SortFilesByName(SIE_FILE *top, int keep_folders_on_top);

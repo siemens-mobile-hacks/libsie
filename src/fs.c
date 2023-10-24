@@ -67,9 +67,7 @@ void Sie_FS_DestroyFiles(SIE_FILE *top) {
     SIE_FILE *p = top;
     while (p) {
         SIE_FILE *next = p->next;
-        mfree(p->dir_name);
-        mfree(p->file_name);
-        mfree(p);
+        Sie_FS_DestroyFileElement(p);
         p = next;
     }
 }
@@ -126,19 +124,25 @@ char *Sie_FS_GetPathByFile(SIE_FILE *file) {
     return path;
 }
 
-SIE_FILE *Sie_FS_CopyFileElement(SIE_FILE *file) {
-    SIE_FILE *top = malloc(sizeof(SIE_FILE));
-    memcpy(top, file, sizeof(SIE_FILE));
-    top->prev = NULL;
-    top->next = NULL;
-    top->dir_name = malloc(strlen(file->dir_name) + 1);
-    strcpy(top->dir_name, file->dir_name);
-    top->file_name = malloc(strlen(file->file_name) + 1);
-    strcpy(top->file_name, file->file_name);
-    return top;
+void Sie_FS_DestroyFileElement(SIE_FILE *file) {
+    mfree(file->dir_name);
+    mfree(file->file_name);
+    mfree(file);
 }
 
-void Sie_FS_DeleteFilesElement(SIE_FILE *top, SIE_FILE *element) {
+SIE_FILE *Sie_FS_CopyFileElement(SIE_FILE *file) {
+    SIE_FILE *new = malloc(sizeof(SIE_FILE));
+    memcpy(new, file, sizeof(SIE_FILE));
+    new->prev = NULL;
+    new->next = NULL;
+    new->dir_name = malloc(strlen(file->dir_name) + 1);
+    strcpy(new->dir_name, file->dir_name);
+    new->file_name = malloc(strlen(file->file_name) + 1);
+    strcpy(new->file_name, file->file_name);
+    return new;
+}
+
+SIE_FILE *Sie_FS_DeleteFileElement(SIE_FILE *top, SIE_FILE *element) {
     SIE_FILE *p = top;
     while (p) {
         if (p == element) {
@@ -150,11 +154,11 @@ void Sie_FS_DeleteFilesElement(SIE_FILE *top, SIE_FILE *element) {
             if (next) {
                 next->prev = prev;
             }
-            mfree(element);
-            break;
+            return element;
         }
         p = p->next;
     }
+    return NULL;
 }
 
 SIE_FILE *Sie_FS_SortFiles(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int keep_folders_on_top) {
@@ -175,13 +179,14 @@ SIE_FILE *Sie_FS_SortFiles(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int kee
             }
             p2 = p2->next;
         }
-        current = malloc(sizeof(SIE_FILE));
-        memcpy(current, found, sizeof(SIE_FILE));
-        Sie_FS_DeleteFilesElement(p, found);
+        current = Sie_FS_CopyFileElement(found);
+        SIE_FILE *element = Sie_FS_DeleteFileElement(p, found);
+        if (element) {
+            Sie_FS_DestroyFileElement(element);
+        }
         if (found == p) {
             p = p->next;
         }
-
         current->prev = prev;
         current->next = NULL;
         if (!prev) {
@@ -200,9 +205,11 @@ SIE_FILE *Sie_FS_SortFiles(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int kee
         p = new_top;
         while (p) {
             if (p->file_attr & FA_DIRECTORY) {
-                SIE_FILE *current_dir = malloc(sizeof(SIE_FILE));
-                memcpy(current_dir, p, sizeof(SIE_FILE));
-                Sie_FS_DeleteFilesElement(p, p);
+                SIE_FILE *current_dir = Sie_FS_CopyFileElement(p);
+                SIE_FILE *element = Sie_FS_DeleteFileElement(p, p);
+                if (element) {
+                    Sie_FS_DestroyFileElement(element);
+                }
                 current_dir->next = NULL;
                 current_dir->prev = last_dir;
                 if (!last_dir) {
@@ -212,9 +219,11 @@ SIE_FILE *Sie_FS_SortFiles(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int kee
                 }
                 last_dir = current_dir;
             } else {
-                SIE_FILE *current_file = malloc(sizeof(SIE_FILE));
-                memcpy(current_file, p, sizeof(SIE_FILE));
-                Sie_FS_DeleteFilesElement(p, p);
+                SIE_FILE *current_file = Sie_FS_CopyFileElement(p);
+                SIE_FILE *element = Sie_FS_DeleteFileElement(p, p);
+                if (element) {
+                    Sie_FS_DestroyFileElement(element);
+                }
                 current_file->next = NULL;
                 current_file->prev = last_file;
                 if (!last_file) {
