@@ -134,6 +134,7 @@ void Sie_Menu_List_Draw(SIE_MENU_LIST *menu) {
 void Sie_Menu_List_OnKey(SIE_MENU_LIST *menu, GUI_MSG *msg) {
     if (msg->gbsmsg->msg == KEY_DOWN || msg->gbsmsg->msg == LONG_PRESS) {
         if (menu->n_items) {
+            SIE_MENU_LIST_ITEM *menu_item = &(menu->items[menu->row]);
             switch (msg->gbsmsg->submess) {
                 case SIE_MENU_LIST_KEY_PREV:
                     if (menu->row != 0) {
@@ -154,10 +155,9 @@ void Sie_Menu_List_OnKey(SIE_MENU_LIST *menu, GUI_MSG *msg) {
                     break;
                 case SIE_MENU_LIST_KEY_ENTER:
                     if (menu->n_items) {
-                        void (*proc)();
-                        proc = menu->items[menu->row].proc;
+                        void (*proc)(void *menu_item, unsigned int row) = menu_item->proc;
                         if (proc) {
-                            proc();
+                            proc(menu_item, menu->row);
                         }
                     }
                     break;

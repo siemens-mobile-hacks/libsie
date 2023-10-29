@@ -11,7 +11,7 @@
 typedef struct {
     IMGHDR *icon;
     WSHDR *ws;
-    void (*proc)(void);
+    void (*proc)(void *menu_item, unsigned int row);
 } SIE_MENU_LIST_ITEM;
 
 typedef struct {
