@@ -123,20 +123,6 @@ void Sie_Menu_List_DrawEmpty() {
     FreeWS(ws);
 }
 
-void Sie_Menu_List_Refresh(SIE_MENU_LIST *menu) {
-    if (menu->n_items > SIE_MENU_LIST_MAX_ITEMS) {
-        if (menu->row >= (unsigned int)(SIE_MENU_LIST_MAX_ITEMS / 2)) {
-            if (menu->row < menu->n_items - (unsigned int)(SIE_MENU_LIST_MAX_ITEMS / 2)) {
-                menu->offset = menu->row - (unsigned int)(SIE_MENU_LIST_MAX_ITEMS) / 2;
-            } else {
-                menu->offset = menu->n_items - SIE_MENU_LIST_MAX_ITEMS;
-            }
-        } else {
-            menu->offset = 0;
-        }
-    }
-}
-
 void Sie_Menu_List_Draw(SIE_MENU_LIST *menu) {
     if (menu->n_items) {
         Sie_Menu_List_DrawMenu(menu);
@@ -177,5 +163,37 @@ void Sie_Menu_List_OnKey(SIE_MENU_LIST *menu, GUI_MSG *msg) {
                     break;
             }
         }
+    }
+}
+
+void Sie_Menu_List_Refresh(SIE_MENU_LIST *menu) {
+    if (menu->n_items > SIE_MENU_LIST_MAX_ITEMS) {
+        if (menu->row >= (unsigned int)(SIE_MENU_LIST_MAX_ITEMS / 2)) {
+            if (menu->row < menu->n_items - (unsigned int)(SIE_MENU_LIST_MAX_ITEMS / 2)) {
+                menu->offset = menu->row - (unsigned int)(SIE_MENU_LIST_MAX_ITEMS) / 2;
+            } else {
+                menu->offset = menu->n_items - SIE_MENU_LIST_MAX_ITEMS;
+            }
+        } else {
+            menu->offset = 0;
+        }
+    }
+}
+
+unsigned int Sie_Menu_List_GetIdByName_ws(SIE_MENU_LIST *menu, WSHDR *ws, unsigned int *err) {
+    unsigned int i = 0;
+    while (i < menu->n_items) {
+        if (wstrcmp(menu->items[i].ws, ws) == 0) {
+            return i;
+        }
+        i++;
+    }
+    *err = 1;
+    return 0;
+}
+
+void Sie_Menu_List_SetRow(SIE_MENU_LIST *menu, unsigned int row) {
+    if (row < menu->n_items) {
+        menu->row = row;
     }
 }

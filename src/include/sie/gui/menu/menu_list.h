@@ -27,8 +27,11 @@ void Sie_Menu_List_Destroy(SIE_MENU_LIST *menu);
 
 void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu);
 void Sie_Menu_List_DrawEmpty();
-void Sie_Menu_List_Refresh(SIE_MENU_LIST *menu);
 void Sie_Menu_List_Draw(SIE_MENU_LIST *menu);
 void Sie_Menu_List_OnKey(SIE_MENU_LIST *menu, GUI_MSG *msg);
+
+void Sie_Menu_List_Refresh(SIE_MENU_LIST *menu);
+unsigned int Sie_Menu_List_GetIdByName_ws(SIE_MENU_LIST *menu, WSHDR *ws, unsigned int *err);
+void Sie_Menu_List_SetRow(SIE_MENU_LIST *menu, unsigned int row);
 
 #endif
