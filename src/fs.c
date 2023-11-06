@@ -118,6 +118,36 @@ SIE_FILE *Sie_FS_GetLastFile(SIE_FILE *top) {
     return last;
 }
 
+SIE_FILE *Sie_FS_GetUniqueFile(SIE_FILE *file) {
+    const size_t len_suffix = 32;
+    char *file_name = malloc(strlen(file->file_name) + len_suffix + 1);
+    char *dest_path = malloc(strlen(file->dir_name) + strlen(file->file_name) + len_suffix + 1);
+    unsigned int i = 0;
+    while (1) {
+        char suffix[len_suffix], *ext;
+        sprintf(suffix, "(%d)", i + 1);
+        ext = strrchr(file->file_name, '.');
+        if (ext) {
+            strncpy(file_name, file->file_name, ext - file->file_name);
+            file_name[ext - file->file_name] = '\0';
+            strcat(file_name, suffix);
+            strcat(file_name, ext);
+        } else {
+            strcpy(file_name, file->file_name);
+            strcat(file_name, suffix);
+        }
+        sprintf(dest_path, "%s%s", file->dir_name, file_name);
+        if (!Sie_FS_FileExists(dest_path)) {
+            SIE_FILE *unique = Sie_FS_CopyFileElement(file);
+            unique->file_name = file_name;
+            mfree(dest_path);
+            return unique;
+        } else {
+            i += 1;
+        }
+    }
+}
+
 char *Sie_FS_GetPathByFile(SIE_FILE *file) {
     char *path = malloc(strlen(file->dir_name) + strlen(file->file_name) + 1);
     sprintf(path, "%s%s", file->dir_name, file->file_name);
