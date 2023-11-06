@@ -149,6 +149,10 @@ HObj Sie_Resources_CreateHObjFromImgFile(const char *path) {
     }
     err = Obs_SetInput_File(hobj, 0, ws);
     FreeWS(ws);
+    if (err) {
+        Obs_DestroyObject(hobj);
+        return 0;
+    }
     return hobj;
 }
 

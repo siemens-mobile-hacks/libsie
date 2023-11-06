@@ -122,6 +122,13 @@ SIE_FILE *Sie_FS_GetUniqueFile(SIE_FILE *file) {
     const size_t len_suffix = 32;
     char *file_name = malloc(strlen(file->file_name) + len_suffix + 1);
     char *dest_path = malloc(strlen(file->dir_name) + strlen(file->file_name) + len_suffix + 1);
+
+    sprintf(dest_path, "%s%s", file->dir_name, file->file_name);
+    if (!Sie_FS_FileExists(dest_path)) {
+        mfree(file_name);
+        mfree(dest_path);
+        return Sie_FS_CopyFileElement(file);
+    }
     unsigned int i = 0;
     while (1) {
         char suffix[len_suffix], *ext;
