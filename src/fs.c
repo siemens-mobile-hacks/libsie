@@ -217,12 +217,12 @@ SIE_FILE *Sie_FS_SortFiles(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int kee
             p2 = p2->next;
         }
         current = Sie_FS_CopyFileElement(found);
+        if (found == p) {
+            p = p->next;
+        }
         SIE_FILE *element = Sie_FS_DeleteFileElement(p, found);
         if (element) {
             Sie_FS_DestroyFileElement(element);
-        }
-        if (found == p) {
-            p = p->next;
         }
         current->prev = prev;
         current->next = NULL;
@@ -241,12 +241,10 @@ SIE_FILE *Sie_FS_SortFiles(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int kee
         SIE_FILE *last_file = NULL;
         p = new_top;
         while (p) {
+            SIE_FILE *element = NULL;
             if (p->file_attr & FA_DIRECTORY) {
                 SIE_FILE *current_dir = Sie_FS_CopyFileElement(p);
                 SIE_FILE *element = Sie_FS_DeleteFileElement(p, p);
-                if (element) {
-                    Sie_FS_DestroyFileElement(element);
-                }
                 current_dir->next = NULL;
                 current_dir->prev = last_dir;
                 if (!last_dir) {
@@ -258,9 +256,6 @@ SIE_FILE *Sie_FS_SortFiles(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int kee
             } else {
                 SIE_FILE *current_file = Sie_FS_CopyFileElement(p);
                 SIE_FILE *element = Sie_FS_DeleteFileElement(p, p);
-                if (element) {
-                    Sie_FS_DestroyFileElement(element);
-                }
                 current_file->next = NULL;
                 current_file->prev = last_file;
                 if (!last_file) {
@@ -271,6 +266,9 @@ SIE_FILE *Sie_FS_SortFiles(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int kee
                 last_file = current_file;
             }
             p = p->next;
+            if (element) {
+                Sie_FS_DestroyFileElement(element);
+            }
         }
         if (top_dir) {
             last_dir->next = top_file;
@@ -284,11 +282,12 @@ SIE_FILE *Sie_FS_SortFiles(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int kee
     return new_top;
 }
 
+int _cmp(SIE_FILE *f1, SIE_FILE *f2) {
+    return (strcmpi(f1->file_name, f2->file_name) < 0);
+}
+
 SIE_FILE *Sie_FS_SortFilesByName(SIE_FILE *top, int keep_folders_on_top) {
-    int cmp(SIE_FILE *f1, SIE_FILE *f2) {
-        return (strcmpi(f1->file_name, f2->file_name) < 0);
-    }
-    return Sie_FS_SortFiles(top, cmp, keep_folders_on_top);
+    return Sie_FS_SortFiles(top, _cmp, keep_folders_on_top);
 }
 
 int Sie_FS_FileExists(const char *path) {
