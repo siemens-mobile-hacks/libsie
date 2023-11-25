@@ -282,7 +282,7 @@ SIE_FILE *Sie_FS_SortFiles(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int kee
     return new_top;
 }
 
-int _cmp(SIE_FILE *f1, SIE_FILE *f2) {
+static int _cmp(SIE_FILE *f1, SIE_FILE *f2) {
     return (strcmpi(f1->file_name, f2->file_name) < 0);
 }
 
