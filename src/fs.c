@@ -244,7 +244,7 @@ SIE_FILE *Sie_FS_SortFiles(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int kee
             SIE_FILE *element = NULL;
             if (p->file_attr & FA_DIRECTORY) {
                 SIE_FILE *current_dir = Sie_FS_CopyFileElement(p);
-                SIE_FILE *element = Sie_FS_DeleteFileElement(p, p);
+                element = Sie_FS_DeleteFileElement(p, p);
                 current_dir->next = NULL;
                 current_dir->prev = last_dir;
                 if (!last_dir) {
@@ -255,7 +255,7 @@ SIE_FILE *Sie_FS_SortFiles(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int kee
                 last_dir = current_dir;
             } else {
                 SIE_FILE *current_file = Sie_FS_CopyFileElement(p);
-                SIE_FILE *element = Sie_FS_DeleteFileElement(p, p);
+                element = Sie_FS_DeleteFileElement(p, p);
                 current_file->next = NULL;
                 current_file->prev = last_file;
                 if (!last_file) {
