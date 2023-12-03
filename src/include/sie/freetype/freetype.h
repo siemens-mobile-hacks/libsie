@@ -4,7 +4,12 @@
 #include <wchar.h>
 #include <swilib.h>
 
-#define SIE_FT_TEXT_ALIGN_LEFT TEXT_ALIGNLEFT
+#define SIE_FT_TEXT_ALIGN_LEFT   TEXT_ALIGNLEFT
+#define SIE_FT_TEXT_ALIGN_CENTER TEXT_ALIGNMIDDLE
+#define SIE_FT_TEXT_ALIGN_RIGHT  TEXT_ALIGNRIGHT
+#define SIE_FT_TEXT_VALIGN_TOP    8
+#define SIE_FT_TEXT_VALIGN_MIDDLE 16
+#define SIE_FT_TEXT_VALIGN_BOTTOM 32
 
 extern void Sie_FT_Init();
 extern void Sie_FT_Destroy();

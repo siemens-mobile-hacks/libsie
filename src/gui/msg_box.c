@@ -40,17 +40,19 @@ static void OnRedraw(MAIN_GUI *data) {
     const int y2 = y + h_window;
     DrawRectangle(x, y, x2, y2, 0,color_border, color_bg);
 
-    unsigned int w = 0, h = 0;
-    // msg
-    Sie_FT_GetStringSize(data->msg_ws, FONT_SIZE_MSG, &w, &h);
-    const int x_msg = (ScreenW() / 2) - (int)w / 2;
-    const int y_msg = (YDISP + (ScreenH() - YDISP) / 2) - (int)(h / 1.5);
-    Sie_FT_DrawString(data->msg_ws, x_msg, y_msg, FONT_SIZE_MSG, NULL);
-    // softkeys
-    Sie_FT_GetStringSize(data->left_ws, FONT_SIZE_SOFT_KEYS, &w, &h);
-    Sie_FT_DrawString(data->left_ws, x + 10, y2 - 5 - (int)h, FONT_SIZE_SOFT_KEYS, NULL);
-    Sie_FT_GetStringSize(data->right_ws, FONT_SIZE_SOFT_KEYS, &w, &h);
-    Sie_FT_DrawString(data->right_ws, x2 - 10 - (int)w, y2 - 5 - (int)h, FONT_SIZE_SOFT_KEYS, NULL);
+    const int y2_msg = y2 - 5;
+    const int x_left_sk = x + 10;
+    const int x2_left_sk = x + (x2 - x) / 2 - 5;
+    const int x_right_sk = x + (x2 - x) / 2 + 5;
+    const int x2_right_sk = x2 - 10;
+    const int y2_sk = y2 - 5;
+    Sie_FT_DrawBoundingString(data->msg_ws, x, y, x2, y2_msg,FONT_SIZE_MSG,
+                              SIE_FT_TEXT_ALIGN_CENTER + SIE_FT_TEXT_VALIGN_MIDDLE, NULL);
+    Sie_FT_DrawBoundingString(data->left_ws, x_left_sk, y, x2_left_sk, y2_sk,FONT_SIZE_SOFT_KEYS,
+                              SIE_FT_TEXT_ALIGN_LEFT + SIE_FT_TEXT_VALIGN_BOTTOM,NULL);
+    Sie_FT_DrawBoundingString(data->right_ws, x_right_sk, y, x2_right_sk, y2_sk,
+                              FONT_SIZE_SOFT_KEYS,
+                              SIE_FT_TEXT_ALIGN_RIGHT + SIE_FT_TEXT_VALIGN_BOTTOM, NULL);
 }
 
 static void OnAfterDrawIconBar() {

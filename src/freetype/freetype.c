@@ -100,25 +100,54 @@ void Sie_FT_DrawString(WSHDR *ws, int x, int y, int font_size, const char *rgb) 
 }
 
 void Sie_FT_DrawBoundingString(WSHDR *ws, int x, int y, int x2, int y2, int font_size, int attr, const char *rgb) {
+    int x_text = x, y_text = y;
     int len = wstrlen(ws);
+    unsigned int w = 0, h = 0;
     WSHDR *copy_ws = AllocWS(len);
     wstrcpy(copy_ws, ws);
-    if (attr & SIE_FT_TEXT_ALIGN_LEFT) {
-        unsigned int w = 0, h = 0;
+    if (attr & SIE_FT_TEXT_ALIGN_CENTER) {
+        Sie_FT_GetStringSize(copy_ws, font_size, &w, &h);
+        if (w <= x2 - x) {
+            x_text = x + (x2 - x - (int)w) / 2;
+        } else {
+            goto ALIGN_LEFT;
+        }
+    }
+    else if (attr & SIE_FT_TEXT_ALIGN_RIGHT) {
         while (1) {
             if (len <= 1) {
                 break;
+            } else {
+                Sie_FT_GetStringSize(copy_ws, font_size, &w, &h);
+                x_text = x2 - (int)w;
+                if (w > x2 -x) {
+                    wsRemoveChars(copy_ws, 1, 2);
+                    len -= 1;
+                } else break;
             }
-            else {
+        }
+    }
+    else if (attr & SIE_FT_TEXT_ALIGN_LEFT) {
+        ALIGN_LEFT:
+        x_text = x;
+        while (1) {
+            if (len <= 1) {
+                break;
+            } else {
                 Sie_FT_GetStringSize(copy_ws, font_size, &w, &h);
                 if (w > x2 - x) {
                     wsRemoveChars(copy_ws, len - 1, len);
                     len -= 1;
-                }
-                else break;
+                } else break;
             }
         }
     }
-    Sie_FT_DrawString(copy_ws, x, y, font_size, rgb);
+    if (attr & SIE_FT_TEXT_VALIGN_MIDDLE) {
+        y_text = y + (y2 - y) / 2 - (int)h / 2;
+    }
+    else if (attr & SIE_FT_TEXT_VALIGN_BOTTOM) {
+        y_text = y2 - (int)h;
+    }
+    Sie_FT_DrawString(copy_ws, x_text, y_text, font_size, rgb);
     FreeWS(copy_ws);
 }
