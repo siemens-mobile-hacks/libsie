@@ -299,6 +299,18 @@ int Sie_FS_FileExists(const char *path) {
     return exists;
 }
 
+int Sie_FS_CreateFile(const char *path) {
+    int fp;
+    unsigned int err;
+    fp = _open(path, A_Create + A_WriteOnly, P_WRITE, &err);
+    if (fp != -1) {
+        _close(fp, &err);
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 unsigned int Sie_FS_CopyFile(const char *src, const char *dest) {
     int in = 0, out = 0;
     unsigned int err = 0, err2 = 0;
