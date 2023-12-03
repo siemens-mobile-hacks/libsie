@@ -32,9 +32,13 @@ static void OnRedraw(MAIN_GUI *data) {
     DrawRectangle(0, YDISP, SCREEN_X2, SCREEN_Y2, 0,
                   GetPaletteAdrByColorIndex(23), color_surface_bg);
 
-    const int x = 20, x2 = SCREEN_X2 - 20;
-    const int y = (YDISP + (ScreenH() - YDISP) / 2) - 80, y2 = y + 80 * 2;
-    DrawRectangle(20, y, x2, y2, 0,color_border, color_bg);
+    const int w_window = ScreenW() - 8;
+    const int h_window = 170;
+    const int x = (ScreenW() - w_window) / 2;
+    const int x2 = x + w_window;
+    const int y = (YDISP + (ScreenH() - YDISP) / 2) - h_window / 2;
+    const int y2 = y + h_window;
+    DrawRectangle(x, y, x2, y2, 0,color_border, color_bg);
 
     unsigned int w = 0, h = 0;
     // msg
@@ -44,9 +48,9 @@ static void OnRedraw(MAIN_GUI *data) {
     Sie_FT_DrawString(data->msg_ws, x_msg, y_msg, FONT_SIZE_MSG, NULL);
     // softkeys
     Sie_FT_GetStringSize(data->left_ws, FONT_SIZE_SOFT_KEYS, &w, &h);
-    Sie_FT_DrawString(data->left_ws, x + 15, y2 - 5 - (int)h, FONT_SIZE_SOFT_KEYS, NULL);
+    Sie_FT_DrawString(data->left_ws, x + 10, y2 - 5 - (int)h, FONT_SIZE_SOFT_KEYS, NULL);
     Sie_FT_GetStringSize(data->right_ws, FONT_SIZE_SOFT_KEYS, &w, &h);
-    Sie_FT_DrawString(data->right_ws, x2 - 15 - (int)w, y2 - 5 - (int)h, FONT_SIZE_SOFT_KEYS, NULL);
+    Sie_FT_DrawString(data->right_ws, x2 - 10 - (int)w, y2 - 5 - (int)h, FONT_SIZE_SOFT_KEYS, NULL);
 }
 
 static void OnAfterDrawIconBar() {
