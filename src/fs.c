@@ -299,6 +299,11 @@ int Sie_FS_FileExists(const char *path) {
     return exists;
 }
 
+int Sie_FS_MMCardExists() {
+    unsigned int err;
+    return GetTotalFlexSpace(4, &err) ? 1 : 0;
+}
+
 int Sie_FS_CreateFile(const char *path) {
     int fp;
     unsigned int err;
