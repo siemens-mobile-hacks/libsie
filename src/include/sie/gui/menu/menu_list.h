@@ -2,6 +2,7 @@
 #define __SIE_MENU_LIST_H__
 
 #include <swilib.h>
+#include "../../freetype/freetype.h"
 
 #define SIE_MENU_LIST_MAX_ITEMS 7
 #define SIE_MENU_LIST_KEY_PREV UP_BUTTON
@@ -17,17 +18,19 @@ typedef struct {
 typedef struct {
     SIE_MENU_LIST_ITEM *items;
     unsigned int n_items;
-
     unsigned int row;
     unsigned int offset;
+    SIE_FT_SCROLL_STRING *ss;
+    GBSTMR tmr_ss;
 } SIE_MENU_LIST;
 
-SIE_MENU_LIST *Sie_Menu_List_Init(SIE_MENU_LIST_ITEM *items, unsigned int n_items);
+SIE_MENU_LIST *Sie_Menu_List_Init(unsigned int gui_id, SIE_MENU_LIST_ITEM *items, unsigned int n_items);
 void Sie_Menu_List_Destroy(SIE_MENU_LIST *menu);
 
 void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu);
 void Sie_Menu_List_DrawEmpty();
 void Sie_Menu_List_Draw(SIE_MENU_LIST *menu);
+
 void Sie_Menu_List_OnKey(SIE_MENU_LIST *menu, GUI_MSG *msg);
 
 void Sie_Menu_List_Refresh(SIE_MENU_LIST *menu);

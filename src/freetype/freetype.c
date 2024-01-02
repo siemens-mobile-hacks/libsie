@@ -1,8 +1,10 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include "../include/sie/gui/gui.h"
-#include "../include/sie/freetype/freetype.h"
 #include "../include/sie/freetype/freetype_cache.h"
+
+#define TMR_MS_SS_START (216 / 1.5)
+#define TMR_MS_SS       (216 / 8)
 
 FT_Library *FT_LIBRARY = NULL;
 FT_Face *FT_FACE_REGULAR = NULL;
@@ -150,4 +152,50 @@ void Sie_FT_DrawBoundingString(WSHDR *ws, int x, int y, int x2, int y2, int font
     }
     Sie_FT_DrawString(copy_ws, x_text, y_text, font_size, rgb);
     FreeWS(copy_ws);
+}
+
+static void DrawBoundingScrollString(GBSTMR *tmr) {
+    SIE_FT_SCROLL_STRING *ss = (SIE_FT_SCROLL_STRING*)tmr->param6;
+    if (!IsGuiOnTop((int)(ss->gui_id))) {
+        return;
+    }
+
+    WSHDR *ws = ss->ws_copy;
+    unsigned int w, h;
+    int tmr_ms = TMR_MS_SS;
+    Sie_FT_GetStringSize(ws, ss->font_size, &w, &h);
+    if (ss->offset != 0) {
+        if (w > ss->x2 - ss->x) {
+            wsRemoveChars(ws, 1, 1);
+            ss->offset--;
+        } else {
+            if (ss->offset < 0) {
+                ss->offset = 0;
+                wstrcpy(ss->ws_copy, ss->ws);
+                GBS_StartTimerProc(tmr, TMR_MS_SS_START, DrawBoundingScrollString);
+                return;
+            }
+        }
+    } else {
+        ss->offset = -1;
+        tmr_ms = TMR_MS_SS_START;
+    }
+    if (ss->OnBeforeDraw) {
+        ss->OnBeforeDraw(ss->x, ss->y, ss->x2, ss->y + (int)h);
+    }
+    Sie_FT_DrawBoundingString(ws, ss->x, ss->y, ss->x2, ss->y2, ss->font_size, ss->attr, ss->rgb);
+    GBS_StartTimerProc(tmr, tmr_ms, DrawBoundingScrollString);
+}
+
+void Sie_FT_DrawBoundingScrollString(SIE_FT_SCROLL_STRING *ss, GBSTMR *tmr) {
+    Sie_FT_DrawBoundingString(ss->ws, ss->x, ss->y, ss->x2, ss->y2, ss->font_size, ss->attr, ss->rgb);
+    wstrcpy(ss->ws_copy, ss->ws);
+
+    unsigned int w, h;
+    Sie_FT_GetStringSize(ss->ws, ss->font_size, &w, &h);
+    if (w > ss->x2 - ss->x) {
+        ss->offset = -1;
+        tmr->param6 = (unsigned int)ss;
+        GBS_StartTimerProc(tmr, TMR_MS_SS_START, DrawBoundingScrollString);
+    }
 }
