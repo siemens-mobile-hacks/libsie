@@ -1,7 +1,8 @@
 #include <swilib.h>
 #include <stdlib.h>
-#include "../include/sie/freetype/freetype.h"
+#include "../include/sie/resources.h"
 #include "../include/sie/gui/gui.h"
+#include "../include/sie/freetype/freetype.h"
 
 #define FONT_SIZE_ICONBAR 14
 #define FONT_SIZE_HEADER 20
@@ -120,27 +121,59 @@ void Sie_GUI_DrawIconBar() {
     Sie_GUI_DrawIMGHDR(SIE_RES_IMG_WALLPAPER, 0, 0, ScreenW(), YDISP);
 
     int x = 0, y = 0;
+    char img_name[64];
     unsigned int w = 0, h = 0;
     WSHDR *ws = AllocWS(64);
-    // battery capacity
-    wsprintf(ws, "%d%%", *RamCap());
-    Sie_FT_GetStringSize(ws, FONT_SIZE_ICONBAR, &w, &h);
-    x = SCREEN_X2 - PADDING_ICONBAR - w;
-    y = 0 + (YDISP - h) / 2;
-    Sie_FT_DrawString(ws, x, y, FONT_SIZE_ICONBAR, NULL);
+
+    // free ram
+    wsprintf(ws, "%d %t", GetFreeRamAvail(), "Б");
+    Sie_FT_DrawString(ws,
+                      0 + PADDING_ICONBAR,
+                      0 + (YDISP - Sie_FT_GetMaxHeight(FONT_SIZE_ICONBAR)) / 2,
+                      FONT_SIZE_ICONBAR, NULL);
+    // battery cap
+    int percent = 0;
+    const int cap = *RamCap();
+    const unsigned short ls = *RamLS();
+    if (cap <= 5) {
+        percent = 0;
+    } else if (cap <= 20) {
+        percent = 20;
+    } else if (cap <= 40) {
+        percent = 40;
+    } else if (cap <= 60) {
+        percent = 60;
+    } else if (cap <= 90) {
+        percent = 80;
+    } else if (cap <= 100) {
+        percent = 100;
+    }
+    sprintf(img_name, "%s-%02d", "battery", percent);
+    if (ls) {
+        strcat(img_name, "-charging");
+    }
+    SIE_RESOURCES_IMG *res = Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_STATUS, 24, img_name);
+    if (res) {
+        IMGHDR *img = res->icon;
+        x = SCREEN_X2 - PADDING_ICONBAR - img->w;
+        y = 0 + (YDISP - img->h) / 2;
+        Sie_GUI_DrawIMGHDR(img, x, y, img->w, img->h);
+    } else {
+        wsprintf(ws, "%d%%", *RamCap());
+        Sie_FT_GetStringSize(ws, FONT_SIZE_ICONBAR, &w, &h);
+        x = SCREEN_X2 - PADDING_ICONBAR - w;
+        y = 0 + (YDISP - (int)h) / 2;
+        Sie_FT_DrawString(ws, x, y, FONT_SIZE_ICONBAR, NULL);
+    }
     // clock
     TTime time;
     GetDateTime(NULL, &time);
     wsprintf(ws, "%02d:%02d", time.hour, time.min);
     Sie_FT_GetStringSize(ws, FONT_SIZE_ICONBAR, &w, &h);
     x = x - PADDING_ICONBAR - (int)w;
+    y = 0 + (YDISP - (int)h) / 2;
     Sie_FT_DrawString(ws,  x, y, FONT_SIZE_ICONBAR, NULL);
-    // other info
-    wsprintf(ws, "%d %t", GetFreeRamAvail(), "Б");
-    Sie_FT_DrawString(ws,
-                      0 + PADDING_ICONBAR,
-                      0 + (YDISP - Sie_FT_GetMaxHeight(FONT_SIZE_ICONBAR)) / 2,
-                      FONT_SIZE_ICONBAR, NULL);
+    
     FreeWS(ws);
     if (surface) {
         if (surface->handlers.OnAfterDrawIconBar) {
