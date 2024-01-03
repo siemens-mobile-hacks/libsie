@@ -67,7 +67,7 @@ void Sie_FT_GetStringSize(WSHDR *ws, int font_size, unsigned int *w, unsigned in
 }
 
 void Sie_FT_DrawString(WSHDR *ws, int x, int y, int font_size, const char *rgb) {
-    char _rgb[3];
+    char _rgb[3] = COLOR_TEXT_PRIMARY;
     FT_Face *face = FT_FACE_REGULAR;
     SIE_FT_CACHE *ft_cache = Sie_FT_Cache_GetOrCreate(face, font_size);
     SIE_FT_CC_CACHE *ft_cc_cache = NULL;
@@ -75,8 +75,6 @@ void Sie_FT_DrawString(WSHDR *ws, int x, int y, int font_size, const char *rgb) 
     FT_Set_Pixel_Sizes(*face, 0, font_size);
     if (rgb) {
         memcpy(_rgb, rgb, 3);
-    } else {
-        memset(_rgb, 0xFF, 3);
     }
 
     IMGHDR img;
