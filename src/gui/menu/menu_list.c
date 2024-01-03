@@ -25,7 +25,7 @@ SIE_MENU_LIST *Sie_Menu_List_Init(unsigned int gui_id, SIE_MENU_LIST_ITEM *items
     ss->ws_copy = AllocWS(512);
     ss->font_size = FONT_SIZE;
     ss->attr = SIE_FT_TEXT_ALIGN_LEFT;
-    ss->rgb = NULL;
+    ss->color = NULL;
     ss->gui_id = gui_id;
     ss->OnBeforeDraw = DrawSSBG;
     menu->ss = ss;
@@ -44,8 +44,8 @@ void Sie_Menu_List_Destroy(SIE_MENU_LIST *menu) {
         }
         SIE_FT_SCROLL_STRING *ss = menu->ss;
         FreeWS(ss->ws_copy);
+        GBS_DelTimer(&(ss->tmr));
         mfree(ss);
-        GBS_DelTimer(&(menu->tmr_ss));
         mfree(menu);
     }
 }
@@ -132,8 +132,8 @@ void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
             ss->y = (int)text_y;
             ss->x2 = text_x2;
             ss->y2 = 0;
-            ss->rgb = item->color;
-            Sie_FT_DrawBoundingScrollString(menu->ss, &(menu->tmr_ss));
+            ss->color = item->color;
+            Sie_FT_DrawBoundingScrollString(menu->ss, &(ss->tmr));
         } else {
             Sie_FT_DrawBoundingString(ws, text_x, (int)text_y, text_x2, 0,
                                       FONT_SIZE, SIE_FT_TEXT_ALIGN_LEFT, item->color);

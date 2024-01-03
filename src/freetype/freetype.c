@@ -66,15 +66,15 @@ void Sie_FT_GetStringSize(WSHDR *ws, int font_size, unsigned int *w, unsigned in
     *h = height;
 }
 
-void Sie_FT_DrawString(WSHDR *ws, int x, int y, int font_size, const char *rgb) {
-    char _rgb[3] = COLOR_TEXT_PRIMARY;
+void Sie_FT_DrawString(WSHDR *ws, int x, int y, int font_size, const char *color) {
+    char rgb[3] = COLOR_TEXT_PRIMARY;
     FT_Face *face = FT_FACE_REGULAR;
     SIE_FT_CACHE *ft_cache = Sie_FT_Cache_GetOrCreate(face, font_size);
     SIE_FT_CC_CACHE *ft_cc_cache = NULL;
 
     FT_Set_Pixel_Sizes(*face, 0, font_size);
-    if (rgb) {
-        memcpy(_rgb, rgb, 3);
+    if (color) {
+        memcpy(rgb, color, 3);
     }
 
     IMGHDR img;
@@ -89,9 +89,9 @@ void Sie_FT_DrawString(WSHDR *ws, int x, int y, int font_size, const char *rgb) 
         img.bitmap = malloc(size);
         memcpy(img.bitmap, ft_cc_cache->img->bitmap, size);
         for (int j = 0; j < size; j += 4) {
-            img.bitmap[j + 0] = _rgb[2]; // b
-            img.bitmap[j + 1] = _rgb[1]; // g
-            img.bitmap[j + 2] = _rgb[0]; // r
+            img.bitmap[j + 0] = rgb[2]; // b
+            img.bitmap[j + 1] = rgb[1]; // g
+            img.bitmap[j + 2] = rgb[0]; // r
         }
         Sie_GUI_DrawIMGHDR(&img, x, y + ft_cc_cache->y_offset, img.w, img.h);
         mfree(img.bitmap);
@@ -99,7 +99,7 @@ void Sie_FT_DrawString(WSHDR *ws, int x, int y, int font_size, const char *rgb) 
     }
 }
 
-void Sie_FT_DrawBoundingString(WSHDR *ws, int x, int y, int x2, int y2, int font_size, int attr, const char *rgb) {
+void Sie_FT_DrawBoundingString(WSHDR *ws, int x, int y, int x2, int y2, int font_size, int attr, const char *color) {
     int x_text = x, y_text = y;
     int len = wstrlen(ws);
     unsigned int w = 0, h = 0;
@@ -148,7 +148,7 @@ void Sie_FT_DrawBoundingString(WSHDR *ws, int x, int y, int x2, int y2, int font
     else if (attr & SIE_FT_TEXT_VALIGN_BOTTOM) {
         y_text = y2 - (int)h;
     }
-    Sie_FT_DrawString(copy_ws, x_text, y_text, font_size, rgb);
+    Sie_FT_DrawString(copy_ws, x_text, y_text, font_size, color);
     FreeWS(copy_ws);
 }
 
@@ -181,12 +181,12 @@ static void DrawBoundingScrollString(GBSTMR *tmr) {
     if (ss->OnBeforeDraw) {
         ss->OnBeforeDraw(ss->x, ss->y, ss->x2, ss->y + (int)h);
     }
-    Sie_FT_DrawBoundingString(ws, ss->x, ss->y, ss->x2, ss->y2, ss->font_size, ss->attr, ss->rgb);
+    Sie_FT_DrawBoundingString(ws, ss->x, ss->y, ss->x2, ss->y2, ss->font_size, ss->attr, ss->color);
     GBS_StartTimerProc(tmr, tmr_ms, DrawBoundingScrollString);
 }
 
 void Sie_FT_DrawBoundingScrollString(SIE_FT_SCROLL_STRING *ss, GBSTMR *tmr) {
-    Sie_FT_DrawBoundingString(ss->ws, ss->x, ss->y, ss->x2, ss->y2, ss->font_size, ss->attr, ss->rgb);
+    Sie_FT_DrawBoundingString(ss->ws, ss->x, ss->y, ss->x2, ss->y2, ss->font_size, ss->attr, ss->color);
     wstrcpy(ss->ws_copy, ss->ws);
 
     unsigned int w, h;

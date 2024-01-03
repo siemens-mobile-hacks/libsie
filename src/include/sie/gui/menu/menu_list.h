@@ -22,7 +22,6 @@ typedef struct {
     unsigned int row;
     unsigned int offset;
     SIE_FT_SCROLL_STRING *ss;
-    GBSTMR tmr_ss;
 } SIE_MENU_LIST;
 
 SIE_MENU_LIST *Sie_Menu_List_Init(unsigned int gui_id, SIE_MENU_LIST_ITEM *items, unsigned int n_items);
