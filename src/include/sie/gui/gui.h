@@ -37,6 +37,8 @@ int Sie_GUI_Surface_OnKey(SIE_GUI_SURFACE *surface, void *data, GUI_MSG *msg);
 #define PADDING_HEADER 5
 
 void Sie_GUI_InitCanvas(RECT *canvas);
+void Sie_GUI_SetRGB(char *rgb, char r, char g, char b);
+
 void Sie_GUI_DrawIMGHDR(IMGHDR *img, int x, int y, int w, int h);
 void Sie_GUI_DrawBleedIMGHDR(IMGHDR  *img, int x, int y, int x2, int y2, int bleed_x, int bleed_y);
 void Sie_GUI_DrawIconBar();

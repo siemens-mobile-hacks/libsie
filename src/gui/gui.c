@@ -80,6 +80,12 @@ void Sie_GUI_InitCanvas(RECT *canvas) {
     canvas->y2 = SCREEN_Y2;
 }
 
+void Sie_GUI_SetRGB(char *rgb, char r, char g, char b) {
+    rgb[0] = r;
+    rgb[1] = g;
+    rgb[2] = b;
+}
+
 void Sie_GUI_DrawIMGHDR(IMGHDR *img, int x, int y, int w, int h) {
     RECT rc;
     DRWOBJ drwobj;

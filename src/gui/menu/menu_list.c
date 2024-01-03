@@ -8,7 +8,6 @@ extern IMGHDR *SIE_RES_IMG_WALLPAPER;
 #define FONT_SIZE 18
 #define FONT_SIZE_EMPTY 22
 #define COLOR_SELECT_BG {0x00, 0x00, 0x00, 0x35}
-#define COLOR_SELECT_TEXT {0xFF, 0xFF,  0xFF}
 #define COLOR_INDICATOR_BG {0x00, 0x00, 0x00, 0x35}
 #define COLOR_INDICATOR {0xFF, 0xFF, 0x00, 0x64}
 #define COLOR_EMPTY_TEXT {0xFF, 0xFF, 0xFF}
@@ -37,9 +36,8 @@ SIE_MENU_LIST *Sie_Menu_List_Init(unsigned int gui_id, SIE_MENU_LIST_ITEM *items
 void Sie_Menu_List_Destroy(SIE_MENU_LIST *menu) {
     if (menu) {
         if (menu->items) {
-            SIE_MENU_LIST_ITEM *item;
             for (unsigned int i = 0; i < menu->n_items; i++) {
-                item = &(menu->items[i]);
+                SIE_MENU_LIST_ITEM *item = &(menu->items[i]);
                 FreeWS(item->ws);
             }
             mfree(menu->items);
@@ -88,7 +86,6 @@ void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
 #define is_select (i == (menu->row - menu->offset))
 
     const char color_select_bg[] = COLOR_SELECT_BG;
-    const char color_select_text[] = COLOR_SELECT_TEXT;
 
     const int h_offset = 3;
     const int v_offset = 2;
@@ -135,10 +132,11 @@ void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
             ss->y = (int)text_y;
             ss->x2 = text_x2;
             ss->y2 = 0;
+            ss->rgb = item->color;
             Sie_FT_DrawBoundingScrollString(menu->ss, &(menu->tmr_ss));
         } else {
             Sie_FT_DrawBoundingString(ws, text_x, (int)text_y, text_x2, 0,
-                                      FONT_SIZE, SIE_FT_TEXT_ALIGN_LEFT, color_select_text);
+                                      FONT_SIZE, SIE_FT_TEXT_ALIGN_LEFT, item->color);
         }
     }
     if (show_indicator) {
