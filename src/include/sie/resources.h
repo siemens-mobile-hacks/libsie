@@ -3,9 +3,10 @@
 
 #include <swilib.h>
 
-#define SIE_RESOURCES_TYPE_EXT    0x00
-#define SIE_RESOURCES_TYPE_PLACES 0x01
-#define SIE_RESOURCES_TYPE_STATUS 0x02
+#define SIE_RESOURCES_TYPE_EXT     0x00
+#define SIE_RESOURCES_TYPE_PLACES  0x01
+#define SIE_RESOURCES_TYPE_STATUS  0x02
+#define SIE_RESOURCES_TYPE_ACTIONS 0x03
 
 typedef struct {
     void *prev;

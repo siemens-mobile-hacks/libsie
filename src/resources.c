@@ -105,6 +105,9 @@ SIE_RESOURCES_IMG *Sie_Resources_LoadImage(unsigned int type, unsigned int size,
         case SIE_RESOURCES_TYPE_STATUS:
             strcpy(_type, "status");
             break;
+        case SIE_RESOURCES_TYPE_ACTIONS:
+            strcpy(_type, "actions");
+            break;
         default:
             strcpy(_type, "apps");
     }

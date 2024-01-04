@@ -1,6 +1,7 @@
 #include <swilib.h>
 #include <stdlib.h>
 #include "../../include/sie/gui/gui.h"
+#include "../../include/sie/resources.h"
 
 extern IMGHDR *SIE_RES_IMG_WALLPAPER;
 
@@ -34,6 +35,22 @@ void Sie_Menu_List_AddItem(SIE_MENU_LIST *menu, SIE_MENU_LIST_ITEM *item, const 
     menu_item = &(menu->items[menu->n_items]);
     memcpy(menu_item, item, sizeof(SIE_MENU_LIST_ITEM));
 
+    // type
+    char res_name[32];
+    switch (menu_item->type) {
+        case SIE_MENU_LIST_ITEM_TYPE_CHECKBOX:
+            if (!menu_item->flag) {
+                strcpy(res_name, "checkbox");
+            } else {
+                strcpy(res_name, "checkbox-checked");
+            }
+            SIE_RESOURCES_IMG *res_img = Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_ACTIONS, 24,
+                                                                 res_name);
+            if (res_img) {
+                menu_item->icon = res_img->icon;
+            }
+            break;
+    }
     // ws
     size_t len = strlen(name);
     menu_item->ws = AllocWS(len);

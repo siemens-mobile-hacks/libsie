@@ -9,7 +9,12 @@
 #define SIE_MENU_LIST_KEY_NEXT DOWN_BUTTON
 #define SIE_MENU_LIST_KEY_ENTER ENTER_BUTTON
 
+#define SIE_MENU_LIST_ITEM_TYPE_DEFAULT  0x00
+#define SIE_MENU_LIST_ITEM_TYPE_CHECKBOX 0x01
+
 typedef struct {
+    int type;
+    int flag;
     IMGHDR *icon;
     WSHDR *ws;
     char *color;
