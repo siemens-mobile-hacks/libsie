@@ -1,7 +1,6 @@
 #include <swilib.h>
 #include <stdlib.h>
 #include "../../include/sie/gui/gui.h"
-#include "../../include/sie/freetype/freetype.h"
 
 extern IMGHDR *SIE_RES_IMG_WALLPAPER;
 
@@ -14,12 +13,9 @@ extern IMGHDR *SIE_RES_IMG_WALLPAPER;
 
 static void DrawSSBG(int x, int y, int x2, int y2);
 
-SIE_MENU_LIST *Sie_Menu_List_Init(unsigned int gui_id, SIE_MENU_LIST_ITEM *items, unsigned int n_items) {
+SIE_MENU_LIST *Sie_Menu_List_Init(unsigned int gui_id) {
     SIE_MENU_LIST *menu = malloc(sizeof(SIE_MENU_LIST));
     zeromem(menu, sizeof(SIE_MENU_LIST));
-    menu->items = items;
-    menu->n_items = n_items;
-
     SIE_FT_SCROLL_STRING *ss = malloc(sizeof(SIE_FT_SCROLL_STRING));
     zeromem(ss, sizeof(SIE_FT_SCROLL_STRING));
     ss->ws_copy = AllocWS(512);
@@ -29,8 +25,26 @@ SIE_MENU_LIST *Sie_Menu_List_Init(unsigned int gui_id, SIE_MENU_LIST_ITEM *items
     ss->gui_id = gui_id;
     ss->OnBeforeDraw = DrawSSBG;
     menu->ss = ss;
-
     return menu;
+}
+
+void Sie_Menu_List_AddItem(SIE_MENU_LIST *menu, SIE_MENU_LIST_ITEM *item, const char *name) {
+    SIE_MENU_LIST_ITEM *menu_item;
+    menu->items = realloc(menu->items, sizeof(SIE_MENU_LIST_ITEM) * (menu->n_items + 1));
+    menu_item = &(menu->items[menu->n_items]);
+    memcpy(menu_item, item, sizeof(SIE_MENU_LIST_ITEM));
+
+    // ws
+    size_t len = strlen(name);
+    menu_item->ws = AllocWS(len);
+    if (name[0] >= 65) { // cp1251
+        wsprintf(menu_item->ws, "%t", name);
+    } else { // file_name
+        str_2ws(menu_item->ws, name, len);
+    }
+
+    zeromem(item, sizeof(SIE_MENU_LIST_ITEM));
+    menu->n_items++;
 }
 
 void Sie_Menu_List_Destroy(SIE_MENU_LIST *menu) {

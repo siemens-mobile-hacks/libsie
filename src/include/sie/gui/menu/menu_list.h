@@ -24,7 +24,8 @@ typedef struct {
     SIE_FT_SCROLL_STRING *ss;
 } SIE_MENU_LIST;
 
-SIE_MENU_LIST *Sie_Menu_List_Init(unsigned int gui_id, SIE_MENU_LIST_ITEM *items, unsigned int n_items);
+SIE_MENU_LIST *Sie_Menu_List_Init(unsigned int gui_id);
+void Sie_Menu_List_AddItem(SIE_MENU_LIST *menu, SIE_MENU_LIST_ITEM *item, const char *name);
 void Sie_Menu_List_Destroy(SIE_MENU_LIST *menu);
 
 void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu);
