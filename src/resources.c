@@ -114,7 +114,7 @@ SIE_RESOURCES_IMG *Sie_Resources_LoadImage(unsigned int type, unsigned int size,
         size_t len_type = strlen(_type);
         size_t len_name = strlen(name);
 
-        char *path = malloc(strlen(dir) + len_type + 16 + len_name + 3 + 1);
+        char *path = malloc(strlen(dir) + len_type + 16 + len_name + 4 + 1);
         sprintf(path, "%s\\%s\\%d\\%s.png", dir, _type, size, name);
         IMGHDR *img = CreateIMGHDRFromPngFile(path, 0);
         mfree(path);
@@ -123,7 +123,7 @@ SIE_RESOURCES_IMG *Sie_Resources_LoadImage(unsigned int type, unsigned int size,
             zeromem(res_ext, sizeof(SIE_RESOURCES_IMG));
             res_ext->type = type;
             res_ext->size = size;
-            res_ext->name = malloc(len_name);
+            res_ext->name = malloc(len_name + 1);
             strcpy(res_ext->name, name);
             res_ext->icon = img;
             if (!SIE_RES_IMG) {
