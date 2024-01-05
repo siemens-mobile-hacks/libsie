@@ -13,7 +13,6 @@
 
 typedef struct {
     WSHDR *ws;
-    WSHDR *ws_copy;
     int offset;
     int x, y;
     int x2, y2;

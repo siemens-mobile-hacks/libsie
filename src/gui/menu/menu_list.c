@@ -19,7 +19,6 @@ SIE_MENU_LIST *Sie_Menu_List_Init(unsigned int gui_id) {
     zeromem(menu, sizeof(SIE_MENU_LIST));
     SIE_FT_SCROLL_STRING *ss = malloc(sizeof(SIE_FT_SCROLL_STRING));
     zeromem(ss, sizeof(SIE_FT_SCROLL_STRING));
-    ss->ws_copy = AllocWS(512);
     ss->font_size = FONT_SIZE;
     ss->attr = SIE_FT_TEXT_ALIGN_LEFT;
     ss->color = NULL;
@@ -74,7 +73,6 @@ void Sie_Menu_List_Destroy(SIE_MENU_LIST *menu) {
             mfree(menu->items);
         }
         SIE_FT_SCROLL_STRING *ss = menu->ss;
-        FreeWS(ss->ws_copy);
         GBS_DelTimer(&(ss->tmr));
         mfree(ss);
         mfree(menu);

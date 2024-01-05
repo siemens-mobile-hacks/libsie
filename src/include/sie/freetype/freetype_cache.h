@@ -11,6 +11,7 @@ typedef struct {
     IMGHDR *img;
     int y_offset;
     int h_advance;
+    int h_bearing_x;
 } SIE_FT_CC_CACHE;
 
 typedef struct {
