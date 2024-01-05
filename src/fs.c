@@ -46,7 +46,7 @@ SIE_FILE *Sie_FS_FindFilesRecursive(const char *mask) {
 
     SIE_FILE *p = top;
     while (p) {
-        if (p->file_attr & FA_DIRECTORY) {
+        if (p->file_attr & SIE_FS_FA_DIRECTORY) {
             char *_mask = malloc(strlen(p->dir_name) + strlen(p->file_name) + 2 + 1);
             sprintf(_mask, "%s%s\\*", p->dir_name, p->file_name);
             SIE_FILE *_files = Sie_FS_FindFiles(_mask);
@@ -242,7 +242,7 @@ SIE_FILE *Sie_FS_SortFiles(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int kee
         p = new_top;
         while (p) {
             SIE_FILE *element = NULL;
-            if (p->file_attr & FA_DIRECTORY) {
+            if (p->file_attr & SIE_FS_FA_DIRECTORY) {
                 SIE_FILE *current_dir = Sie_FS_CopyFileElement(p);
                 element = Sie_FS_DeleteFileElement(p, p);
                 current_dir->next = NULL;
@@ -385,7 +385,7 @@ int Sie_FS_RemoveDirRecursive(const char *dir) {
 
         p = files;
         while (1) {
-            if (!(p->file_attr & FA_DIRECTORY)) {
+            if (!(p->file_attr & SIE_FS_FA_DIRECTORY)) {
                 char *path = Sie_FS_GetPathByFile(p);
                 if (_unlink(path, &err) != 0) {
                     result = -1;
@@ -401,7 +401,7 @@ int Sie_FS_RemoveDirRecursive(const char *dir) {
         }
         p = last;
         while (p) {
-            if (p->file_attr & FA_DIRECTORY) {
+            if (p->file_attr & SIE_FS_FA_DIRECTORY) {
                 char *path = Sie_FS_GetPathByFile(p);
                 if (_rmdir(path, &err) != 0) {
                     result = -1;

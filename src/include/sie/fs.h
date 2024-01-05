@@ -1,6 +1,15 @@
 #ifndef __SIE_FS_H__
 #define __SIE_FS_H__
 
+#include <swilib.h>
+
+#define SIE_FS_FA_READONLY  FA_READONLY
+#define SIE_FS_FA_HIDDEN    FA_HIDDEN
+#define SIE_FS_FA_SYSTEM    FA_SYSTEM
+#define SIE_FS_FA_VOLUME    0x0008
+#define SIE_FS_FA_DIRECTORY FA_DIRECTORY
+#define SIE_FS_FA_ARCHIVE   FA_ARCHIVE
+
 typedef struct {
     void *prev;
     void *next;
