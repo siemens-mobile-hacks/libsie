@@ -15,6 +15,7 @@ typedef struct {
     void *next;
     char *dir_name;
     char *file_name;
+    char *alias;
     short file_attr;
 } SIE_FILE;
 
@@ -25,6 +26,7 @@ void Sie_FS_DestroyFiles(SIE_FILE *top);
 unsigned int Sie_FS_GetFilesCount(SIE_FILE *top);
 SIE_FILE *Sie_FS_GetFileByID(SIE_FILE *top, unsigned int id);
 SIE_FILE *Sie_FS_GetFileByFileName(SIE_FILE *top, const char *file_name);
+SIE_FILE *Sie_FS_GetFileByAlias(SIE_FILE *top, const char *alias);
 SIE_FILE *Sie_FS_GetLastFile(SIE_FILE *top);
 SIE_FILE *Sie_FS_GetUniqueFile(SIE_FILE *file);
 char *Sie_FS_GetPathByFile(SIE_FILE *file);

@@ -107,6 +107,18 @@ SIE_FILE *Sie_FS_GetFileByFileName(SIE_FILE *top, const char *file_name) {
     return file;
 }
 
+SIE_FILE *Sie_FS_GetFileByAlias(SIE_FILE *top, const char *alias) {
+    SIE_FILE *file = NULL;
+    while (top) {
+        if (top->alias && strcmpi(top->alias, alias) == 0) {
+            file = top;
+            break;
+        }
+        top = top->next;
+    }
+    return file;
+}
+
 SIE_FILE *Sie_FS_GetLastFile(SIE_FILE *top) {
     SIE_FILE *last = top;
     while (top) {
@@ -164,6 +176,9 @@ char *Sie_FS_GetPathByFile(SIE_FILE *file) {
 void Sie_FS_DestroyFileElement(SIE_FILE *file) {
     mfree(file->dir_name);
     mfree(file->file_name);
+    if (file->alias) {
+        mfree(file->alias);
+    }
     mfree(file);
 }
 
