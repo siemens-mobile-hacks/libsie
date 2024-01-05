@@ -201,6 +201,7 @@ void Sie_Menu_List_OnKey(SIE_MENU_LIST *menu, GUI_MSG *msg) {
             SIE_MENU_LIST_ITEM *menu_item = &(menu->items[menu->row]);
             switch (msg->gbsmsg->submess) {
                 case SIE_MENU_LIST_KEY_PREV:
+                    GBS_DelTimer(&(menu->ss->tmr));
                     if (menu->row != 0) {
                         menu->row--;
                     } else {
@@ -210,6 +211,7 @@ void Sie_Menu_List_OnKey(SIE_MENU_LIST *menu, GUI_MSG *msg) {
                     Sie_Menu_List_Draw(menu);
                     break;
                 case SIE_MENU_LIST_KEY_NEXT:
+                    GBS_DelTimer(&(menu->ss->tmr));
                     menu->row++;
                     if (menu->row >= menu->n_items) {
                         menu->row = 0;
