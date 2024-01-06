@@ -12,7 +12,7 @@
 
 RECT canvas;
 
-static void OnRedraw(SIE_MSG_BOX_GUI *data) {
+static void OnRedraw(SIE_GUI_BOX_GUI *data) {
     const char color_bg[] = COLOR_BG;
     const char color_border[] = COLOR_BORDER;
     const char color_surface_bg[] = COLOR_SURFACE_BG;
@@ -58,11 +58,11 @@ static void OnAfterDrawIconBar() {
                   GetPaletteAdrByColorIndex(23), color_surface_bg);
 }
 
-static void OnCreate(SIE_MSG_BOX_GUI *data, void *(*malloc_adr)(int)) {
+static void OnCreate(SIE_GUI_BOX_GUI *data, void *(*malloc_adr)(int)) {
     data->gui.state = 1;
 }
 
-static void OnClose(SIE_MSG_BOX_GUI *data, void (*mfree_adr)(void *)) {
+static void OnClose(SIE_GUI_BOX_GUI *data, void (*mfree_adr)(void *)) {
     data->gui.state = 0;
     FreeWS(data->msg_ws);
     if (data->left_ws) {
@@ -74,26 +74,26 @@ static void OnClose(SIE_MSG_BOX_GUI *data, void (*mfree_adr)(void *)) {
     Sie_GUI_Surface_Destroy(data->surface);
 }
 
-static void OnFocus(SIE_MSG_BOX_GUI *data, void *(*malloc_adr)(int), void (*mfree_adr)(void *)) {
+static void OnFocus(SIE_GUI_BOX_GUI *data, void *(*malloc_adr)(int), void (*mfree_adr)(void *)) {
     data->gui.state = 2;
     Sie_GUI_Surface_OnFocus(data->surface);
 }
 
-static void OnUnFocus(SIE_MSG_BOX_GUI *data, void (*mfree_adr)(void *)) {
+static void OnUnFocus(SIE_GUI_BOX_GUI *data, void (*mfree_adr)(void *)) {
     if (data->gui.state != 2) return;
     data->gui.state = 1;
     Sie_GUI_Surface_OnUnFocus(data->surface);
 }
 
-static int OnKey(SIE_MSG_BOX_GUI *data, GUI_MSG *msg) {
+static int OnKey(SIE_GUI_BOX_GUI *data, GUI_MSG *msg) {
     if (data->callback.proc) {
         if (msg->gbsmsg->msg == KEY_DOWN || msg->gbsmsg->msg == LONG_PRESS) {
             switch (msg->gbsmsg->submess) {
                 case LEFT_SOFT:
-                    data->callback.proc(SIE_GUI_MSG_BOX_CALLBACK_YES, data->callback.data);
+                    data->callback.proc(SIE_GUI_BOX_CALLBACK_YES, data->callback.data);
                     return 1;
                 case RIGHT_SOFT:
-                    data->callback.proc(SIE_GUI_MSG_BOX_CALLBACK_NO, data->callback.data);
+                    data->callback.proc(SIE_GUI_BOX_CALLBACK_NO, data->callback.data);
                     return 1;
             }
         }
@@ -121,14 +121,14 @@ static const void *const gui_methods[11] = {
         0
 };
 
-SIE_MSG_BOX_GUI *Sie_GUI_MsgBox(const char *msg, const char *left, const char *right,
-                                SIE_GUI_MSG_BOX_CALLBACK *callback) {
-    SIE_MSG_BOX_GUI *gui = malloc(sizeof(SIE_MSG_BOX_GUI));
+SIE_GUI_BOX_GUI *Sie_GUI_Box(const char *msg, const char *left, const char *right,
+                             SIE_GUI_BOX_CALLBACK *callback) {
+    SIE_GUI_BOX_GUI *gui = malloc(sizeof(SIE_GUI_BOX_GUI));
     const SIE_GUI_SURFACE_HANDLERS surface_handlers = {
             OnAfterDrawIconBar,
             NULL
     };
-    zeromem(gui, sizeof(SIE_MSG_BOX_GUI));
+    zeromem(gui, sizeof(SIE_GUI_BOX_GUI));
     gui->msg_ws = AllocWS(128);
     wsprintf(gui->msg_ws, "%t", msg);
     if (left) {
@@ -140,7 +140,7 @@ SIE_MSG_BOX_GUI *Sie_GUI_MsgBox(const char *msg, const char *left, const char *r
         wsprintf(gui->right_ws, "%t", right);
     }
     if (callback) {
-        memcpy(&(gui->callback), callback, sizeof(SIE_GUI_MSG_BOX_CALLBACK));
+        memcpy(&(gui->callback), callback, sizeof(SIE_GUI_BOX_CALLBACK));
     }
     gui->surface = Sie_GUI_Surface_Init(SIE_GUI_SURFACE_TYPE_DEFAULT, &surface_handlers);
     LockSched();
@@ -154,10 +154,10 @@ SIE_MSG_BOX_GUI *Sie_GUI_MsgBox(const char *msg, const char *left, const char *r
     return gui;
 }
 
-SIE_MSG_BOX_GUI *Sie_GUI_MsgBoxDefault(const char *msg) {
-    return Sie_GUI_MsgBox(msg, NULL, NULL, NULL);
+SIE_GUI_BOX_GUI *Sie_GUI_MsgBox(const char *msg) {
+    return Sie_GUI_Box(msg, NULL, NULL, NULL);
 }
 
-SIE_MSG_BOX_GUI *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_MSG_BOX_CALLBACK *callback) {
-    return Sie_GUI_MsgBox(msg, "Да", "Нет", callback);
+SIE_GUI_BOX_GUI *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_BOX_CALLBACK *callback) {
+    return Sie_GUI_Box(msg, "Да", "Нет", callback);
 }

@@ -3,9 +3,9 @@
 
 #include <swilib.h>
 #include <wchar.h>
+#include "box.h"
 #include "stack.h"
 #include "colors.h"
-#include "msg_box.h"
 #include "surface.h"
 #include "menu/menu.h"
 #include "menu/menu_list.h"
