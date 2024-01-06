@@ -22,6 +22,7 @@ typedef struct {
 
 SIE_MSG_BOX_GUI *Sie_GUI_MsgBox(const char *msg, const char *left, const char *right,
                                 SIE_GUI_MSG_BOX_CALLBACK *callback);
+SIE_MSG_BOX_GUI *Sie_GUI_MsgBoxDefault(const char *msg);
 SIE_MSG_BOX_GUI *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_MSG_BOX_CALLBACK *callback);
 
 #endif

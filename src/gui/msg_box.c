@@ -32,19 +32,24 @@ static void OnRedraw(SIE_MSG_BOX_GUI *data) {
     const int y2 = y + h_window;
     DrawRectangle(x, y, x2, y2, 0,color_border, color_bg);
 
-    const int y2_msg = y2 - 5;
-    const int x_left_sk = x + 10;
-    const int x2_left_sk = x + (x2 - x) / 2 - 5;
-    const int x_right_sk = x + (x2 - x) / 2 + 5;
-    const int x2_right_sk = x2 - 10;
     const int y2_sk = y2 - 5;
+    const int y2_msg = y2 - 5;
     Sie_FT_DrawBoundingString(data->msg_ws, x, y, x2, y2_msg,FONT_SIZE_MSG,
                               SIE_FT_TEXT_ALIGN_CENTER + SIE_FT_TEXT_VALIGN_MIDDLE, NULL);
-    Sie_FT_DrawBoundingString(data->left_ws, x_left_sk, y, x2_left_sk, y2_sk,FONT_SIZE_SOFT_KEYS,
-                              SIE_FT_TEXT_ALIGN_LEFT + SIE_FT_TEXT_VALIGN_BOTTOM,NULL);
-    Sie_FT_DrawBoundingString(data->right_ws, x_right_sk, y, x2_right_sk, y2_sk,
-                              FONT_SIZE_SOFT_KEYS,
-                              SIE_FT_TEXT_ALIGN_RIGHT + SIE_FT_TEXT_VALIGN_BOTTOM, NULL);
+    if (data->left_ws) {
+        const int x_left_sk = x + 10;
+        const int x2_left_sk = x + (x2 - x) / 2 - 5;
+        Sie_FT_DrawBoundingString(data->left_ws, x_left_sk, y, x2_left_sk, y2_sk,
+                                  FONT_SIZE_SOFT_KEYS, SIE_FT_TEXT_ALIGN_LEFT + SIE_FT_TEXT_VALIGN_BOTTOM,
+                                  NULL);
+    }
+    if (data->right_ws) {
+        const int x_right_sk = x + (x2 - x) / 2 + 5;
+        const int x2_right_sk = x2 - 10;
+        Sie_FT_DrawBoundingString(data->right_ws, x_right_sk, y, x2_right_sk, y2_sk,
+                                  FONT_SIZE_SOFT_KEYS,SIE_FT_TEXT_ALIGN_RIGHT + SIE_FT_TEXT_VALIGN_BOTTOM,
+                                  NULL);
+    }
 }
 
 static void OnAfterDrawIconBar() {
@@ -60,8 +65,12 @@ static void OnCreate(SIE_MSG_BOX_GUI *data, void *(*malloc_adr)(int)) {
 static void OnClose(SIE_MSG_BOX_GUI *data, void (*mfree_adr)(void *)) {
     data->gui.state = 0;
     FreeWS(data->msg_ws);
-    FreeWS(data->left_ws);
-    FreeWS(data->right_ws);
+    if (data->left_ws) {
+        FreeWS(data->left_ws);
+    }
+    if (data->right_ws) {
+        FreeWS(data->right_ws);
+    }
     Sie_GUI_Surface_Destroy(data->surface);
 }
 
@@ -112,7 +121,8 @@ static const void *const gui_methods[11] = {
         0
 };
 
-SIE_MSG_BOX_GUI *Sie_GUI_MsgBox(const char *msg, const char *left, const char *right, SIE_GUI_MSG_BOX_CALLBACK *callback) {
+SIE_MSG_BOX_GUI *Sie_GUI_MsgBox(const char *msg, const char *left, const char *right,
+                                SIE_GUI_MSG_BOX_CALLBACK *callback) {
     SIE_MSG_BOX_GUI *gui = malloc(sizeof(SIE_MSG_BOX_GUI));
     const SIE_GUI_SURFACE_HANDLERS surface_handlers = {
             OnAfterDrawIconBar,
@@ -121,11 +131,17 @@ SIE_MSG_BOX_GUI *Sie_GUI_MsgBox(const char *msg, const char *left, const char *r
     zeromem(gui, sizeof(SIE_MSG_BOX_GUI));
     gui->msg_ws = AllocWS(strlen(msg));
     wsprintf(gui->msg_ws, "%t", msg);
-    gui->left_ws = AllocWS(strlen(left));
-    wsprintf(gui->left_ws, "%t", left);
-    gui->right_ws = AllocWS(strlen(right));
-    wsprintf(gui->right_ws, "%t", right);
-    memcpy(&(gui->callback), callback, sizeof(SIE_GUI_MSG_BOX_CALLBACK));
+    if (left) {
+        gui->left_ws = AllocWS(strlen(left));
+        wsprintf(gui->left_ws, "%t", left);
+    }
+    if (right) {
+        gui->right_ws = AllocWS(strlen(right));
+        wsprintf(gui->right_ws, "%t", right);
+    }
+    if (callback) {
+        memcpy(&(gui->callback), callback, sizeof(SIE_GUI_MSG_BOX_CALLBACK));
+    }
     gui->surface = Sie_GUI_Surface_Init(SIE_GUI_SURFACE_TYPE_DEFAULT, &surface_handlers);
     LockSched();
     Sie_GUI_Surface_DoScrot(gui->surface);
@@ -136,6 +152,10 @@ SIE_MSG_BOX_GUI *Sie_GUI_MsgBox(const char *msg, const char *left, const char *r
     CreateGUI(gui);
     UnlockSched();
     return gui;
+}
+
+SIE_MSG_BOX_GUI *Sie_GUI_MsgBoxDefault(const char *msg) {
+    return Sie_GUI_MsgBox(msg, NULL, NULL, NULL);
 }
 
 SIE_MSG_BOX_GUI *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_MSG_BOX_CALLBACK *callback) {
