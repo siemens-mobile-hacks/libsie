@@ -2,77 +2,13 @@
 #include <stdlib.h>
 #include "../include/sie/resources.h"
 #include "../include/sie/gui/gui.h"
-#include "../include/sie/freetype/freetype.h"
 
 #define FONT_SIZE_ICONBAR 14
 #define FONT_SIZE_HEADER 20
 #define COLOR_HEADER_BG {0x00, 0x00, 0x00, 0x35}
 
 extern IMGHDR *SIE_RES_IMG_WALLPAPER;
-
-GBSTMR TIMER_DRAW_ICONBAR;
-
-SIE_GUI_SURFACE *Sie_GUI_Surface_Init(int type, const SIE_GUI_SURFACE_HANDLERS *handlers) {
-    SIE_GUI_SURFACE *surface = malloc(sizeof(SIE_GUI_SURFACE));
-    zeromem(surface, sizeof(SIE_GUI_SURFACE));
-    surface->type = type;
-    if (handlers) {
-        memcpy(&(surface->handlers), handlers, sizeof(SIE_GUI_SURFACE_HANDLERS));
-    }
-    surface->hdr_ws = AllocWS(256);
-    return surface;
-};
-
-void Sie_GUI_Surface_Destroy(SIE_GUI_SURFACE *surface) {
-    FreeWS(surface->hdr_ws);
-    if (surface->scrot.bitmap) {
-        mfree(surface->scrot.bitmap);
-    }
-    mfree(surface);
-}
-
-void Sie_GUI_Surface_DoScrot(SIE_GUI_SURFACE *surface) {
-    LockSched();
-    size_t size = ScreenW() * ScreenH() * 2;
-    surface->scrot.w = ScreenW();
-    surface->scrot.h = ScreenH();
-    surface->scrot.bpnum = 8;
-    surface->scrot.bitmap = malloc(size);
-    memcpy(surface->scrot.bitmap, RamScreenBuffer(), size);
-    UnlockSched();
-}
-
-void Sie_GUI_Surface_Draw(const SIE_GUI_SURFACE *surface) {
-    Sie_GUI_DrawIconBar();
-    if (wstrlen(surface->hdr_ws)) {
-        Sie_GUI_DrawHeader(surface->hdr_ws);
-    }
-}
-
-void Sie_GUI_Surface_OnFocus(SIE_GUI_SURFACE *surface) {
-#ifdef ELKA
-    DisableIconBar(1);
-#endif
-    TIMER_DRAW_ICONBAR.param6 = (unsigned int)surface;
-    GBS_StartTimerProc(&TIMER_DRAW_ICONBAR, 216, Sie_GUI_DrawIconBar);
-}
-
-void Sie_GUI_Surface_OnUnFocus(SIE_GUI_SURFACE *surface) {
-#ifdef ELKA
-    DisableIconBar(0);
-#endif
-    TIMER_DRAW_ICONBAR.param6 = 0;
-    GBS_StopTimer(&TIMER_DRAW_ICONBAR);
-}
-
-int Sie_GUI_Surface_OnKey(SIE_GUI_SURFACE *surface, void *data, GUI_MSG *msg) {
-    if (surface->handlers.OnKey) {
-        return surface->handlers.OnKey(data, msg);
-    }
-    return 0;
-}
-
-/**********************************************************************************************************************/
+extern GBSTMR TMR_REDRAW_ICONBAR;
 
 void Sie_GUI_InitCanvas(RECT *canvas) {
     canvas->x = 0;
@@ -108,14 +44,14 @@ void Sie_GUI_DrawBleedIMGHDR(IMGHDR *img, int x, int y, int x2, int y2, int blee
 
 void Sie_GUI_DrawIconBar() {
     const SIE_GUI_SURFACE *surface = NULL;
-    if (TIMER_DRAW_ICONBAR.param6) {
-        surface = (SIE_GUI_SURFACE*)TIMER_DRAW_ICONBAR.param6;
+    if (TMR_REDRAW_ICONBAR.param6) {
+        surface = (SIE_GUI_SURFACE*)TMR_REDRAW_ICONBAR.param6;
     }
-    if (IsTimerProc(&TIMER_DRAW_ICONBAR)) {
-        GBS_StopTimer(&TIMER_DRAW_ICONBAR);
+    if (IsTimerProc(&TMR_REDRAW_ICONBAR)) {
+        GBS_StopTimer(&TMR_REDRAW_ICONBAR);
     }
 //    if (surface) {
-//        TIMER_DRAW_ICONBAR.param6 = (unsigned int)surface;
+//        TMR_REDRAW_ICONBAR.param6 = (unsigned int)surface;
 //    }
 
     Sie_GUI_DrawIMGHDR(SIE_RES_IMG_WALLPAPER, 0, 0, ScreenW(), YDISP);
@@ -180,7 +116,7 @@ void Sie_GUI_DrawIconBar() {
             surface->handlers.OnAfterDrawIconBar();
         }
     }
-    GBS_StartTimerProc(&TIMER_DRAW_ICONBAR, 216, Sie_GUI_DrawIconBar);
+    GBS_StartTimerProc(&TMR_REDRAW_ICONBAR, 216, Sie_GUI_DrawIconBar);
 }
 
 void Sie_GUI_DrawHeader(WSHDR *ws) {

@@ -6,22 +6,9 @@
 #include "stack.h"
 #include "colors.h"
 #include "msg_box.h"
+#include "surface.h"
 #include "menu/menu.h"
 #include "menu/menu_list.h"
-
-#define SIE_GUI_SURFACE_TYPE_DEFAULT 0x00
-
-typedef struct {
-    void (*OnAfterDrawIconBar)();
-    int (*OnKey)(void *data, GUI_MSG *msg);
-} SIE_GUI_SURFACE_HANDLERS;
-
-typedef struct {
-    int type;
-    SIE_GUI_SURFACE_HANDLERS handlers;
-    WSHDR *hdr_ws;
-    IMGHDR scrot;
-} SIE_GUI_SURFACE;
 
 SIE_GUI_SURFACE *Sie_GUI_Surface_Init(int type, const SIE_GUI_SURFACE_HANDLERS *handlers);
 void Sie_GUI_Surface_Destroy(SIE_GUI_SURFACE *surface);
