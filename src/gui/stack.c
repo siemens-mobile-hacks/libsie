@@ -49,7 +49,7 @@ SIE_GUI_STACK *Sie_GUI_Stack_CloseChildren(SIE_GUI_STACK *top, unsigned int gui_
         SIE_GUI_STACK *p = stack->next;
         while (p) {
             SIE_GUI_STACK *next = p->next;
-            GeneralFunc_flag1((int)p->gui_id, 0);
+            Sie_GUI_CloseGUI(p->gui_id);
             mfree(p);
             p = next;
         }

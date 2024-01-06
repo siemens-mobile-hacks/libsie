@@ -10,6 +10,10 @@
 extern IMGHDR *SIE_RES_IMG_WALLPAPER;
 extern GBSTMR TMR_REDRAW_ICONBAR;
 
+void Sie_GUI_CloseGUI(unsigned int id) {
+    GeneralFunc_flag1((int)id, 0);
+}
+
 void Sie_GUI_InitCanvas(RECT *canvas) {
     canvas->x = 0;
     canvas->y = 0;
