@@ -129,7 +129,7 @@ SIE_MSG_BOX_GUI *Sie_GUI_MsgBox(const char *msg, const char *left, const char *r
             NULL
     };
     zeromem(gui, sizeof(SIE_MSG_BOX_GUI));
-    gui->msg_ws = AllocWS(strlen(msg));
+    gui->msg_ws = AllocWS(128);
     wsprintf(gui->msg_ws, "%t", msg);
     if (left) {
         gui->left_ws = AllocWS(strlen(left));
