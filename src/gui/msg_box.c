@@ -149,7 +149,7 @@ SIE_MSG_BOX_GUI *Sie_GUI_MsgBox(const char *msg, const char *left, const char *r
     gui->gui.canvas = (RECT*)(&canvas);
     gui->gui.methods = (void*)gui_methods;
     gui->gui.item_ll.data_mfree = (void (*)(void *))mfree_adr();
-    CreateGUI(gui);
+    gui->gui_id = CreateGUI(gui);
     UnlockSched();
     return gui;
 }
