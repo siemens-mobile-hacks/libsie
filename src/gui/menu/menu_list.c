@@ -284,8 +284,11 @@ unsigned int Sie_Menu_List_GetIdByName_ws(SIE_MENU_LIST *menu, WSHDR *ws, unsign
     return 0;
 }
 
-void Sie_Menu_List_SetRow(SIE_MENU_LIST *menu, unsigned int row) {
+unsigned int Sie_Menu_List_SetRow(SIE_MENU_LIST *menu, unsigned int row) {
     if (row < menu->n_items) {
         menu->row = row;
+    } else {
+        menu->row = menu->n_items - 1;
     }
+    return menu->row;
 }

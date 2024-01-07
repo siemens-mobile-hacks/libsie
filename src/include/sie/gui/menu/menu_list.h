@@ -44,6 +44,6 @@ void Sie_Menu_List_OnKey(SIE_MENU_LIST *menu, GUI_MSG *msg);
 void Sie_Menu_List_Refresh(SIE_MENU_LIST *menu);
 #define Sie_Menu_List_GetCurrentItem(menu) &(menu->items[menu->row]);
 unsigned int Sie_Menu_List_GetIdByName_ws(SIE_MENU_LIST *menu, WSHDR *ws, unsigned int *err);
-void Sie_Menu_List_SetRow(SIE_MENU_LIST *menu, unsigned int row);
+unsigned int Sie_Menu_List_SetRow(SIE_MENU_LIST *menu, unsigned int row);
 
 #endif
