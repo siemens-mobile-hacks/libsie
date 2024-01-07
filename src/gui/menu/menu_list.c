@@ -28,28 +28,33 @@ SIE_MENU_LIST *Sie_Menu_List_Init(unsigned int gui_id) {
     return menu;
 }
 
+void LoadIcon2(SIE_MENU_LIST_ITEM *item) {
+    char name[64];
+    zeromem(name, 1);
+    switch (item->type) {
+        case SIE_MENU_LIST_ITEM_TYPE_CHECKBOX:
+            if (!item->flag) {
+                strcpy(name, "checkbox");
+            } else {
+                strcpy(name, "checkbox-checked");
+            }
+    }
+    if (name[0]) {
+        SIE_RESOURCES_IMG *res_img = Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_ACTIONS, 24, name);
+        if (res_img) {
+            item->icon2 = res_img->icon;
+        }
+    }
+}
+
 void Sie_Menu_List_AddItem(SIE_MENU_LIST *menu, SIE_MENU_LIST_ITEM *item, const char *name) {
     SIE_MENU_LIST_ITEM *menu_item;
     menu->items = realloc(menu->items, sizeof(SIE_MENU_LIST_ITEM) * (menu->n_items + 1));
     menu_item = &(menu->items[menu->n_items]);
     memcpy(menu_item, item, sizeof(SIE_MENU_LIST_ITEM));
 
-    // type
-    char res_name[32];
-    switch (menu_item->type) {
-        case SIE_MENU_LIST_ITEM_TYPE_CHECKBOX:
-            if (!menu_item->flag) {
-                strcpy(res_name, "checkbox");
-            } else {
-                strcpy(res_name, "checkbox-checked");
-            }
-            SIE_RESOURCES_IMG *res_img = Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_ACTIONS, 24,
-                                                                 res_name);
-            if (res_img) {
-                menu_item->icon = res_img->icon;
-            }
-            break;
-    }
+    // icon2
+    LoadIcon2(menu_item);
     // ws
     size_t len = strlen(name);
     menu_item->ws = AllocWS(len);
@@ -61,6 +66,18 @@ void Sie_Menu_List_AddItem(SIE_MENU_LIST *menu, SIE_MENU_LIST_ITEM *item, const 
 
     zeromem(item, sizeof(SIE_MENU_LIST_ITEM));
     menu->n_items++;
+}
+
+void Sie_Menu_List_SetItemType(SIE_MENU_LIST_ITEM *item, unsigned int type, unsigned int flag) {
+    switch (type) {
+        case SIE_MENU_LIST_ITEM_TYPE_CHECKBOX:
+            item->type = type;
+            item->flag = flag;
+            LoadIcon2(item);
+            break;
+        default:
+            break;
+    }
 }
 
 void Sie_Menu_List_Destroy(SIE_MENU_LIST *menu) {
@@ -110,6 +127,15 @@ static void DrawSSBG(int x, int y, int x2, int y2) {
     DrawRectangle(x, y, x2, y2, 0, color_bg, color_bg);
 }
 
+IMGHDR *GetIcon(const SIE_MENU_LIST_ITEM *item) {
+    switch (item->type) {
+        case SIE_MENU_LIST_ITEM_TYPE_CHECKBOX:
+            return item->icon2;
+        default:
+            return item->icon;
+    }
+}
+
 void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
 #define show_indicator (menu->n_items > SIE_MENU_LIST_MAX_ITEMS)
 #define is_select (i == (menu->row - menu->offset))
@@ -129,7 +155,7 @@ void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
     int c = min(menu->n_items, SIE_MENU_LIST_MAX_ITEMS);
     for (unsigned int i = 0; i < c; i++) {
         const SIE_MENU_LIST_ITEM *item = &(menu->items[menu->offset + i]);
-        IMGHDR *img = item->icon;
+        IMGHDR *img = GetIcon(item);
         WSHDR *ws = item->ws;
 
         const int x = 3;

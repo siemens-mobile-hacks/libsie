@@ -72,6 +72,19 @@ void Sie_FS_DestroyFiles(SIE_FILE *top) {
     }
 }
 
+/**********************************************************************************************************************/
+
+unsigned int Sie_FS_ContainsFile(SIE_FILE *top, SIE_FILE *file) {
+    while (top) {
+        if (strcmp(top->dir_name, file->dir_name) == 0 &&
+            strcmp(top->file_name, file->file_name) == 0) {
+            return 1;
+        }
+        top = top->next;
+    }
+    return 0;
+}
+
 unsigned int Sie_FS_GetFilesCount(SIE_FILE *top) {
     unsigned int count = 0;
     while (top) {
