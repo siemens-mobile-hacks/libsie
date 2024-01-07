@@ -82,17 +82,15 @@ unsigned int Sie_FS_GetFilesCount(SIE_FILE *top) {
 }
 
 SIE_FILE *Sie_FS_GetFileByID(SIE_FILE *top, unsigned int id) {
-    SIE_FILE *file = NULL;
     unsigned int i = 0;
     while (top) {
         if (i == id) {
-            file = top;
-            break;
+            return top;
         }
         top = top->next;
         i++;
     }
-    return file;
+    return NULL;
 }
 
 SIE_FILE *Sie_FS_GetFileByFileName(SIE_FILE *top, const char *file_name) {
@@ -191,24 +189,29 @@ SIE_FILE *Sie_FS_CopyFileElement(SIE_FILE *file) {
     strcpy(new->dir_name, file->dir_name);
     new->file_name = malloc(strlen(file->file_name) + 1);
     strcpy(new->file_name, file->file_name);
+    if (file->alias) {
+        new->alias = malloc(strlen(file->alias) + 1);
+        strcpy(new->alias, file->alias);
+    }
     return new;
 }
 
-SIE_FILE *Sie_FS_DeleteFileElement(SIE_FILE *top, SIE_FILE *element) {
-    SIE_FILE *p = top;
-    while (p) {
-        if (p == element) {
-            SIE_FILE *prev = element->prev;
-            SIE_FILE *next = element->next;
+SIE_FILE *Sie_FS_DeleteFileElement(SIE_FILE *top, SIE_FILE *file) {
+#define _cmp (strcmpi(current->dir_name, file->dir_name) == 0 && strcmp(current->file_name, file->file_name) == 0)
+    while (top) {
+        SIE_FILE *current = top;
+        if (_cmp) {
+            SIE_FILE *prev = current->prev;
+            SIE_FILE *next = current->next;
             if (prev) {
                 prev->next = next;
             }
             if (next) {
                 next->prev = prev;
             }
-            return element;
+            return current;
         }
-        p = p->next;
+        top = top->next;
     }
     return NULL;
 }
