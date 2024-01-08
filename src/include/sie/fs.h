@@ -21,14 +21,16 @@ typedef struct {
 
 SIE_FILE *Sie_FS_FindFiles(const char *mask);
 SIE_FILE *Sie_FS_FindFilesRecursive(const char *mask);
+SIE_FILE *Sie_FS_CloneFiles(SIE_FILE *top);
 void Sie_FS_DestroyFiles(SIE_FILE *top);
 
 unsigned int Sie_FS_ContainsFile(SIE_FILE *top, SIE_FILE *file);
 unsigned int Sie_FS_GetFilesCount(SIE_FILE *top);
+SIE_FILE *Sie_FS_GetFirstFile(SIE_FILE *top);
+SIE_FILE *Sie_FS_GetLastFile(SIE_FILE *top);
 SIE_FILE *Sie_FS_GetFileByID(SIE_FILE *top, unsigned int id);
 SIE_FILE *Sie_FS_GetFileByFileName(SIE_FILE *top, const char *file_name);
 SIE_FILE *Sie_FS_GetFileByAlias(SIE_FILE *top, const char *alias);
-SIE_FILE *Sie_FS_GetLastFile(SIE_FILE *top);
 SIE_FILE *Sie_FS_GetUniqueFile(SIE_FILE *file);
 char *Sie_FS_GetPathByFile(SIE_FILE *file);
 

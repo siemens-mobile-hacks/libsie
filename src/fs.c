@@ -63,6 +63,23 @@ SIE_FILE *Sie_FS_FindFilesRecursive(const char *mask) {
     return top;
 }
 
+SIE_FILE *Sie_FS_CloneFiles(SIE_FILE *top) {
+    if (top) {
+        SIE_FILE *files = Sie_FS_CopyFileElement(top);
+        SIE_FILE *current = files;
+        top = top->next;
+        while (top) {
+            SIE_FILE *file = Sie_FS_CopyFileElement(top);
+            file->prev = current;
+            current->next = file;
+            current = file;
+            top = top->next;
+        }
+        return files;
+    }
+    return NULL;
+}
+
 void Sie_FS_DestroyFiles(SIE_FILE *top) {
     SIE_FILE *p = top;
     while (p) {
@@ -92,6 +109,28 @@ unsigned int Sie_FS_GetFilesCount(SIE_FILE *top) {
         count++;
     }
     return count;
+}
+
+SIE_FILE *Sie_FS_GetFirstFile(SIE_FILE *top) {
+    SIE_FILE *first = top;
+    while (top) {
+        if (top->prev) {
+            first = top->prev;
+        }
+        top = top->prev;
+    }
+    return first;
+}
+
+SIE_FILE *Sie_FS_GetLastFile(SIE_FILE *top) {
+    SIE_FILE *last = top;
+    while (top) {
+        if (top->next) {
+            last = top->next;
+        }
+        top = top->next;
+    }
+    return last;
 }
 
 SIE_FILE *Sie_FS_GetFileByID(SIE_FILE *top, unsigned int id) {
@@ -128,17 +167,6 @@ SIE_FILE *Sie_FS_GetFileByAlias(SIE_FILE *top, const char *alias) {
         top = top->next;
     }
     return file;
-}
-
-SIE_FILE *Sie_FS_GetLastFile(SIE_FILE *top) {
-    SIE_FILE *last = top;
-    while (top) {
-        if (top->next) {
-            last = top->next;
-        }
-        top = top->next;
-    }
-    return last;
 }
 
 SIE_FILE *Sie_FS_GetUniqueFile(SIE_FILE *file) {
