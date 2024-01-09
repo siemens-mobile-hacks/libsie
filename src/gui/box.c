@@ -1,8 +1,7 @@
 #include <swilib.h>
 #include <stdlib.h>
-#include "../include/sie/fs.h"
 #include "../include/sie/gui/gui.h"
-#include "../include/sie/freetype/freetype.h"
+#include "../include/sie/resources.h"
 
 #define FONT_SIZE_MSG 20
 #define FONT_SIZE_SOFT_KEYS 18
@@ -11,6 +10,7 @@
 #define COLOR_SURFACE_BG {0x00, 0x00, 0x00, 0x20}
 
 RECT canvas;
+IMGHDR *IMG_YES;
 
 static void OnRedraw(SIE_GUI_BOX_GUI *data) {
     const char color_bg[] = COLOR_BG;
@@ -36,19 +36,47 @@ static void OnRedraw(SIE_GUI_BOX_GUI *data) {
     const int y2_msg = y2 - 5;
     Sie_FT_DrawBoundingString(data->msg_ws, x, y, x2, y2_msg,FONT_SIZE_MSG,
                               SIE_FT_TEXT_ALIGN_CENTER + SIE_FT_TEXT_VALIGN_MIDDLE, NULL);
-    if (data->left_ws) {
-        const int x_left_sk = x + 10;
-        const int x2_left_sk = x + (x2 - x) / 2 - 5;
-        Sie_FT_DrawBoundingString(data->left_ws, x_left_sk, y, x2_left_sk, y2_sk,
-                                  FONT_SIZE_SOFT_KEYS, SIE_FT_TEXT_ALIGN_LEFT + SIE_FT_TEXT_VALIGN_BOTTOM,
-                                  NULL);
-    }
-    if (data->right_ws) {
-        const int x_right_sk = x + (x2 - x) / 2 + 5;
-        const int x2_right_sk = x2 - 10;
-        Sie_FT_DrawBoundingString(data->right_ws, x_right_sk, y, x2_right_sk, y2_sk,
-                                  FONT_SIZE_SOFT_KEYS,SIE_FT_TEXT_ALIGN_RIGHT + SIE_FT_TEXT_VALIGN_BOTTOM,
-                                  NULL);
+
+    if (&(data->callback)) {
+        int x_img = 0;
+        int x2_img = 0;
+        if (IMG_YES) {
+            int y_img = 0;
+            unsigned int w, h = 0, h1 = 0, h2 = 0;
+            if (data->left_ws) {
+                Sie_FT_GetStringSize(data->left_ws, FONT_SIZE_SOFT_KEYS, &w, &h1);
+            }
+            if (data->right_ws) {
+                Sie_FT_GetStringSize(data->right_ws, FONT_SIZE_SOFT_KEYS, &w, &h2);
+            }
+            h = max(h1, h2);
+            if (h) {
+                x_img = 4 + (w_window / 2) - IMG_YES->w / 2;
+                y_img = y2_sk - (int) h / 2 - IMG_YES->h / 2;
+                x2_img = x_img + IMG_YES->w;
+                Sie_GUI_DrawIMGHDR(IMG_YES, x_img, y_img, IMG_YES->w, IMG_YES->h);
+            }
+        }
+        if (data->left_ws) {
+            int x_left_sk = x + 10;
+            int x2_left_sk = x + (x2 - x) / 2 - 5;
+            if (x_img) {
+                x2_left_sk -= IMG_YES->w / 2;
+            }
+            Sie_FT_DrawBoundingString(data->left_ws, x_left_sk, y, x2_left_sk, y2_sk,
+                                      FONT_SIZE_SOFT_KEYS,
+                                      SIE_FT_TEXT_ALIGN_LEFT + SIE_FT_TEXT_VALIGN_BOTTOM,NULL);
+        }
+        if (data->right_ws) {
+            int x_right_sk = x + (x2 - x) / 2 + 5;
+            int x2_right_sk = x2 - 10;
+            if (x2_img) {
+                x_right_sk += IMG_YES->w / 2;
+            }
+            Sie_FT_DrawBoundingString(data->right_ws, x_right_sk, y, x2_right_sk, y2_sk,
+                                      FONT_SIZE_SOFT_KEYS,
+                                      SIE_FT_TEXT_ALIGN_RIGHT + SIE_FT_TEXT_VALIGN_BOTTOM,NULL);
+        }
     }
 }
 
@@ -89,7 +117,7 @@ static int OnKey(SIE_GUI_BOX_GUI *data, GUI_MSG *msg) {
     if (data->callback.proc) {
         if (msg->gbsmsg->msg == KEY_DOWN || msg->gbsmsg->msg == LONG_PRESS) {
             switch (msg->gbsmsg->submess) {
-                case LEFT_SOFT:
+                case LEFT_SOFT: case ENTER_BUTTON:
                     data->callback.proc(SIE_GUI_BOX_CALLBACK_YES, data->callback.data);
                     return 1;
                 case RIGHT_SOFT:
@@ -131,15 +159,19 @@ SIE_GUI_BOX_GUI *Sie_GUI_Box(const char *msg, const char *left, const char *righ
     zeromem(gui, sizeof(SIE_GUI_BOX_GUI));
     gui->msg_ws = AllocWS(128);
     wsprintf(gui->msg_ws, "%t", msg);
-    if (left) {
-        gui->left_ws = AllocWS(strlen(left));
-        wsprintf(gui->left_ws, "%t", left);
-    }
-    if (right) {
-        gui->right_ws = AllocWS(strlen(right));
-        wsprintf(gui->right_ws, "%t", right);
-    }
     if (callback) {
+        SIE_RESOURCES_IMG *res_img = Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_ACTIONS, 24, "yes");
+        if (res_img) {
+            IMG_YES = res_img->icon;
+        }
+        if (left) {
+            gui->left_ws = AllocWS((int)strlen(left));
+            wsprintf(gui->left_ws, "%t", left);
+        }
+        if (right) {
+            gui->right_ws = AllocWS((int)strlen(right));
+            wsprintf(gui->right_ws, "%t", right);
+        }
         memcpy(&(gui->callback), callback, sizeof(SIE_GUI_BOX_CALLBACK));
     }
     gui->surface = Sie_GUI_Surface_Init(SIE_GUI_SURFACE_TYPE_DEFAULT, &surface_handlers);
