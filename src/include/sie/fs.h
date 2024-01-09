@@ -34,8 +34,8 @@ SIE_FILE *Sie_FS_GetFileByAlias(SIE_FILE *top, const char *alias);
 SIE_FILE *Sie_FS_GetUniqueFile(SIE_FILE *file);
 char *Sie_FS_GetPathByFile(SIE_FILE *file);
 
-void Sie_FS_DestroyFileElement(SIE_FILE *file);
 SIE_FILE *Sie_FS_CopyFileElement(SIE_FILE *file);
+void Sie_FS_DestroyFileElement(SIE_FILE *file);
 SIE_FILE *Sie_FS_DeleteFileElement(SIE_FILE *top, SIE_FILE *file);
 
 SIE_FILE *Sie_FS_SortFiles(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int keep_folders_on_top);
@@ -46,6 +46,8 @@ int Sie_FS_MMCardExists();
 
 int Sie_FS_CreateFile(const char *path);
 unsigned int Sie_FS_CopyFile(const char *src, const char *dest);
+#define Sie_FS_MoveFile(src, dest, err) fmove(src, dest, err)
+#define Sie_FS_DeleteFile(path, err) _unlink(path, err)
 int Sie_FS_DeleteFilesRecursive(const char *dir);
 
 #endif

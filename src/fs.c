@@ -212,15 +212,6 @@ char *Sie_FS_GetPathByFile(SIE_FILE *file) {
     return path;
 }
 
-void Sie_FS_DestroyFileElement(SIE_FILE *file) {
-    mfree(file->dir_name);
-    mfree(file->file_name);
-    if (file->alias) {
-        mfree(file->alias);
-    }
-    mfree(file);
-}
-
 SIE_FILE *Sie_FS_CopyFileElement(SIE_FILE *file) {
     SIE_FILE *new = malloc(sizeof(SIE_FILE));
     memcpy(new, file, sizeof(SIE_FILE));
@@ -235,6 +226,15 @@ SIE_FILE *Sie_FS_CopyFileElement(SIE_FILE *file) {
         strcpy(new->alias, file->alias);
     }
     return new;
+}
+
+void Sie_FS_DestroyFileElement(SIE_FILE *file) {
+    mfree(file->dir_name);
+    mfree(file->file_name);
+    if (file->alias) {
+        mfree(file->alias);
+    }
+    mfree(file);
 }
 
 SIE_FILE *Sie_FS_DeleteFileElement(SIE_FILE *top, SIE_FILE *file) {
