@@ -430,7 +430,7 @@ unsigned int Sie_FS_CopyFile(const char *src, const char *dest) {
         return result;
 }
 
-int Sie_FS_RemoveDirRecursive(const char *dir) {
+int Sie_FS_DeleteFilesRecursive(const char *dir) {
     int result = 0;
     char *mask = malloc(strlen(dir) + 1 + 1);
     sprintf(mask, "%s*", dir);
