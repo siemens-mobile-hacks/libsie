@@ -225,6 +225,8 @@ void Sie_Menu_List_OnKey(SIE_MENU_LIST *menu, GUI_MSG *msg) {
     if (msg->gbsmsg->msg == KEY_DOWN || msg->gbsmsg->msg == LONG_PRESS) {
         if (menu->n_items) {
             SIE_MENU_LIST_ITEM *menu_item = &(menu->items[menu->row]);
+            void (*proc)(void *menu_item, unsigned int row) = menu_item->proc;
+
             switch (msg->gbsmsg->submess) {
                 case SIE_MENU_LIST_KEY_PREV:
                     GBS_DelTimer(&(menu->ss->tmr));
@@ -246,11 +248,8 @@ void Sie_Menu_List_OnKey(SIE_MENU_LIST *menu, GUI_MSG *msg) {
                     Sie_Menu_List_Draw(menu);
                     break;
                 case SIE_MENU_LIST_KEY_ENTER:
-                    if (menu->n_items) {
-                        void (*proc)(void *menu_item, unsigned int row) = menu_item->proc;
-                        if (proc) {
-                            proc(menu_item, menu->row);
-                        }
+                    if (proc) {
+                        proc(menu_item, menu->row);
                     }
                     break;
             }
