@@ -351,7 +351,7 @@ SIE_FILE *Sie_FS_SortFilesByName(SIE_FILE *top, int keep_folders_on_top) {
 
 int Sie_FS_FileExists(const char *path) {
     size_t len = strlen(path);
-    WSHDR *ws = AllocWS((ssize_t)len);
+    WSHDR *ws = AllocWS((int)len);
     str_2ws(ws, path, len);
     int exists = fexists(ws);
     FreeWS(ws);
@@ -376,15 +376,17 @@ int Sie_FS_CreateFile(const char *path) {
 }
 
 unsigned int Sie_FS_CopyFile(const char *src, const char *dest) {
-    int in = 0, out = 0;
+    int in = -1, out = -1;
     unsigned int err = 0, err2 = 0;
     unsigned int wb = 0;
     unsigned int result = 0;
 
-    if ((in = _open(src, A_ReadOnly, P_READ, &err)) == -1) {
+    in = _open(src, A_ReadOnly, P_READ, &err);
+    if (in == -1) {
         goto EXIT;
     }
-    if ((out = _open(dest, A_Create + A_WriteOnly + A_Append, P_WRITE, &err)) == -1) {
+    out = _open(dest, A_Create + A_WriteOnly + A_Append, P_WRITE, &err);
+    if (out == -1) {
         goto EXIT;
     }
 
@@ -415,16 +417,15 @@ unsigned int Sie_FS_CopyFile(const char *src, const char *dest) {
             break;
         }
     } while (wb < fstats_in.size);
-
     EXIT:
         result = 0;
         if (!err) {
             result = wb;
         }
-        if (in) {
+        if (in != -1) {
             _close(in, &err);
         }
-        if (out) {
+        if (out != -1) {
             _close(out, &err);
         }
         return result;
