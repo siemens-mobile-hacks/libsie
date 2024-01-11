@@ -44,8 +44,8 @@ SIE_FILE *Sie_FS_SortFilesByName(SIE_FILE *top, int keep_folders_on_top);
 int Sie_FS_FileExists(const char *path);
 int Sie_FS_MMCardExists();
 
-int Sie_FS_CreateFile(const char *path);
-unsigned int Sie_FS_CopyFile(const char *src, const char *dest);
+int Sie_FS_CreateFile(const char *path, unsigned int *err);
+unsigned int Sie_FS_CopyFile(const char *src, const char *dest, unsigned int *err);
 #define Sie_FS_MoveFile(src, dest, err) fmove(src, dest, err)
 #define Sie_FS_DeleteFile(path, err) _unlink(path, err)
 int Sie_FS_DeleteFilesRecursive(const char *dir);

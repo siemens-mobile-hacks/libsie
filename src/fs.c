@@ -363,70 +363,71 @@ int Sie_FS_MMCardExists() {
     return GetTotalFlexSpace(4, &err) ? 1 : 0;
 }
 
-int Sie_FS_CreateFile(const char *path) {
+int Sie_FS_CreateFile(const char *path, unsigned int *err) {
     int fp;
-    unsigned int err;
-    fp = _open(path, A_Create + A_WriteOnly, P_WRITE, &err);
+    fp = _open(path, A_Create + A_WriteOnly, P_WRITE, err);
     if (fp != -1) {
-        _close(fp, &err);
+        _close(fp, err);
         return 1;
     } else {
         return 0;
     }
 }
 
-unsigned int Sie_FS_CopyFile(const char *src, const char *dest) {
+unsigned int Sie_FS_CopyFile(const char *src, const char *dest, unsigned int *err) {
     int in = -1, out = -1;
-    unsigned int err = 0, err2 = 0;
+    unsigned int err1 = 0, err2 = 0;
     unsigned int wb = 0;
     unsigned int result = 0;
 
-    in = _open(src, A_ReadOnly, P_READ, &err);
+    in = _open(src, A_ReadOnly, P_READ, &err1);
     if (in == -1) {
         goto EXIT;
     }
-    out = _open(dest, A_Create + A_WriteOnly + A_Append, P_WRITE, &err);
+    out = _open(dest, A_Create + A_WriteOnly + A_Append, P_WRITE, &err1);
     if (out == -1) {
         goto EXIT;
     }
 
     FSTATS fstats_in, fstats_out;
-    GetFileStats(src, &fstats_in, &err);
-    if (err) {
+    GetFileStats(src, &fstats_in, &err1);
+    if (err1) {
         goto EXIT;
     }
-    GetFileStats(dest, &fstats_out, &err);
-    if (fstats_out.size || err) {
+    GetFileStats(dest, &fstats_out, &err1);
+    if (fstats_out.size || err1) {
         goto EXIT;
     }
 
     char buffer[COPY_BUFFER_SIZE];
     unsigned int offset = 0;
     do {
-        _lseek(in, offset, SEEK_SET, &err, &err2);
-        if (err || err2) {
+        _lseek(in, offset, SEEK_SET, &err1, &err2);
+        if (err1 || err2) {
             break;
         }
-        int rb = _read(in, &buffer, COPY_BUFFER_SIZE, &err);
-        if (err) {
+        int rb = _read(in, &buffer, COPY_BUFFER_SIZE, &err1);
+        if (err1) {
             break;
         }
         offset += rb;
-        wb += _write(out, buffer, rb, &err);
-        if (err) {
+        wb += _write(out, buffer, rb, &err1);
+        if (err1) {
             break;
         }
     } while (wb < fstats_in.size);
     EXIT:
         result = 0;
-        if (!err) {
+        if (err1) {
+            *err = err1;
+        } else {
             result = wb;
         }
         if (in != -1) {
-            _close(in, &err);
+            _close(in, &err1);
         }
         if (out != -1) {
-            _close(out, &err);
+            _close(out, &err1);
         }
         return result;
 }
