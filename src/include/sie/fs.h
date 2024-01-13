@@ -46,7 +46,7 @@ int Sie_FS_MMCardExists();
 
 int Sie_FS_CreateFile(const char *path, unsigned int *err);
 unsigned int Sie_FS_CopyFile(const char *src, const char *dest, unsigned int *err);
-#define Sie_FS_MoveFile(src, dest, err) fmove(src, dest, err)
+unsigned int Sie_FS_MoveFile(const char *src, const char *dest, unsigned int *err);
 #define Sie_FS_DeleteFile(path, err) _unlink(path, err)
 int Sie_FS_DeleteFilesRecursive(const char *dir);
 

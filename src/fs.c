@@ -432,6 +432,25 @@ unsigned int Sie_FS_CopyFile(const char *src, const char *dest, unsigned int *er
         return result;
 }
 
+unsigned int Sie_FS_MoveFile(const char *src, const char *dest, unsigned int *err) {
+    if (src[0] == dest[0]) { // check disk number
+        return fmove(src, dest, err);
+    } else {
+        unsigned int res = 0, err1 = 0;
+        if (!isdir(src, &err1)) {
+            Sie_FS_CopyFile(src, dest, &err1);
+            if (!err1) {
+                res = (_unlink(src, &err1) != -1);
+            }
+            if (err1) {
+                *err = err1;
+            }
+        }
+        return res;
+    }
+    return 0;
+}
+
 int Sie_FS_DeleteFilesRecursive(const char *dir) {
     int result = 0;
     char *mask = malloc(strlen(dir) + 1 + 1);
