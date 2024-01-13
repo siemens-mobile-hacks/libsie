@@ -363,6 +363,11 @@ int Sie_FS_MMCardExists() {
     return GetTotalFlexSpace(4, &err) ? 1 : 0;
 }
 
+int Sie_FS_IsDir(const char *path) {
+    unsigned int err;
+    return isdir(path, &err);
+}
+
 int Sie_FS_CreateFile(const char *path, unsigned int *err) {
     int fp;
     fp = _open(path, A_Create + A_WriteOnly, P_WRITE, err);
@@ -372,6 +377,10 @@ int Sie_FS_CreateFile(const char *path, unsigned int *err) {
     } else {
         return 0;
     }
+}
+
+unsigned int Sie_FS_CreateDir(const char *path, unsigned int *err) {
+    return (_mkdir(path, err) == -1) ? 0 : 1;
 }
 
 unsigned int Sie_FS_CopyFile(const char *src, const char *dest, unsigned int *err) {
@@ -430,6 +439,43 @@ unsigned int Sie_FS_CopyFile(const char *src, const char *dest, unsigned int *er
             _close(out, &err1);
         }
         return result;
+}
+
+unsigned int Sie_FS_CopyFilesRecursive(const char *src, const char *dest, unsigned int *err) {
+    char *mask = malloc(strlen(src) + 1 + 1);
+    sprintf(mask, "%s\\*", src);
+    SIE_FILE *files = Sie_FS_FindFilesRecursive(mask);
+    mfree(mask);
+
+    unsigned int wb = 0;
+    if (_mkdir(dest, err) != -1) {
+        SIE_FILE *file = files;
+        while (file) {
+            char *relative = file->dir_name + strlen(src);
+            size_t len_relative = strlen(relative);
+            size_t len_file_name = strlen(file->file_name);
+
+            char *s = malloc(strlen(src) + len_relative + len_file_name + 1);
+            char *d = malloc(strlen(dest) + len_relative + len_file_name + 1);
+            sprintf(s, "%s%s%s", src, relative, file->file_name);
+            sprintf(d, "%s%s%s", dest, relative, file->file_name);
+            if (file->file_attr & SIE_FS_FA_DIRECTORY) {
+                if (!Sie_FS_CreateDir(d, err)) {
+                    break;
+                }
+            } else {
+                wb += Sie_FS_CopyFile(s, d, err);
+                if (*err) {
+                    break;
+                }
+            }
+            mfree(s);
+            mfree(d);
+            file = file->next;
+        }
+        Sie_FS_DestroyFiles(files);
+    }
+    return wb;
 }
 
 unsigned int Sie_FS_MoveFile(const char *src, const char *dest, unsigned int *err) {
