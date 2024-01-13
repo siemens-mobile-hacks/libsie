@@ -349,26 +349,29 @@ SIE_FILE *Sie_FS_SortFilesByName(SIE_FILE *top, int keep_folders_on_top) {
     return Sie_FS_SortFiles(top, cmp_by_name, keep_folders_on_top);
 }
 
-int Sie_FS_FileExists(const char *path) {
+unsigned int Sie_FS_FileExists(const char *path) {
     size_t len = strlen(path);
-    WSHDR *ws = AllocWS((int)len);
+    WSHDR *ws = AllocWS((int)len + 5);
     str_2ws(ws, path, len);
-    int exists = fexists(ws);
+    unsigned int exists = fexists(ws);
     FreeWS(ws);
+    if (!exists) {
+        unsigned int err = 0;
+        exists = Sie_FS_IsDir(path, &err);
+    }
     return exists;
 }
 
-int Sie_FS_MMCardExists() {
+unsigned int Sie_FS_MMCardExists() {
     unsigned int err;
     return GetTotalFlexSpace(4, &err) ? 1 : 0;
 }
 
-int Sie_FS_IsDir(const char *path) {
-    unsigned int err;
-    return isdir(path, &err);
+unsigned int Sie_FS_IsDir(const char *path, unsigned int *err) {
+    return isdir(path, err);
 }
 
-int Sie_FS_CreateFile(const char *path, unsigned int *err) {
+unsigned int Sie_FS_CreateFile(const char *path, unsigned int *err) {
     int fp;
     fp = _open(path, A_Create + A_WriteOnly, P_WRITE, err);
     if (fp != -1) {
@@ -441,7 +444,7 @@ unsigned int Sie_FS_CopyFile(const char *src, const char *dest, unsigned int *er
         return result;
 }
 
-unsigned int Sie_FS_CopyFilesRecursive(const char *src, const char *dest, unsigned int *err) {
+unsigned int Sie_FS_CopyDir(const char *src, const char *dest, unsigned int *err) {
     char *mask = malloc(strlen(src) + 1 + 1);
     sprintf(mask, "%s\\*", src);
     SIE_FILE *files = Sie_FS_FindFilesRecursive(mask);
@@ -480,13 +483,21 @@ unsigned int Sie_FS_CopyFilesRecursive(const char *src, const char *dest, unsign
 
 unsigned int Sie_FS_MoveFile(const char *src, const char *dest, unsigned int *err) {
     if (src[0] == dest[0]) { // check disk number
-        return fmove(src, dest, err);
+        return (fmove(src, dest, err) == -1) ? 0 : 1;
     } else {
         unsigned int res = 0, err1 = 0;
-        if (!isdir(src, &err1)) {
+        if (!Sie_FS_IsDir(src, &err1)) {
             Sie_FS_CopyFile(src, dest, &err1);
             if (!err1) {
-                res = (_unlink(src, &err1) != -1);
+                res = Sie_FS_DeleteFile(src, &err1);
+            }
+            if (err1) {
+                *err = err1;
+            }
+        } else {
+            Sie_FS_CopyDir(src, dest, &err1);
+            if (!err1) {
+                res = Sie_FS_DeleteDirRecursive(src, &err1);
             }
             if (err1) {
                 *err = err1;
@@ -494,52 +505,61 @@ unsigned int Sie_FS_MoveFile(const char *src, const char *dest, unsigned int *er
         }
         return res;
     }
-    return 0;
 }
 
-int Sie_FS_DeleteFilesRecursive(const char *dir) {
-    int result = 0;
-    char *mask = malloc(strlen(dir) + 1 + 1);
-    sprintf(mask, "%s*", dir);
+unsigned int Sie_FS_DeleteFile(const char *path, unsigned int *err) {
+    return (_unlink(path, err) == -1) ? 0 : 1;
+}
+
+unsigned int Sie_FS_DeleteDir(const char *path, unsigned int *err) {
+    return (_rmdir(path, err) == -1) ? 0 : 1;
+}
+
+unsigned Sie_FS_DeleteDirRecursive(const char *path, unsigned int *err) {
+    int result = 1;
+    char *mask = malloc(strlen(path) + 1 + 1);
+    sprintf(mask, "%s*", path);
     SIE_FILE *files = Sie_FS_FindFilesRecursive(mask);
     mfree(mask);
 
-    unsigned int err = 0;
     if (files) {
-        SIE_FILE *p = NULL;
+        SIE_FILE *file = NULL;
         SIE_FILE *last = NULL;
 
-        p = files;
+        file = files;
         while (1) {
-            if (!(p->file_attr & SIE_FS_FA_DIRECTORY)) {
-                char *path = Sie_FS_GetPathByFile(p);
-                if (_unlink(path, &err) != 0) {
-                    result = -1;
+            if (!(file->file_attr & SIE_FS_FA_DIRECTORY)) {
+                char *p = Sie_FS_GetPathByFile(file);
+                if (!Sie_FS_DeleteFile(p, err)) {
+                    result = 0;
+                    mfree(p);
+                    break;
+                } else {
+                    mfree(p);
                 }
-                mfree(path);
             }
-            p = p->next;
-            if (p) {
-                last = p;
+            file = file->next;
+            if (file) {
+                last = file;
             } else {
                 break;
             }
         }
-        p = last;
-        while (p) {
-            if (p->file_attr & SIE_FS_FA_DIRECTORY) {
-                char *path = Sie_FS_GetPathByFile(p);
-                if (_rmdir(path, &err) != 0) {
-                    result = -1;
-                };
-                mfree(path);
+        file = last;
+        while (file) {
+            if (file->file_attr & SIE_FS_FA_DIRECTORY) {
+                char *p = Sie_FS_GetPathByFile(file);
+                if (!Sie_FS_DeleteDir(p, err)) {
+                    result = 0;
+                    mfree(p);
+                    break;
+                } else {
+                    mfree(p);
+                }
             }
-            p = p->prev;
+            file = file->prev;
         }
         Sie_FS_DestroyFiles(files);
     }
-    if (_rmdir(dir, &err) != 0) {
-        result = -1;
-    }
-    return result;
+    return (result) ? Sie_FS_DeleteDir(path, err) : result;
 }
