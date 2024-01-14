@@ -4,6 +4,7 @@
 #include "fs.h"
 #include "ext.h"
 #include "strings.h"
+#include "subproc.h"
 #include "settings.h"
 #include "resources.h"
 #include "gui/gui.h"
