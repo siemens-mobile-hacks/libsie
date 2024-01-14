@@ -113,7 +113,7 @@ static void OnUnFocus(SIE_GUI_BOX_GUI *data, void (*mfree_adr)(void *)) {
     Sie_GUI_Surface_OnUnFocus(data->surface);
 }
 
-static int OnKey(SIE_GUI_BOX_GUI *data, GUI_MSG *msg) {
+static int _OnKey(SIE_GUI_BOX_GUI *data, GUI_MSG *msg) {
     if (data->callback.proc) {
         if (msg->gbsmsg->msg == KEY_DOWN || msg->gbsmsg->msg == LONG_PRESS) {
             switch (msg->gbsmsg->submess) {
@@ -127,6 +127,10 @@ static int OnKey(SIE_GUI_BOX_GUI *data, GUI_MSG *msg) {
         }
     }
     return 0;
+}
+
+static int OnKey(SIE_GUI_BOX_GUI *data, GUI_MSG *msg) {
+    return Sie_GUI_Surface_OnKey(data->surface, data, msg);
 }
 
 extern void kill_data(void *p, void (*func_p)(void *));
@@ -154,7 +158,7 @@ SIE_GUI_BOX_GUI *Sie_GUI_Box(const char *msg, const char *left, const char *righ
     SIE_GUI_BOX_GUI *gui = malloc(sizeof(SIE_GUI_BOX_GUI));
     const SIE_GUI_SURFACE_HANDLERS surface_handlers = {
             OnAfterDrawIconBar,
-            NULL
+            (int(*)(void *, GUI_MSG *msg))_OnKey,
     };
     zeromem(gui, sizeof(SIE_GUI_BOX_GUI));
     gui->msg_ws = AllocWS(128);
@@ -174,14 +178,14 @@ SIE_GUI_BOX_GUI *Sie_GUI_Box(const char *msg, const char *left, const char *righ
         }
         memcpy(&(gui->callback), callback, sizeof(SIE_GUI_BOX_CALLBACK));
     }
-    gui->surface = Sie_GUI_Surface_Init(SIE_GUI_SURFACE_TYPE_DEFAULT, &surface_handlers);
     LockSched();
-    Sie_GUI_Surface_DoScrot(gui->surface);
     Sie_GUI_InitCanvas(&canvas);
     gui->gui.canvas = (RECT*)(&canvas);
     gui->gui.methods = (void*)gui_methods;
     gui->gui.item_ll.data_mfree = (void (*)(void *))mfree_adr();
-    gui->gui_id = CreateGUI(gui);
+    gui->surface = Sie_GUI_Surface_Init(SIE_GUI_SURFACE_TYPE_DEFAULT, &surface_handlers,
+                                        CreateGUI(gui));
+    Sie_GUI_Surface_DoScrot(gui->surface);
     UnlockSched();
     return gui;
 }

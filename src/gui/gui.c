@@ -3,12 +3,32 @@
 #include "../include/sie/resources.h"
 #include "../include/sie/gui/gui.h"
 
+#define TMR_MS_FOCUS (216 / 8)
 #define FONT_SIZE_ICONBAR 14
 #define FONT_SIZE_HEADER 20
 #define COLOR_HEADER_BG {0x00, 0x00, 0x00, 0x35}
 
 extern IMGHDR *SIE_RES_IMG_WALLPAPER;
 extern GBSTMR TMR_REDRAW_ICONBAR;
+
+void Focus_GUI(GBSTMR *tmr) {
+    SIE_GUI_FOCUS_DATA *data = (SIE_GUI_FOCUS_DATA*)tmr->param6;
+    unsigned int gui_id = data->gui_id;
+    FocusGUI((int)gui_id);
+    if (IsGuiOnTop((int)gui_id)) {
+        GBS_DelTimer(tmr);
+        if (data->proc) {
+            data->proc(data->data);
+        }
+    } else {
+        GBS_StartTimerProc(tmr, TMR_MS_FOCUS, Focus_GUI);
+    }
+}
+
+void Sie_GUI_FocusGUI(GBSTMR *tmr, SIE_GUI_FOCUS_DATA *data) {
+    tmr->param6 = (int)data;
+    Focus_GUI(tmr);
+}
 
 void Sie_GUI_InitCanvas(RECT *canvas) {
     canvas->x = 0;

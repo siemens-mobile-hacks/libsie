@@ -13,6 +13,7 @@ typedef struct {
 typedef struct {
     int type;
     SIE_GUI_SURFACE_HANDLERS handlers;
+    unsigned int gui_id;
     WSHDR *hdr_ws;
     IMGHDR scrot;
 } SIE_GUI_SURFACE;

@@ -1,7 +1,7 @@
 #ifndef __SIE_GUI_BOX_H__
 #define __SIE_GUI_BOX_H__
 
-#include "../include/sie/gui/surface.h"
+#include "surface.h"
 
 #define SIE_GUI_BOX_CALLBACK_NO  0x00
 #define SIE_GUI_BOX_CALLBACK_YES 0x01
@@ -13,7 +13,6 @@ typedef struct {
 
 typedef struct {
     GUI gui;
-    unsigned int gui_id;
     SIE_GUI_SURFACE *surface;
     WSHDR *msg_ws;
     WSHDR *left_ws;
