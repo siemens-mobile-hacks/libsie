@@ -9,14 +9,14 @@ int PRIOS[SUBPROC_MAX_SLOTS] = {0x80, 0x80};
 
 static void OnMsg(void);
 
-void InitSubProc() {
+void Sie_SubProc_Init() {
     for (unsigned int i = 0; i < SUBPROC_MAX_SLOTS; i++) {
         SLOTS[i] = 0;
         CreateGBSproc(CEPIDS[i], SUBPROC_NAME, OnMsg, PRIOS[i], 0);
     }
 }
 
-void DestroySubProc() {
+void Sie_SubProc_Destroy() {
     for (unsigned int i = 0; i < SUBPROC_MAX_SLOTS; i++) {
         KillGBSproc(CEPIDS[i]);
     }

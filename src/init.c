@@ -2,12 +2,20 @@
 
 __attribute_constructor
 void InitLibrary() {
-    extern void InitSubProc();
-    InitSubProc();
+    extern void Sie_FT_Init();
+    extern void Sie_SubProc_Init();
+    extern void Sie_Resources_Init();
+    Sie_FT_Init();
+    Sie_SubProc_Init();
+    Sie_Resources_Init();
 }
 
 __attribute_destructor
 void DestroyLibrary() {
-    extern void DestroySubProc();
-    DestroySubProc();
+    extern void Sie_FT_Destroy();
+    extern void Sie_SubProc_Destroy();
+    extern void Sie_Resources_Destroy();
+    Sie_FT_Destroy();
+    Sie_SubProc_Destroy();
+    Sie_Resources_Destroy();
 }

@@ -18,9 +18,6 @@ typedef struct {
     IMGHDR *icon;
 } SIE_RESOURCES_IMG;
 
-void Sie_Resources_Init();
-void Sie_Resources_Destroy();
-
 void Sie_Resources_SetWallpaper(WSHDR *ws);
 
 SIE_RESOURCES_IMG *Sie_Resources_LoadImage(unsigned int type, unsigned int size, const char *name);
