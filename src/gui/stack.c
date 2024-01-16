@@ -34,15 +34,6 @@ SIE_GUI_STACK *Sie_GUI_Stack_FindByGuiID(const SIE_GUI_STACK *top, unsigned int 
     return NULL;
 }
 
-SIE_GUI_STACK *Sie_GUI_Stack_Pop(SIE_GUI_STACK *top, unsigned int gui_id) {
-    if (top->gui_id == gui_id) {
-        SIE_GUI_STACK *prev = top->prev;
-        prev->next = NULL;
-        mfree(top);
-        return prev;
-    } else return top;
-}
-
 SIE_GUI_STACK *Sie_GUI_Stack_Delete(SIE_GUI_STACK *top, unsigned int gui_id) {
     SIE_GUI_STACK *gui = Sie_GUI_Stack_FindByGuiID(top, gui_id);
     if (gui) {
