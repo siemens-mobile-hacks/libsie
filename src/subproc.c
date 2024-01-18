@@ -39,18 +39,15 @@ static void OnMsg()
 
 unsigned int Sie_SubProc_Run(void *proc, void *data)
 {
-    int slot = -1;
-    while (slot < SUBPROC_MAX_SLOTS - 1) {
-        slot += 1;
+    int slot = 0;
+    while (slot < SUBPROC_MAX_SLOTS) {
         if (!SLOTS[slot]) {
             SLOTS[slot] = 1;
-            break;
+            GBS_SendMessage(CEPIDS[slot], slot, 0, proc, data);
+            return 1;
+        } else {
+            slot++;
         }
     }
-    if (slot != -1) {
-        GBS_SendMessage(CEPIDS[slot], slot, 0, proc, data);
-        return 1;
-    } else {
-        return 0;
-    }
+    return 0;
 }

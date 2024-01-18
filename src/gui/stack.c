@@ -62,10 +62,10 @@ SIE_GUI_STACK *Sie_GUI_Stack_CloseChildren(SIE_GUI_STACK *top, unsigned int gui_
         ids[i++] = top->gui_id;
         top = top->prev;
     }
-    for (unsigned int j = 0; j < i; j++) {
-        Sie_GUI_CloseGUI_GBS(ids[j]);
-    }
     if (ids) {
+        for (unsigned int j = 0; j < i; j++) {
+            Sie_GUI_CloseGUI_GBS(ids[j]);
+        }
         mfree(ids);
     }
     return (stack) ? stack : top;

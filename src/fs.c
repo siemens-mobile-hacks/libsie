@@ -445,7 +445,7 @@ unsigned int Sie_FS_CopyFile(const char *src, const char *dest, unsigned int *er
 }
 
 unsigned int Sie_FS_CopyDir(const char *src, const char *dest, unsigned int *err) {
-    char *mask = malloc(strlen(src) + 1 + 1);
+    char *mask = malloc(strlen(src) + 2 + 1);
     sprintf(mask, "%s\\*", src);
     SIE_FILE *files = Sie_FS_FindFilesRecursive(mask);
     mfree(mask);
