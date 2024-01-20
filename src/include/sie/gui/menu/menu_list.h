@@ -32,17 +32,17 @@ typedef struct {
 
 SIE_MENU_LIST *Sie_Menu_List_Init(unsigned int gui_id);
 void Sie_Menu_List_AddItem(SIE_MENU_LIST *menu, SIE_MENU_LIST_ITEM *item, const char *name);
-void Sie_Menu_List_SetItemType(SIE_MENU_LIST_ITEM *item, unsigned int type, unsigned int flag);
 void Sie_Menu_List_Destroy(SIE_MENU_LIST *menu);
 
 void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu);
 void Sie_Menu_List_DrawEmpty();
 void Sie_Menu_List_Draw(SIE_MENU_LIST *menu);
-
 void Sie_Menu_List_OnKey(SIE_MENU_LIST *menu, GUI_MSG *msg);
-
 void Sie_Menu_List_Refresh(SIE_MENU_LIST *menu);
-#define Sie_Menu_List_GetCurrentItem(menu) &(menu->items[menu->row]);
+
+void Sie_Menu_List_SetItemType(SIE_MENU_LIST_ITEM *item, unsigned int type, unsigned int flag);
+SIE_MENU_LIST_ITEM *Sie_Menu_List_GetItem(SIE_MENU_LIST *menu, unsigned int row);
+#define Sie_Menu_List_GetCurrentItem(menu) Sie_Menu_List_GetItem(menu, menu->row);
 unsigned int Sie_Menu_List_GetIdByName_ws(SIE_MENU_LIST *menu, WSHDR *ws, unsigned int *err);
 unsigned int Sie_Menu_List_SetRow(SIE_MENU_LIST *menu, unsigned int row);
 

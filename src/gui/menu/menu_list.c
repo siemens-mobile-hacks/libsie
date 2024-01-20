@@ -68,18 +68,6 @@ void Sie_Menu_List_AddItem(SIE_MENU_LIST *menu, SIE_MENU_LIST_ITEM *item, const 
     menu->n_items++;
 }
 
-void Sie_Menu_List_SetItemType(SIE_MENU_LIST_ITEM *item, unsigned int type, unsigned int flag) {
-    switch (type) {
-        case SIE_MENU_LIST_ITEM_TYPE_CHECKBOX:
-            item->type = type;
-            item->flag = flag;
-            LoadIcon2(item);
-            break;
-        default:
-            break;
-    }
-}
-
 void Sie_Menu_List_Destroy(SIE_MENU_LIST *menu) {
     if (menu) {
         if (menu->items) {
@@ -269,6 +257,22 @@ void Sie_Menu_List_Refresh(SIE_MENU_LIST *menu) {
             menu->offset = 0;
         }
     }
+}
+
+void Sie_Menu_List_SetItemType(SIE_MENU_LIST_ITEM *item, unsigned int type, unsigned int flag) {
+    switch (type) {
+        case SIE_MENU_LIST_ITEM_TYPE_CHECKBOX:
+            item->type = type;
+            item->flag = flag;
+            LoadIcon2(item);
+            break;
+        default:
+            break;
+    }
+}
+
+SIE_MENU_LIST_ITEM *Sie_Menu_List_GetItem(SIE_MENU_LIST *menu, unsigned int row) {
+    return (row < menu->n_items) ? &(menu->items[row]) : NULL;
 }
 
 unsigned int Sie_Menu_List_GetIdByName_ws(SIE_MENU_LIST *menu, WSHDR *ws, unsigned int *err) {
