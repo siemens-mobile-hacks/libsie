@@ -257,88 +257,85 @@ SIE_FILE *Sie_FS_DeleteFileElement(SIE_FILE *top, SIE_FILE *file) {
     return NULL;
 }
 
-SIE_FILE *Sie_FS_SortFiles(SIE_FILE *top, int cmp(SIE_FILE*, SIE_FILE*), int keep_folders_on_top) {
-    SIE_FILE *new_top = NULL;
+SIE_FILE *Sie_FS_SortFiles(SIE_FILE *files, int cmp(SIE_FILE*, SIE_FILE*), int keep_dirs_on_top) {
+    SIE_FILE *p = files;
     SIE_FILE *prev = NULL;
-    SIE_FILE *current = NULL;
-
-    SIE_FILE *p = NULL;
-    SIE_FILE *p2 = NULL;
-
-    p = top;
+    SIE_FILE *next = NULL;
+    SIE_FILE *new_files = NULL;
     while (p) {
         SIE_FILE *found = p;
-        p2 = p->next;
+        SIE_FILE *p2 = p->next;
+        next = p->next;
         while (p2) {
             if (cmp(p2, found)) {
                 found = p2;
             }
             p2 = p2->next;
         }
-        current = Sie_FS_CopyFileElement(found);
-        if (found == p) {
-            p = p->next;
+        if (p != found) {
+            SIE_FILE *found_prev = found->prev;
+            SIE_FILE *found_next = found->next;
+            if (found_prev) {
+                found_prev->next = found_next;
+            }
+            if (found_next) {
+                found_next->prev = found_prev;
+            }
+            found->prev = NULL;
+            found->next = NULL;
         }
-        SIE_FILE *element = Sie_FS_DeleteFileElement(p, found);
-        if (element) {
-            Sie_FS_DestroyFileElement(element);
-        }
-        current->prev = prev;
-        current->next = NULL;
-        if (!prev) {
-            new_top = current;
+        if (!new_files) {
+            new_files = found;
+            new_files->prev = NULL;
+            new_files->next = NULL;
         } else {
-            prev->next = current;
+            prev->next = found;
+            found->prev = prev;
         }
-        prev = current;
+        prev = found;
+        if (p == found) {
+            p = next;
+        }
     }
 
-    if (keep_folders_on_top) {
-        SIE_FILE *top_dir = NULL;
-        SIE_FILE *top_file = NULL;
+    if (keep_dirs_on_top) {
+        SIE_FILE *dirs = NULL;
         SIE_FILE *last_dir = NULL;
-        SIE_FILE *last_file = NULL;
-        p = new_top;
+        SIE_FILE *first_file = NULL;
+        p = new_files;
         while (p) {
-            SIE_FILE *element = NULL;
+            prev = p->prev, next = p->next;
             if (p->file_attr & SIE_FS_FA_DIRECTORY) {
-                SIE_FILE *current_dir = Sie_FS_CopyFileElement(p);
-                element = Sie_FS_DeleteFileElement(p, p);
-                current_dir->next = NULL;
-                current_dir->prev = last_dir;
-                if (!last_dir) {
-                    top_dir = current_dir;
-                } else {
-                    last_dir->next = current_dir;
+                SIE_FILE *dir = Sie_FS_CopyFileElement(p);
+                if (prev) {
+                    prev->next = next;
                 }
-                last_dir = current_dir;
-            } else {
-                SIE_FILE *current_file = Sie_FS_CopyFileElement(p);
-                element = Sie_FS_DeleteFileElement(p, p);
-                current_file->next = NULL;
-                current_file->prev = last_file;
-                if (!last_file) {
-                    top_file = current_file;
-                } else {
-                    last_file->next = current_file;
+                if (next) {
+                    next->prev = prev;
                 }
-                last_file = current_file;
+                Sie_FS_DestroyFileElement(p);
+                if (!dirs) {
+                    dirs = dir;
+                } else {
+                    last_dir->next = dir;
+                    dir->prev = last_dir;
+                }
+                last_dir = dir;
             }
-            p = p->next;
-            if (element) {
-                Sie_FS_DestroyFileElement(element);
+            else if (!first_file) {
+                first_file = p;
             }
+            p = next;
         }
-        if (top_dir) {
-            last_dir->next = top_file;
+        if (last_dir) {
+            if (first_file) {
+                last_dir->next = first_file;
+                first_file->prev = last_dir;
+            }
+            return dirs;
         }
-        if (top_file) {
-            top_file->prev = last_dir;
-        }
-        new_top = (top_dir) ? top_dir : top_file;
     }
-
-    return new_top;
+    return new_files;
 }
 
 static int cmp_by_name(SIE_FILE *f1, SIE_FILE *f2) {
