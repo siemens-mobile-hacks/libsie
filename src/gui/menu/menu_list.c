@@ -259,6 +259,15 @@ void Sie_Menu_List_Refresh(SIE_MENU_LIST *menu) {
     }
 }
 
+unsigned int Sie_Menu_List_SetRow(SIE_MENU_LIST *menu, unsigned int row) {
+    if (row < menu->n_items) {
+        menu->row = row;
+    } else {
+        menu->row = menu->n_items - 1;
+    }
+    return menu->row;
+}
+
 void Sie_Menu_List_SetItemType(SIE_MENU_LIST_ITEM *item, unsigned int type, unsigned int flag) {
     switch (type) {
         case SIE_MENU_LIST_ITEM_TYPE_CHECKBOX:
@@ -275,7 +284,7 @@ SIE_MENU_LIST_ITEM *Sie_Menu_List_GetItem(SIE_MENU_LIST *menu, unsigned int row)
     return (row < menu->n_items) ? &(menu->items[row]) : NULL;
 }
 
-unsigned int Sie_Menu_List_GetIdByName_ws(SIE_MENU_LIST *menu, WSHDR *ws, unsigned int *err) {
+unsigned int Sie_Menu_List_GetRowByName_ws(SIE_MENU_LIST *menu, WSHDR *ws, unsigned int *err) {
     unsigned int i = 0;
     while (i < menu->n_items) {
         if (wstrcmp(menu->items[i].ws, ws) == 0) {
@@ -285,13 +294,4 @@ unsigned int Sie_Menu_List_GetIdByName_ws(SIE_MENU_LIST *menu, WSHDR *ws, unsign
     }
     *err = 1;
     return 0;
-}
-
-unsigned int Sie_Menu_List_SetRow(SIE_MENU_LIST *menu, unsigned int row) {
-    if (row < menu->n_items) {
-        menu->row = row;
-    } else {
-        menu->row = menu->n_items - 1;
-    }
-    return menu->row;
 }

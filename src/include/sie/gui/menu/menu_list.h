@@ -40,10 +40,10 @@ void Sie_Menu_List_Draw(SIE_MENU_LIST *menu);
 void Sie_Menu_List_OnKey(SIE_MENU_LIST *menu, GUI_MSG *msg);
 void Sie_Menu_List_Refresh(SIE_MENU_LIST *menu);
 
+unsigned int Sie_Menu_List_SetRow(SIE_MENU_LIST *menu, unsigned int row);
 void Sie_Menu_List_SetItemType(SIE_MENU_LIST_ITEM *item, unsigned int type, unsigned int flag);
 SIE_MENU_LIST_ITEM *Sie_Menu_List_GetItem(SIE_MENU_LIST *menu, unsigned int row);
 #define Sie_Menu_List_GetCurrentItem(menu) Sie_Menu_List_GetItem(menu, menu->row);
-unsigned int Sie_Menu_List_GetIdByName_ws(SIE_MENU_LIST *menu, WSHDR *ws, unsigned int *err);
-unsigned int Sie_Menu_List_SetRow(SIE_MENU_LIST *menu, unsigned int row);
+unsigned int Sie_Menu_List_GetRowByName_ws(SIE_MENU_LIST *menu, WSHDR *ws, unsigned int *err);
 
 #endif
