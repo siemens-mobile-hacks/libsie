@@ -81,12 +81,12 @@ void Sie_GUI_DrawIconBar() {
     unsigned int w = 0, h = 0;
     WSHDR *ws = AllocWS(64);
 
-    // free ram
-    wsprintf(ws, "%d %t", GetFreeRamAvail(), "Б");
-    Sie_FT_DrawString(ws,
-                      0 + PADDING_ICONBAR,
-                      0 + (YDISP - Sie_FT_GetMaxHeight(FONT_SIZE_ICONBAR)) / 2,
-                      FONT_SIZE_ICONBAR, NULL);
+//    // free ram
+//    wsprintf(ws, "%d %t", GetFreeRamAvail(), "Б");
+//    Sie_FT_DrawString(ws,
+//                      0 + PADDING_ICONBAR,
+//                      0 + (YDISP - Sie_FT_GetMaxHeight(FONT_SIZE_ICONBAR)) / 2,
+//                      FONT_SIZE_ICONBAR, NULL);
     // battery cap
     int percent = 0;
     const int cap = *RamCap();
