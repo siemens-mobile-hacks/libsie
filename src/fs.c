@@ -346,6 +346,27 @@ SIE_FILE *Sie_FS_SortFilesByName(SIE_FILE *top, int keep_folders_on_top) {
     return Sie_FS_SortFiles(top, cmp_by_name, keep_folders_on_top);
 }
 
+SIE_FILE *Sie_FS_ExcludeFilesByFileAttr(SIE_FILE *top, short file_attr) {
+    SIE_FILE *file = top;
+    while (file) {
+        SIE_FILE *prev = file->prev;
+        SIE_FILE *next = file->next;
+        if (file->file_attr & file_attr) {
+            if (prev) {
+                prev->next = next;
+            }
+            if (next) {
+                next->prev = prev;
+            }
+            if (file == top) {
+                top = next;
+            }
+        }
+        file = next;
+    }
+    return top;
+}
+
 unsigned int Sie_FS_FileExists(const char *path) {
     size_t len = strlen(path);
     WSHDR *ws = AllocWS((int)len + 5);
