@@ -195,5 +195,5 @@ SIE_GUI_BOX_GUI *Sie_GUI_MsgBox(const char *msg) {
 }
 
 SIE_GUI_BOX_GUI *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_BOX_CALLBACK *callback) {
-    return Sie_GUI_Box(msg, "Да", "Нет", callback);
+    return Sie_GUI_Box(msg, "Yes", "No", callback);
 }
