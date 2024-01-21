@@ -109,7 +109,7 @@ static void DrawStr(WSHDR *ws, int x, int y, int x2, int y2, int x_offset, int f
             img.bitmap[j + 2] = rgb[0]; // r
         }
 
-        int x_img = x;
+        int x_img = x + ft_cc_cache->h_bearing_x;
         int y_img = y + ft_cc_cache->y_offset;
         int x2_img = x_img + ft_cc_cache->h_advance;
         int w_img = img.w;
