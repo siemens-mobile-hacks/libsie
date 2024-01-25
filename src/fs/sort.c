@@ -93,5 +93,10 @@ SIE_FILE *Sie_FS_SortFilesByNameAsc(SIE_FILE *files, int keep_dirs_on_top) {
     return Sie_FS_SortFiles(files, CompareByNameAsc, keep_dirs_on_top);
 }
 
-/**********************************************************************************************************************/
+static int CompareByNameDesc(SIE_FILE *f1, SIE_FILE *f2) {
+    return (strcmpi(f1->file_name, f2->file_name) > 0);
+}
 
+SIE_FILE *Sie_FS_SortFilesByNameDesc(SIE_FILE *files, int keep_dirs_on_top) {
+    return Sie_FS_SortFiles(files, CompareByNameDesc, keep_dirs_on_top);
+}
