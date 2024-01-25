@@ -68,6 +68,15 @@ void Sie_Menu_List_AddItem(SIE_MENU_LIST *menu, SIE_MENU_LIST_ITEM *item, const 
     menu->n_items++;
 }
 
+void Sie_Menu_List_AddSeparator(SIE_MENU_LIST *menu) {
+    if (menu->n_items) {
+        menu->separators = realloc(menu->separators, sizeof(SIE_MENU_LIST_SEPARATOR) * (menu->n_separators + 1));
+        SIE_MENU_LIST_SEPARATOR *separator = &(menu->separators[menu->n_separators]);
+        separator->row = menu->n_items - 1;
+        menu->n_separators++;
+    }
+}
+
 void Sie_Menu_List_Destroy(SIE_MENU_LIST *menu) {
     if (menu) {
         if (menu->items) {
@@ -76,6 +85,9 @@ void Sie_Menu_List_Destroy(SIE_MENU_LIST *menu) {
                 FreeWS(item->ws);
             }
             mfree(menu->items);
+        }
+        if (menu->n_separators) {
+            mfree(menu->separators);
         }
         SIE_FT_SCROLL_STRING *ss = menu->ss;
         GBS_DelTimer(&(ss->tmr));
@@ -115,72 +127,75 @@ static void DrawSSBG(int x, int y, int x2, int y2) {
     DrawRectangle(x, y, x2, y2, 0, color_bg, color_bg);
 }
 
-IMGHDR *GetIcon(const SIE_MENU_LIST_ITEM *item) {
-    switch (item->type) {
-        case SIE_MENU_LIST_ITEM_TYPE_CHECKBOX:
-            return item->icon2;
-        default:
-            return item->icon;
-    }
-}
-
 void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
-#define show_indicator (menu->n_items > SIE_MENU_LIST_MAX_ITEMS)
 #define is_select (i == (menu->row - menu->offset))
 
     const char color_select_bg[] = COLOR_SELECT_BG;
+    const int show_indicator = (menu->n_items > SIE_MENU_LIST_MAX_ITEMS) ? 1 : 0;
 
     const int h_offset = 3;
-    const int v_offset = 2;
+    const int v_offset = 3;
     const int header_h = HeaderH();
     const int width = ScreenW();
-    const int height = ScreenH() - 1 - YDISP - header_h - v_offset;
-    const float item_h = (float)height / SIE_MENU_LIST_MAX_ITEMS;
+    const int height = ScreenH() - YDISP - header_h - 1;
+    const float item_h = (float)height / SIE_MENU_LIST_MAX_ITEMS - (float)v_offset;
     const int item_w = (show_indicator) ? width - 6 - 1 - h_offset : width - 1 - h_offset;
 
-    Sie_GUI_DrawBleedIMGHDR(SIE_RES_IMG_WALLPAPER, 0, 0 + YDISP + HeaderH(), SCREEN_X2, SCREEN_Y2, 0, YDISP + HeaderH());
+    Sie_GUI_DrawBleedIMGHDR(SIE_RES_IMG_WALLPAPER, 0, 0 + YDISP + header_h, SCREEN_X2, SCREEN_Y2,
+                            0, YDISP + header_h);
 
-    int c = min(menu->n_items, SIE_MENU_LIST_MAX_ITEMS);
-    for (unsigned int i = 0; i < c; i++) {
+    float y_start = YDISP + (float)header_h + 1;
+    const int count = min(menu->n_items, SIE_MENU_LIST_MAX_ITEMS);
+    for (unsigned int i = 0; i < count; i++) {
         const SIE_MENU_LIST_ITEM *item = &(menu->items[menu->offset + i]);
-        IMGHDR *img = GetIcon(item);
-        WSHDR *ws = item->ws;
-
         const int x = 3;
         const int x2 = item_w;
-        const float y = (float)(YDISP + header_h + 1 + (float)v_offset / 2) + (float)i * item_h;
+        const float y = y_start + (float)v_offset / 2;
         const float y2 = y + item_h - (float)v_offset / 2;
-        const float text_y = y + (item_h - (float)Sie_FT_GetMaxHeight(FONT_SIZE)) / 2;
+
+        if (menu->n_separators) {
+            SIE_MENU_LIST_SEPARATOR *separator = NULL;
+            for (unsigned int j = 0; j < menu->n_separators; j++) {
+                separator = &(menu->separators[j]);
+                if (separator->row == (menu->offset + i)) {
+                    const char color[] = COLOR_MENU_SEPARATOR;
+                    DrawLine(x + 2, (int)(y2 + 2), x2 - 2, (int)(y2 + 2), 1,color);
+                    break;
+                }
+            }
+        }
 
         int text_x = x + 8;
         int text_x2 = x2 - 8;
-        int icon_x = 0;
-        float icon_y = 0;
-
+        int text_y = (int)y + ((int)item_h - Sie_FT_GetMaxHeight(FONT_SIZE)) / 2;
+        IMGHDR *img = (item->type == SIE_MENU_LIST_ITEM_TYPE_DEFAULT) ? item->icon : item->icon2;
         if (is_select) {
-            DrawRoundedFrame(x, (int)y, x2, (int)y2,
+            DrawRoundedFrame(x, (int)y - 1, x2, (int)y2 + 1,
                              6, 6, 0,
                              color_select_bg, color_select_bg);
         }
         if (img) {
+            int icon_x = 0;
+            int icon_y = 0;
             icon_x = text_x;
             text_x = icon_x + img->w + 6;
-            icon_y = y + (item_h - (float)img->h) / 2;
-            Sie_GUI_DrawIMGHDR(img, icon_x, (int)icon_y, img->w, img->h);
+            icon_y = (int)y + ((int)item_h - img->h) / 2;
+            Sie_GUI_DrawIMGHDR(img, icon_x, icon_y, img->w, img->h);
         }
         if (is_select) {
             SIE_FT_SCROLL_STRING *ss = menu->ss;
-            ss->ws = ws;
+            ss->ws = item->ws;
             ss->x = text_x;
-            ss->y = (int)text_y;
+            ss->y = text_y;
             ss->x2 = text_x2;
             ss->y2 = 0;
             ss->color = item->color;
             Sie_FT_DrawBoundingScrollString(menu->ss, &(ss->tmr));
         } else {
-            Sie_FT_DrawBoundingString(ws, text_x, (int)text_y, text_x2, 0,
+            Sie_FT_DrawBoundingString(item->ws, text_x, text_y, text_x2, 0,
                                       FONT_SIZE, SIE_FT_TEXT_ALIGN_LEFT, item->color);
         }
+        y_start += item_h + (float)v_offset;
     }
     if (show_indicator) {
         Sie_Menu_List_DrawIndicator(menu);
