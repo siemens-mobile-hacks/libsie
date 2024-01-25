@@ -38,6 +38,14 @@ void LoadIcon2(SIE_MENU_LIST_ITEM *item) {
             } else {
                 strcpy(name, "checkbox-checked");
             }
+            break;
+        case SIE_MENU_LIST_ITEM_TYPE_RADIO:
+            if (!item->flag) {
+                strcpy(name, "radio");
+            } else {
+                strcpy(name, "radio-selected");
+            }
+            break;
     }
     if (name[0]) {
         SIE_RESOURCES_IMG *res_img = Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_ACTIONS, 24, name);

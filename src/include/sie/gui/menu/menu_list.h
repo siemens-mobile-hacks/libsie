@@ -11,6 +11,7 @@
 
 #define SIE_MENU_LIST_ITEM_TYPE_DEFAULT  0x00
 #define SIE_MENU_LIST_ITEM_TYPE_CHECKBOX 0x01
+#define SIE_MENU_LIST_ITEM_TYPE_RADIO    0x02
 
 typedef struct {
     unsigned int type;
