@@ -39,7 +39,7 @@ void Sie_FS_DestroyFileElement(SIE_FILE *file);
 SIE_FILE *Sie_FS_DeleteFileElement(SIE_FILE *top, SIE_FILE *file);
 
 SIE_FILE *Sie_FS_SortFiles(SIE_FILE *files, int cmp(SIE_FILE*, SIE_FILE*), int keep_dirs_on_top);
-SIE_FILE *Sie_FS_SortFilesByName(SIE_FILE *top, int keep_folders_on_top);
+SIE_FILE *Sie_FS_SortFilesByNameAsc(SIE_FILE *files, int keep_dirs_on_top);
 SIE_FILE *Sie_FS_ExcludeFilesByFileAttr(SIE_FILE *top, short file_attr);
 
 unsigned int Sie_FS_FileExists(const char *path);
