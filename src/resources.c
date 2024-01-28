@@ -10,23 +10,24 @@ unsigned int SIE_RES_CLIENTS;
 
 
 void Sie_Resources_Init() {
-    if (!SIE_RES_IMG_WALLPAPER) {
-        size_t len;
-        char *path;
-        WSHDR *ws = AllocWS(1024);
-        Settings_ReadWS(ws, NULL, "wallpaper");
-        len = wstrlen(ws);
-        path = malloc(len + 1);
-        ws_2str(ws, path, len);
-        FreeWS(ws);
-
-        HObj hobj = Sie_Resources_CreateHObjFromImgFile(path);
-        if (hobj) {
-            SIE_RES_IMG_WALLPAPER = Sie_Resources_HObj2IMGHDR(hobj, ScreenW(), ScreenH());
-            Obs_DestroyObject(hobj);
-        }
-        mfree(path);
-    }
+//    if (!SIE_RES_IMG_WALLPAPER) {
+//        size_t len;
+//        char *path;
+//        WSHDR *ws = AllocWS(1024);
+//        Settings_ReadWS(ws, NULL, "wallpaper");
+//        len = wstrlen(ws);
+//        path = malloc(len + 1);
+//        ws_2str(ws, path, len);
+//        FreeWS(ws);
+//
+//        HObj hobj = Sie_Resources_CreateHObjFromImgFile(path);
+//        if (hobj) {
+//            SIE_RES_IMG_WALLPAPER = Sie_Resources_HObj2IMGHDR(hobj, ScreenW(), ScreenH());
+//            Obs_DestroyObject(hobj);
+//        }
+//        mfree(path);
+//    }
+    SIE_RES_IMG_WALLPAPER = GetIMGHDRFromCanvasCache(0);
     Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_STATUS, 24, "battery-00");
     Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_STATUS, 24, "battery-20");
     Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_STATUS, 24, "battery-40");
@@ -41,10 +42,10 @@ void Sie_Resources_Destroy() {
         SIE_RES_CLIENTS--;
     }
     if (!SIE_RES_CLIENTS) {
-        if (SIE_RES_IMG_WALLPAPER) {
-            mfree(SIE_RES_IMG_WALLPAPER->bitmap);
-            mfree(SIE_RES_IMG_WALLPAPER);
-        }
+//        if (SIE_RES_IMG_WALLPAPER) {
+//            mfree(SIE_RES_IMG_WALLPAPER->bitmap);
+//            mfree(SIE_RES_IMG_WALLPAPER);
+//        }
         SIE_RES_IMG_WALLPAPER = NULL;
         SIE_RESOURCES_IMG *p = SIE_RES_IMG;
         while (p) {
