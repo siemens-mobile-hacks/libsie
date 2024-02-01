@@ -13,9 +13,6 @@
 RECT canvas;
 IMGHDR *IMG_YES;
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Waddress"
-
 static void OnRedraw(SIE_GUI_BOX_GUI *data) {
     const char color_bg[] = COLOR_BG;
     const char color_border[] = COLOR_BORDER;
@@ -41,17 +38,17 @@ static void OnRedraw(SIE_GUI_BOX_GUI *data) {
     Sie_FT_DrawBoundingString(data->msg_ws, x, y, x2, y2_msg,FONT_SIZE_MSG,
                               SIE_FT_TEXT_ALIGN_CENTER + SIE_FT_TEXT_VALIGN_MIDDLE, NULL);
 
-    if (&(data->callback)) {
+    if (data->type == SIE_GUI_BOX_TYPE_QUESTION) {
         int x_img = 0;
         int x2_img = 0;
         if (IMG_YES) {
             int y_img = 0;
             unsigned int w, h = 0, h1 = 0, h2 = 0;
-            if (data->left_ws) {
-                Sie_FT_GetStringSize(data->left_ws, FONT_SIZE_SOFT_KEYS, &w, &h1);
+            if (data->left_sk_ws) {
+                Sie_FT_GetStringSize(data->left_sk_ws, FONT_SIZE_SOFT_KEYS, &w, &h1);
             }
-            if (data->right_ws) {
-                Sie_FT_GetStringSize(data->right_ws, FONT_SIZE_SOFT_KEYS, &w, &h2);
+            if (data->right_sk_ws) {
+                Sie_FT_GetStringSize(data->right_sk_ws, FONT_SIZE_SOFT_KEYS, &w, &h2);
             }
             h = MAX(h1, h2);
             if (h) {
@@ -61,30 +58,28 @@ static void OnRedraw(SIE_GUI_BOX_GUI *data) {
                 Sie_GUI_DrawIMGHDR(IMG_YES, x_img, y_img, IMG_YES->w, IMG_YES->h);
             }
         }
-        if (data->left_ws) {
+        if (data->left_sk_ws) {
             int x_left_sk = x + 10;
             int x2_left_sk = x + (x2 - x) / 2 - 5;
             if (x_img) {
                 x2_left_sk -= IMG_YES->w / 2;
             }
-            Sie_FT_DrawBoundingString(data->left_ws, x_left_sk, y, x2_left_sk, y2_sk,
+            Sie_FT_DrawBoundingString(data->left_sk_ws, x_left_sk, y, x2_left_sk, y2_sk,
                                       FONT_SIZE_SOFT_KEYS,
-                                      SIE_FT_TEXT_ALIGN_LEFT + SIE_FT_TEXT_VALIGN_BOTTOM,NULL);
+                                      SIE_FT_TEXT_ALIGN_LEFT + SIE_FT_TEXT_VALIGN_BOTTOM, NULL);
         }
-        if (data->right_ws) {
+        if (data->right_sk_ws) {
             int x_right_sk = x + (x2 - x) / 2 + 5;
             int x2_right_sk = x2 - 10;
             if (x2_img) {
                 x_right_sk += IMG_YES->w / 2;
             }
-            Sie_FT_DrawBoundingString(data->right_ws, x_right_sk, y, x2_right_sk, y2_sk,
+            Sie_FT_DrawBoundingString(data->right_sk_ws, x_right_sk, y, x2_right_sk, y2_sk,
                                       FONT_SIZE_SOFT_KEYS,
-                                      SIE_FT_TEXT_ALIGN_RIGHT + SIE_FT_TEXT_VALIGN_BOTTOM,NULL);
+                                      SIE_FT_TEXT_ALIGN_RIGHT + SIE_FT_TEXT_VALIGN_BOTTOM, NULL);
         }
     }
 }
-
-#pragma GCC diagnostic pop
 
 static void OnAfterDrawIconBar() {
     const char color_surface_bg[] = COLOR_SURFACE_BG;
@@ -99,11 +94,11 @@ static void OnCreate(SIE_GUI_BOX_GUI *data, void *(*malloc_adr)(int)) {
 static void OnClose(SIE_GUI_BOX_GUI *data, void (*mfree_adr)(void *)) {
     data->gui.state = 0;
     FreeWS(data->msg_ws);
-    if (data->left_ws) {
-        FreeWS(data->left_ws);
+    if (data->left_sk_ws) {
+        FreeWS(data->left_sk_ws);
     }
-    if (data->right_ws) {
-        FreeWS(data->right_ws);
+    if (data->right_sk_ws) {
+        FreeWS(data->right_sk_ws);
     }
     Sie_GUI_Surface_Destroy(data->surface);
 }
@@ -159,28 +154,28 @@ static const void *const gui_methods[11] = {
         0
 };
 
-SIE_GUI_BOX_GUI *Sie_GUI_Box(const char *msg, const char *left, const char *right,
-                             SIE_GUI_BOX_CALLBACK *callback) {
+SIE_GUI_BOX_GUI *Sie_GUI_Box(unsigned int type, SIE_GUI_BOX_TEXT *text, SIE_GUI_BOX_CALLBACK *callback) {
     SIE_GUI_BOX_GUI *gui = malloc(sizeof(SIE_GUI_BOX_GUI));
     const SIE_GUI_SURFACE_HANDLERS surface_handlers = {
             OnAfterDrawIconBar,
             (int(*)(void *, GUI_MSG *msg))_OnKey,
     };
     zeromem(gui, sizeof(SIE_GUI_BOX_GUI));
+    gui->type = type;
     gui->msg_ws = AllocWS(128);
-    wsprintf(gui->msg_ws, "%t", msg);
-    if (callback) {
+    wsprintf(gui->msg_ws, "%t", text->msg);
+    if (type == SIE_GUI_BOX_TYPE_QUESTION) {
         SIE_RESOURCES_IMG *res_img = Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_ACTIONS, 24, "yes");
         if (res_img) {
             IMG_YES = res_img->icon;
         }
-        if (left) {
-            gui->left_ws = AllocWS((int)strlen(left));
-            wsprintf(gui->left_ws, "%t", left);
+        if (text->left_sk) {
+            gui->left_sk_ws = AllocWS((int)strlen(text->left_sk));
+            wsprintf(gui->left_sk_ws, "%t", text->left_sk);
         }
-        if (right) {
-            gui->right_ws = AllocWS((int)strlen(right));
-            wsprintf(gui->right_ws, "%t", right);
+        if (text->right_sk) {
+            gui->right_sk_ws = AllocWS((int)strlen(text->right_sk));
+            wsprintf(gui->right_sk_ws, "%t", text->right_sk);
         }
         memcpy(&(gui->callback), callback, sizeof(SIE_GUI_BOX_CALLBACK));
     }
@@ -197,9 +192,11 @@ SIE_GUI_BOX_GUI *Sie_GUI_Box(const char *msg, const char *left, const char *righ
 }
 
 SIE_GUI_BOX_GUI *Sie_GUI_MsgBox(const char *msg) {
-    return Sie_GUI_Box(msg, NULL, NULL, NULL);
+    SIE_GUI_BOX_TEXT text = {msg,NULL, NULL};
+    return Sie_GUI_Box(SIE_GUI_BOX_TYPE_STANDARD, &text, NULL);
 }
 
 SIE_GUI_BOX_GUI *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_BOX_CALLBACK *callback) {
-    return Sie_GUI_Box(msg, "Yes", "No", callback);
+    SIE_GUI_BOX_TEXT text = {msg, "Yes", "No"};
+    return Sie_GUI_Box(SIE_GUI_BOX_TYPE_QUESTION, &text, callback);
 }
