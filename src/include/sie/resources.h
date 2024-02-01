@@ -19,6 +19,7 @@ typedef struct {
 } SIE_RESOURCES_IMG;
 
 void Sie_Resources_SetWallpaper(WSHDR *ws, void (*proc)());
+IMGHDR *Sie_Resources_GetWallpaper();
 
 SIE_RESOURCES_IMG *Sie_Resources_LoadImage(unsigned int type, unsigned int size, const char *name);
 HObj Sie_Resources_CreateHObjFromImgFile(const char *path);

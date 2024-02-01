@@ -69,6 +69,9 @@ void Sie_Resources_SetWallpaper(WSHDR *ws, void (*proc)()) {
         Sie_SubProc_Run(SetWallpaper_Proc, proc);
     }
 }
+
+IMGHDR *Sie_Resources_GetWallpaper() {
+    return SIE_RES_IMG_WALLPAPER;
 }
 
 /**********************************************************************************************************************/
