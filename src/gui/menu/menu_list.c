@@ -1,5 +1,6 @@
 #include <swilib.h>
 #include <stdlib.h>
+#include <sys/param.h>
 #include "../../include/sie/gui/gui.h"
 #include "../../include/sie/resources.h"
 
@@ -153,7 +154,7 @@ void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
                             0, YDISP + header_h);
 
     float y_start = YDISP + (float)header_h + 1;
-    const int count = min(menu->n_items, SIE_MENU_LIST_MAX_ITEMS);
+    const int count = MIN(menu->n_items, SIE_MENU_LIST_MAX_ITEMS);
     for (unsigned int i = 0; i < count; i++) {
         const SIE_MENU_LIST_ITEM *item = &(menu->items[menu->offset + i]);
         const int x = 3;

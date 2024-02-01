@@ -1,6 +1,6 @@
 #include <swilib.h>
 
-__attribute_constructor
+__attribute__((constructor))
 void InitLibrary() {
     extern void Sie_FT_Init();
     extern void Sie_SubProc_Init();
@@ -10,7 +10,7 @@ void InitLibrary() {
     Sie_Resources_Init();
 }
 
-__attribute_destructor
+__attribute__((destructor))
 void DestroyLibrary() {
     extern void Sie_FT_Destroy();
     extern void Sie_SubProc_Destroy();

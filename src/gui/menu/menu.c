@@ -1,5 +1,6 @@
 #include <swilib.h>
 #include <stdlib.h>
+#include <sys/param.h>
 #include "../../include/sie/gui/gui.h"
 
 SIE_MENU *Sie_Menu_Init(SIE_MENU_ITEM *items, int n_items, int col, int row) {
@@ -8,7 +9,7 @@ SIE_MENU *Sie_Menu_Init(SIE_MENU_ITEM *items, int n_items, int col, int row) {
     menu->n_items = n_items;
     menu->col = col;
     menu->row = row;
-    menu->max_cols = min(n_items, SIE_MENU_MAX_COLS);
+    menu->max_cols = MIN(n_items, SIE_MENU_MAX_COLS);
     menu->max_rows = (n_items + SIE_MENU_MAX_COLS - 1) / SIE_MENU_MAX_COLS;
     return menu;
 }

@@ -1,5 +1,6 @@
 #include <swilib.h>
 #include <stdlib.h>
+#include <sys/param.h>
 #include "../include/sie/gui/gui.h"
 #include "../include/sie/resources.h"
 
@@ -11,6 +12,9 @@
 
 RECT canvas;
 IMGHDR *IMG_YES;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waddress"
 
 static void OnRedraw(SIE_GUI_BOX_GUI *data) {
     const char color_bg[] = COLOR_BG;
@@ -49,7 +53,7 @@ static void OnRedraw(SIE_GUI_BOX_GUI *data) {
             if (data->right_ws) {
                 Sie_FT_GetStringSize(data->right_ws, FONT_SIZE_SOFT_KEYS, &w, &h2);
             }
-            h = max(h1, h2);
+            h = MAX(h1, h2);
             if (h) {
                 x_img = 4 + (w_window / 2) - IMG_YES->w / 2;
                 y_img = y2_sk - (int) h / 2 - IMG_YES->h / 2;
@@ -79,6 +83,8 @@ static void OnRedraw(SIE_GUI_BOX_GUI *data) {
         }
     }
 }
+
+#pragma GCC diagnostic pop
 
 static void OnAfterDrawIconBar() {
     const char color_surface_bg[] = COLOR_SURFACE_BG;
