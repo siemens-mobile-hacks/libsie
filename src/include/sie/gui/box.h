@@ -29,10 +29,10 @@ typedef struct {
     WSHDR *left_sk_ws;
     WSHDR *right_sk_ws;
     SIE_GUI_BOX_CALLBACK callback;
-} SIE_GUI_BOX_GUI;
+} SIE_GUI_BOX;
 
-SIE_GUI_BOX_GUI *Sie_GUI_Box(unsigned int type, SIE_GUI_BOX_TEXT *text, SIE_GUI_BOX_CALLBACK *callback);
-SIE_GUI_BOX_GUI *Sie_GUI_MsgBox(const char *msg);
-SIE_GUI_BOX_GUI *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_BOX_CALLBACK *callback);
+SIE_GUI_BOX *Sie_GUI_Box(unsigned int type, SIE_GUI_BOX_TEXT *text, SIE_GUI_BOX_CALLBACK *callback);
+SIE_GUI_BOX *Sie_GUI_MsgBox(const char *msg);
+SIE_GUI_BOX *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_BOX_CALLBACK *callback);
 
 #endif

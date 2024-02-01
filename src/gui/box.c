@@ -13,7 +13,7 @@
 RECT canvas;
 IMGHDR *IMG_YES;
 
-static void OnRedraw(SIE_GUI_BOX_GUI *data) {
+static void OnRedraw(SIE_GUI_BOX *data) {
     const char color_bg[] = COLOR_BG;
     const char color_border[] = COLOR_BORDER;
     const char color_surface_bg[] = COLOR_SURFACE_BG;
@@ -87,11 +87,11 @@ static void OnAfterDrawIconBar() {
                   GetPaletteAdrByColorIndex(23), color_surface_bg);
 }
 
-static void OnCreate(SIE_GUI_BOX_GUI *data, void *(*malloc_adr)(int)) {
+static void OnCreate(SIE_GUI_BOX *data, void *(*malloc_adr)(int)) {
     data->gui.state = 1;
 }
 
-static void OnClose(SIE_GUI_BOX_GUI *data, void (*mfree_adr)(void *)) {
+static void OnClose(SIE_GUI_BOX *data, void (*mfree_adr)(void *)) {
     data->gui.state = 0;
     FreeWS(data->msg_ws);
     if (data->left_sk_ws) {
@@ -103,18 +103,18 @@ static void OnClose(SIE_GUI_BOX_GUI *data, void (*mfree_adr)(void *)) {
     Sie_GUI_Surface_Destroy(data->surface);
 }
 
-static void OnFocus(SIE_GUI_BOX_GUI *data, void *(*malloc_adr)(int), void (*mfree_adr)(void *)) {
+static void OnFocus(SIE_GUI_BOX *data, void *(*malloc_adr)(int), void (*mfree_adr)(void *)) {
     data->gui.state = 2;
     Sie_GUI_Surface_OnFocus(data->surface);
 }
 
-static void OnUnFocus(SIE_GUI_BOX_GUI *data, void (*mfree_adr)(void *)) {
+static void OnUnFocus(SIE_GUI_BOX *data, void (*mfree_adr)(void *)) {
     if (data->gui.state != 2) return;
     data->gui.state = 1;
     Sie_GUI_Surface_OnUnFocus(data->surface);
 }
 
-static int _OnKey(SIE_GUI_BOX_GUI *data, GUI_MSG *msg) {
+static int _OnKey(SIE_GUI_BOX *data, GUI_MSG *msg) {
     if (data->callback.proc) {
         if (msg->gbsmsg->msg == KEY_DOWN || msg->gbsmsg->msg == LONG_PRESS) {
             switch (msg->gbsmsg->submess) {
@@ -130,7 +130,7 @@ static int _OnKey(SIE_GUI_BOX_GUI *data, GUI_MSG *msg) {
     return 0;
 }
 
-static int OnKey(SIE_GUI_BOX_GUI *data, GUI_MSG *msg) {
+static int OnKey(SIE_GUI_BOX *data, GUI_MSG *msg) {
     return Sie_GUI_Surface_OnKey(data->surface, data, msg);
 }
 
@@ -154,13 +154,13 @@ static const void *const gui_methods[11] = {
         0
 };
 
-SIE_GUI_BOX_GUI *Sie_GUI_Box(unsigned int type, SIE_GUI_BOX_TEXT *text, SIE_GUI_BOX_CALLBACK *callback) {
-    SIE_GUI_BOX_GUI *gui = malloc(sizeof(SIE_GUI_BOX_GUI));
+SIE_GUI_BOX *Sie_GUI_Box(unsigned int type, SIE_GUI_BOX_TEXT *text, SIE_GUI_BOX_CALLBACK *callback) {
+    SIE_GUI_BOX *gui = malloc(sizeof(SIE_GUI_BOX));
     const SIE_GUI_SURFACE_HANDLERS surface_handlers = {
             OnAfterDrawIconBar,
             (int(*)(void *, GUI_MSG *msg))_OnKey,
     };
-    zeromem(gui, sizeof(SIE_GUI_BOX_GUI));
+    zeromem(gui, sizeof(SIE_GUI_BOX));
     gui->type = type;
     gui->msg_ws = AllocWS(128);
     wsprintf(gui->msg_ws, "%t", text->msg);
@@ -191,12 +191,12 @@ SIE_GUI_BOX_GUI *Sie_GUI_Box(unsigned int type, SIE_GUI_BOX_TEXT *text, SIE_GUI_
     return gui;
 }
 
-SIE_GUI_BOX_GUI *Sie_GUI_MsgBox(const char *msg) {
+SIE_GUI_BOX *Sie_GUI_MsgBox(const char *msg) {
     SIE_GUI_BOX_TEXT text = {msg,NULL, NULL};
     return Sie_GUI_Box(SIE_GUI_BOX_TYPE_STANDARD, &text, NULL);
 }
 
-SIE_GUI_BOX_GUI *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_BOX_CALLBACK *callback) {
+SIE_GUI_BOX *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_BOX_CALLBACK *callback) {
     SIE_GUI_BOX_TEXT text = {msg, "Yes", "No"};
     return Sie_GUI_Box(SIE_GUI_BOX_TYPE_QUESTION, &text, callback);
 }
