@@ -1,7 +1,7 @@
 #include <swilib.h>
 #include <stdlib.h>
-#include "include/sie/ext.h"
-#include "include/sie/settings.h"
+#include <nu_swilib.h>
+#include "include/sie/subproc.h"
 #include "include/sie/resources.h"
 
 IMGHDR *SIE_RES_IMG_WALLPAPER;
@@ -10,23 +10,6 @@ unsigned int SIE_RES_CLIENTS;
 
 
 void Sie_Resources_Init() {
-//    if (!SIE_RES_IMG_WALLPAPER) {
-//        size_t len;
-//        char *path;
-//        WSHDR *ws = AllocWS(1024);
-//        Settings_ReadWS(ws, NULL, "wallpaper");
-//        len = wstrlen(ws);
-//        path = malloc(len + 1);
-//        ws_2str(ws, path, len);
-//        FreeWS(ws);
-//
-//        HObj hobj = Sie_Resources_CreateHObjFromImgFile(path);
-//        if (hobj) {
-//            SIE_RES_IMG_WALLPAPER = Sie_Resources_HObj2IMGHDR(hobj, ScreenW(), ScreenH());
-//            Obs_DestroyObject(hobj);
-//        }
-//        mfree(path);
-//    }
     SIE_RES_IMG_WALLPAPER = GetIMGHDRFromCanvasCache(0);
     Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_STATUS, 24, "battery-00");
     Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_STATUS, 24, "battery-20");
@@ -42,10 +25,6 @@ void Sie_Resources_Destroy() {
         SIE_RES_CLIENTS--;
     }
     if (!SIE_RES_CLIENTS) {
-//        if (SIE_RES_IMG_WALLPAPER) {
-//            mfree(SIE_RES_IMG_WALLPAPER->bitmap);
-//            mfree(SIE_RES_IMG_WALLPAPER);
-//        }
         SIE_RES_IMG_WALLPAPER = NULL;
         SIE_RESOURCES_IMG *p = SIE_RES_IMG;
         while (p) {
@@ -62,22 +41,34 @@ void Sie_Resources_Destroy() {
 
 /**********************************************************************************************************************/
 
-void Sie_Resources_SetWallpaper(WSHDR *ws) {
-    if (SIE_RES_IMG_WALLPAPER) {
-        mfree(SIE_RES_IMG_WALLPAPER->bitmap);
-        mfree(SIE_RES_IMG_WALLPAPER);
+void SetWallpaper_Proc(void (*proc)()) {
+    IMGHDR *old = SIE_RES_IMG_WALLPAPER;
+    unsigned int i = 0;
+    while (1) {
+        IMGHDR *new = GetIMGHDRFromCanvasCache(0);
+        if (new) {
+            if (!old || new != old) {
+                SIE_RES_IMG_WALLPAPER = new;
+                proc();
+                break;
+            }
+        }
+        i++;
+        if (i == 5) {
+            proc();
+            break;
+        }
+        NU_Sleep(50);
     }
-    Settings_UpdateWS(ws, NULL, "wallpaper");
+}
 
-    size_t len = wstrlen(ws);
-    char *path = malloc(len + 1);
-    ws_2str(ws, path, len);
-    HObj hobj = Sie_Resources_CreateHObjFromImgFile(path);
-    if (hobj) {
-        SIE_RES_IMG_WALLPAPER = Sie_Resources_HObj2IMGHDR(hobj, ScreenW(), ScreenH());
-        Obs_DestroyObject(hobj);
+void Sie_Resources_SetWallpaper(WSHDR *ws, void (*proc)()) {
+    int hmi_key_id = Registry_GetHMIKeyID("Wallpaper");
+    Registry_SetResourcePath(hmi_key_id, 3, ws);
+    if (proc) {
+        Sie_SubProc_Run(SetWallpaper_Proc, proc);
     }
-    mfree(path);
+}
 }
 
 /**********************************************************************************************************************/
