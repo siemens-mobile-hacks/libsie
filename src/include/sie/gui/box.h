@@ -34,5 +34,6 @@ typedef struct {
 SIE_GUI_BOX *Sie_GUI_Box(unsigned int type, SIE_GUI_BOX_TEXT *text, SIE_GUI_BOX_CALLBACK *callback);
 SIE_GUI_BOX *Sie_GUI_MsgBox(const char *msg);
 SIE_GUI_BOX *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_BOX_CALLBACK *callback);
+SIE_GUI_BOX *Sie_GUI_WaitBox();
 
 #endif

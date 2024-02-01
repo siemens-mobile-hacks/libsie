@@ -200,3 +200,8 @@ SIE_GUI_BOX *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_BOX_CALLBACK *callback
     SIE_GUI_BOX_TEXT text = {msg, "Yes", "No"};
     return Sie_GUI_Box(SIE_GUI_BOX_TYPE_QUESTION, &text, callback);
 }
+
+SIE_GUI_BOX *Sie_GUI_WaitBox() {
+    SIE_GUI_BOX_TEXT text = {"Wait...", NULL, NULL};
+    return Sie_GUI_Box(SIE_GUI_BOX_TYPE_WAIT, &text, NULL);
+}
