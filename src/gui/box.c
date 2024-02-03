@@ -195,7 +195,9 @@ SIE_GUI_BOX *Sie_GUI_Box(unsigned int type, SIE_GUI_BOX_TEXT *text, SIE_GUI_BOX_
             gui->right_sk_ws = AllocWS((int)strlen(text->right_sk));
             wsprintf(gui->right_sk_ws, "%t", text->right_sk);
         }
-        memcpy(&(gui->callback), callback, sizeof(SIE_GUI_BOX_CALLBACK));
+        if (callback) {
+            memcpy(&(gui->callback), callback, sizeof(SIE_GUI_BOX_CALLBACK));
+        }
     }
     LockSched();
     Sie_GUI_InitCanvas(&canvas);
