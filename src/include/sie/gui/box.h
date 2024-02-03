@@ -38,6 +38,6 @@ SIE_GUI_BOX *Sie_GUI_MsgBox(const char *msg);
 SIE_GUI_BOX *Sie_GUI_MsgBoxOk(const char *msg);
 SIE_GUI_BOX *Sie_GUI_MsgBoxError(const char *msg);
 SIE_GUI_BOX *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_BOX_CALLBACK *callback);
-SIE_GUI_BOX *Sie_GUI_WaitBox();
+SIE_GUI_BOX *Sie_GUI_WaitBox(const char *msg);
 
 #endif
