@@ -38,7 +38,7 @@ static void OnRedraw(SIE_GUI_BOX *data) {
     Sie_FT_DrawBoundingString(data->msg_ws, x, y, x2, y2_msg,FONT_SIZE_MSG,
                               SIE_FT_TEXT_ALIGN_CENTER + SIE_FT_TEXT_VALIGN_MIDDLE, NULL);
 
-    if (data->type == SIE_GUI_BOX_TYPE_QUESTION) {
+    if (data->type <= SIE_GUI_BOX_TYPE_QUESTION) {
         int x_img = 0;
         int x2_img = 0;
         if (IMG_YES) {
@@ -115,15 +115,21 @@ static void OnUnFocus(SIE_GUI_BOX *data, void (*mfree_adr)(void *)) {
 }
 
 static int _OnKey(SIE_GUI_BOX *data, GUI_MSG *msg) {
-    if (data->callback.proc) {
-        if (msg->gbsmsg->msg == KEY_DOWN || msg->gbsmsg->msg == LONG_PRESS) {
-            switch (msg->gbsmsg->submess) {
-                case LEFT_SOFT: case ENTER_BUTTON:
-                    data->callback.proc(SIE_GUI_BOX_CALLBACK_YES, data->callback.data);
-                    return 1;
-                case RIGHT_SOFT:
-                    data->callback.proc(SIE_GUI_BOX_CALLBACK_NO, data->callback.data);
-                    return 1;
+    if (msg->gbsmsg->msg == KEY_DOWN || msg->gbsmsg->msg == LONG_PRESS) {
+        if (data->type <= SIE_GUI_BOX_TYPE_ERROR) {
+            if (msg->gbsmsg->submess == LEFT_SOFT || msg->gbsmsg->submess == ENTER_BUTTON) {
+                return 1;
+            }
+        } else {
+            if (data->callback.proc) {
+                switch (msg->gbsmsg->submess) {
+                    case LEFT_SOFT: case ENTER_BUTTON:
+                        data->callback.proc(SIE_GUI_BOX_CALLBACK_YES, data->callback.data);
+                        return 1;
+                    case RIGHT_SOFT:
+                        data->callback.proc(SIE_GUI_BOX_CALLBACK_NO, data->callback.data);
+                        return 1;
+                }
             }
         }
     }
@@ -164,7 +170,7 @@ SIE_GUI_BOX *Sie_GUI_Box(unsigned int type, SIE_GUI_BOX_TEXT *text, SIE_GUI_BOX_
     gui->type = type;
     gui->msg_ws = AllocWS(128);
     wsprintf(gui->msg_ws, "%t", text->msg);
-    if (type == SIE_GUI_BOX_TYPE_QUESTION) {
+    if (type <= SIE_GUI_BOX_TYPE_QUESTION) {
         SIE_RESOURCES_IMG *res_img = Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_ACTIONS, 24, "yes");
         if (res_img) {
             IMG_YES = res_img->icon;
@@ -192,8 +198,18 @@ SIE_GUI_BOX *Sie_GUI_Box(unsigned int type, SIE_GUI_BOX_TEXT *text, SIE_GUI_BOX_
 }
 
 SIE_GUI_BOX *Sie_GUI_MsgBox(const char *msg) {
-    SIE_GUI_BOX_TEXT text = {msg,NULL, NULL};
+    SIE_GUI_BOX_TEXT text = {msg, "Ok", NULL};
     return Sie_GUI_Box(SIE_GUI_BOX_TYPE_STANDARD, &text, NULL);
+}
+
+SIE_GUI_BOX *Sie_GUI_MsgBoxOk(const char *msg) {
+    SIE_GUI_BOX_TEXT text = {msg,"Ok", NULL};
+    return Sie_GUI_Box(SIE_GUI_BOX_TYPE_OK, &text, NULL);
+}
+
+SIE_GUI_BOX *Sie_GUI_MsgBoxError(const char *msg) {
+    SIE_GUI_BOX_TEXT text = {msg,"Ok", NULL};
+    return Sie_GUI_Box(SIE_GUI_BOX_TYPE_OK, &text, NULL);
 }
 
 SIE_GUI_BOX *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_BOX_CALLBACK *callback) {

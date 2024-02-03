@@ -4,8 +4,10 @@
 #include "surface.h"
 
 #define SIE_GUI_BOX_TYPE_STANDARD 0x00
-#define SIE_GUI_BOX_TYPE_QUESTION 0x01
-#define SIE_GUI_BOX_TYPE_WAIT     0x02
+#define SIE_GUI_BOX_TYPE_OK       0x01
+#define SIE_GUI_BOX_TYPE_ERROR    0x02
+#define SIE_GUI_BOX_TYPE_QUESTION 0x05
+#define SIE_GUI_BOX_TYPE_WAIT     0x0A
 
 #define SIE_GUI_BOX_CALLBACK_NO  0x00
 #define SIE_GUI_BOX_CALLBACK_YES 0x01
@@ -33,6 +35,8 @@ typedef struct {
 
 SIE_GUI_BOX *Sie_GUI_Box(unsigned int type, SIE_GUI_BOX_TEXT *text, SIE_GUI_BOX_CALLBACK *callback);
 SIE_GUI_BOX *Sie_GUI_MsgBox(const char *msg);
+SIE_GUI_BOX *Sie_GUI_MsgBoxOk(const char *msg);
+SIE_GUI_BOX *Sie_GUI_MsgBoxError(const char *msg);
 SIE_GUI_BOX *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_BOX_CALLBACK *callback);
 SIE_GUI_BOX *Sie_GUI_WaitBox();
 
