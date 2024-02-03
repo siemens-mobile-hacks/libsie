@@ -1,40 +1,48 @@
 #include <swilib.h>
 
 #define SUBPROC_NAME        "Sie_SubProc"
-#define SUBPROC_PG_ID       0x50
-#define SUBPROC_MAX_MEMBERS 0x0A
-#define SUBPROC_START_CEPID (SUBPROC_PG_ID * 0x100)
+#define SUBPROC_START_PG_ID 0x10
+#define SUBPROC_MAX_PG      0x0A
 
-unsigned int SLOTS[SUBPROC_MAX_MEMBERS];
+unsigned int SLOTS[SUBPROC_MAX_PG];
 
 static void OnMsg(void);
 
+inline short GetCepID(int pg) {
+    return pg * 0x100;
+}
+
 void Sie_SubProc_Init() {
     PGROUP pg = {
-            SUBPROC_PG_ID,
+            0x00,
             "T_SIE",
             0x80,
             0x8000,
-            SUBPROC_MAX_MEMBERS + 1,
+            2,
     };
-    if (!GetGBSProcAddress(SUBPROC_START_CEPID)) {
-        CreateICL(&pg);
-        CreateGBSproc(SUBPROC_START_CEPID, SUBPROC_NAME, OnMsg, 0x100, 0);
+    for (int i = 0; i < SUBPROC_MAX_PG; i++) {
+        int pg_id = SUBPROC_START_PG_ID + i;
+        short cepid = GetCepID(pg_id);
+        if (!GetGBSProcAddress(cepid)) {
+            pg.id = pg_id;
+            CreateICL(&pg);
+            CreateGBSproc(cepid, SUBPROC_NAME, OnMsg, 0x100, 0);
+        }
     }
     zeromem(SLOTS, sizeof(unsigned int) * 10);
-    for (unsigned int i = 1; i <= SUBPROC_MAX_MEMBERS; i++) {
-        CreateGBSproc(SUBPROC_START_CEPID + i, SUBPROC_NAME, OnMsg, 0x80, 0);
+    for (unsigned int i = 0; i < SUBPROC_MAX_PG; i++) {
+        CreateGBSproc(GetCepID(SUBPROC_START_PG_ID + i) + 1, SUBPROC_NAME, OnMsg,
+                      0x80, 0);
     }
 }
 
 void Sie_SubProc_Destroy() {
-    for (unsigned int i = 1; i <= SUBPROC_MAX_MEMBERS; i++) {
-        KillGBSproc(SUBPROC_START_CEPID + i);
+    for (unsigned int i = 0; i <= SUBPROC_MAX_PG; i++) {
+        KillGBSproc(GetCepID(SUBPROC_START_PG_ID + i) + 1);
     }
 }
 
-static void OnMsg()
-{
+static void OnMsg() {
     GBS_MSG msg;
     if (GBS_RecActDstMessage(&msg))
     {
@@ -48,12 +56,11 @@ static void OnMsg()
     }
 }
 
-unsigned int Sie_SubProc_Run(void *proc, void *data)
-{
-    for (unsigned int i = 0; i < SUBPROC_MAX_MEMBERS; i++) {
+unsigned int Sie_SubProc_Run(void *proc, void *data) {
+    for (unsigned int i = 0; i < SUBPROC_MAX_PG; i++) {
         if (!SLOTS[i]) {
             SLOTS[i] = 1;
-            GBS_SendMessage(SUBPROC_START_CEPID + 1 + i, i, 0, proc, data);
+            GBS_SendMessage(GetCepID(SUBPROC_START_PG_ID + i) + 1, i, 0, proc, data);
             return 1;
         }
     }
