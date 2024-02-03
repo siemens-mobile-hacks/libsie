@@ -49,6 +49,7 @@ unsigned int Sie_FS_IsDir(const char *path, unsigned int *err);
 
 unsigned int Sie_FS_CreateFile(const char *path, unsigned int *err);
 unsigned int Sie_FS_CreateDir(const char *path, unsigned int *err);
+unsigned int Sie_FS_CreateDirs(const char *path, unsigned int *err);
 unsigned int Sie_FS_CopyFile(const char *src, const char *dest, unsigned int *err);
 unsigned int Sie_FS_CopyDir(const char *src, const char *dest, unsigned int *err);
 unsigned int Sie_FS_MoveFile(const char *src, const char *dest, unsigned int *err);

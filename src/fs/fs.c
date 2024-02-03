@@ -315,6 +315,29 @@ unsigned int Sie_FS_CreateDir(const char *path, unsigned int *err) {
     return (_mkdir(path, err) == -1) ? 0 : 1;
 }
 
+unsigned int Sie_FS_CreateDirs(const char *path, unsigned int *err) {
+    char *p1 = (char*)path;
+    while (1) {
+        p1 = strchr(p1, '\\');
+        if (p1) {
+            unsigned int _err;
+            size_t len = p1 - path;
+            char *dir = malloc(len);
+            strncpy(dir, path, len);
+            dir[len] = '\0';
+            if (!Sie_FS_IsDir(dir, &_err)) {
+                if (!Sie_FS_CreateDir(dir, &_err)) {
+                    *err = _err;
+                    return 0;
+                }
+            }
+            p1++;
+        }
+        else break;
+    }
+    return 1;
+}
+
 unsigned int Sie_FS_CopyFile(const char *src, const char *dest, unsigned int *err) {
     int in = -1, out = -1;
     unsigned int err1 = 0, err2 = 0;
