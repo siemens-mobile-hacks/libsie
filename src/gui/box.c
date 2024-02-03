@@ -13,6 +13,11 @@
 RECT canvas;
 IMGHDR *IMG_YES;
 
+static void Close(GBSTMR *tmr) {
+    Sie_GUI_CloseGUI_GBS(tmr->param6);
+    Sie_GUI_CloseGUI(tmr->param6);
+}
+
 static void OnRedraw(SIE_GUI_BOX *data) {
     const char color_bg[] = COLOR_BG;
     const char color_border[] = COLOR_BORDER;
@@ -89,10 +94,17 @@ static void OnAfterDrawIconBar() {
 
 static void OnCreate(SIE_GUI_BOX *data, void *(*malloc_adr)(int)) {
     data->gui.state = 1;
+    if (data->type <= SIE_GUI_BOX_TYPE_ERROR) {
+        data->tmr_close.param6 = (int)(data->surface->gui_id);
+        GBS_StartTimerProc(&(data->tmr_close), 216 * 3, Close);
+    }
 }
 
 static void OnClose(SIE_GUI_BOX *data, void (*mfree_adr)(void *)) {
     data->gui.state = 0;
+    if (data->type <= SIE_GUI_BOX_TYPE_ERROR) {
+        GBS_DelTimer(&(data->tmr_close));
+    }
     FreeWS(data->msg_ws);
     if (data->left_sk_ws) {
         FreeWS(data->left_sk_ws);

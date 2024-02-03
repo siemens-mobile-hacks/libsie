@@ -27,6 +27,8 @@ typedef struct {
     GUI gui;
     SIE_GUI_SURFACE *surface;
     unsigned int type;
+    GBSTMR tmr_close;
+
     WSHDR *msg_ws;
     WSHDR *left_sk_ws;
     WSHDR *right_sk_ws;
