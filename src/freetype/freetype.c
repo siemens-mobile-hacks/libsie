@@ -1,5 +1,7 @@
+#include <swilib.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include <sys/param.h>
 #include "../include/sie/gui/gui.h"
 #include "../include/sie/freetype/freetype_cache.h"
 
@@ -67,6 +69,20 @@ void Sie_FT_GetStringSize(WSHDR *ws, int font_size, unsigned int *w, unsigned in
     *h = height;
 }
 
+IMGHDR *BrushGlyphIMGHDR(IMGHDR *img, const char *color) {
+    IMGHDR *res = malloc(sizeof(IMGHDR));
+    memcpy(res, img, sizeof(IMGHDR));
+    size_t size = CalcBitmapSize((short)res->w, (short)res->h, res->bpnum);
+    res->bitmap = malloc(size);
+    memcpy(res->bitmap, img->bitmap, size);
+    for (int i = 0; i < size; i += 4) {
+        res->bitmap[i + 0] = color[2];
+        res->bitmap[i + 1] = color[1];
+        res->bitmap[i + 2] = color[0];
+    }
+    return res;
+}
+
 static void DrawStr(WSHDR *ws, int x, int y, int x2, int y2, int x_offset, int font_size, const char *color) {
     char rgb[3] = COLOR_TEXT_PRIMARY;
     FT_Face *face = FT_FACE_REGULAR;
@@ -78,8 +94,6 @@ static void DrawStr(WSHDR *ws, int x, int y, int x2, int y2, int x_offset, int f
         memcpy(rgb, color, 3);
     }
 
-    IMGHDR img;
-    size_t size;
     FT_ULong charcode;
 
     int bleed_x = 0;
@@ -99,35 +113,27 @@ static void DrawStr(WSHDR *ws, int x, int y, int x2, int y2, int x_offset, int f
             }
         }
 
-        size = ft_cc_cache->img->w * ft_cc_cache->img->h * 4;
-        memcpy(&img, ft_cc_cache->img, sizeof(IMGHDR));
-        img.bitmap = malloc(size);
-        memcpy(img.bitmap, ft_cc_cache->img->bitmap, size);
-        for (int j = 0; j < size; j += 4) {
-            img.bitmap[j + 0] = rgb[2]; // b
-            img.bitmap[j + 1] = rgb[1]; // g
-            img.bitmap[j + 2] = rgb[0]; // r
-        }
-
-        int x_img = x + ft_cc_cache->h_bearing_x;
-        int y_img = y + ft_cc_cache->y_offset;
-        int x2_img = x_img + ft_cc_cache->h_advance;
-        int w_img = img.w;
-        int h_img = img.h;
+        IMGHDR *img = BrushGlyphIMGHDR(ft_cc_cache->img, rgb);
+        const int x_img = x + ft_cc_cache->h_bearing_x;
+        const int y_img = y + ft_cc_cache->y_offset;
+        const int x2_img = x_img + ft_cc_cache->h_advance;
+        int w_img = img->w;
+        int h_img = img->h;
         int last = 0;
         if (x2 && x2_img > x2) { // last
             w_img = x2 - (x_img + ft_cc_cache->h_bearing_x);
             last = 1;
         }
         if (bleed_x < 0) {
-            Sie_GUI_DrawBleedIMGHDR(&img, x_img, y_img, x_img + img.w, y_img + img.h,
+            Sie_GUI_DrawBleedIMGHDR(img, x_img, y_img, x_img + img->w, y_img + img->h,
                                     bleed_x * -1, 0);
             x += bleed_x;
             bleed_x = 1; // stop
         } else {
-            Sie_GUI_DrawIMGHDR(&img, x_img, y_img, w_img, h_img);
+            Sie_GUI_DrawIMGHDR(img, x_img, y_img, w_img, h_img);
         }
-        mfree(img.bitmap);
+        mfree(img->bitmap);
+        mfree(img);
         if (last) {
             break;
         }

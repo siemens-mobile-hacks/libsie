@@ -77,12 +77,13 @@ SIE_FT_CC_CACHE *Sie_FT_Cache_CCAdd(FT_Face *face, SIE_FT_CACHE *ft_cache, FT_UL
         }
     }
 
-    int h_advance = 0;
+    int h_advance, v_advance;
     int h_bearing_x = 0;
     int y_offset = 0;
     const int max_ascender = ((*face)->size->metrics.ascender >> 6);
     h_advance = ((*face)->glyph->metrics.horiAdvance >> 6);
     h_bearing_x = ((*face)->glyph->metrics.horiBearingX >> 6);
+    v_advance = ((*face)->glyph->metrics.vertAdvance >> 6);
     y_offset = -((*face)->glyph->bitmap_top) + max_ascender;
 
     ft_cache->cache = realloc(ft_cache->cache, sizeof(SIE_FT_CC_CACHE) * (ft_cache->size + 1));
@@ -92,6 +93,7 @@ SIE_FT_CC_CACHE *Sie_FT_Cache_CCAdd(FT_Face *face, SIE_FT_CACHE *ft_cache, FT_UL
     cc_cache->img = img;
     cc_cache->y_offset = y_offset;
     cc_cache->h_advance = h_advance;
+    cc_cache->v_advance = v_advance;
     cc_cache->h_bearing_x = h_bearing_x;
     ft_cache->size++;
     return cc_cache;
