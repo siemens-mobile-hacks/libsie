@@ -28,7 +28,7 @@ void Sie_FT_Cache_Destroy() {
     for (int i = 0; i < FT_CACHE_SIZE; i++) {
         SIE_FT_CACHE ft_cache = FT_CACHE[i];
         for (unsigned int j = 0; j < ft_cache.size; j++) {
-            SIE_FT_CC_CACHE ft_wc_cache = ft_cache.cache[j];
+            SIE_FT_GLYPH_CACHE ft_wc_cache = ft_cache.cache[j];
             mfree(ft_wc_cache.img->bitmap);
             mfree(ft_wc_cache.img);
         }
@@ -39,18 +39,18 @@ void Sie_FT_Cache_Destroy() {
     FT_CACHE_SIZE = 0;
 }
 
-SIE_FT_CC_CACHE *Sie_FT_Cache_CCGet(SIE_FT_CACHE *ft_cache, FT_ULong charcode) {
-    SIE_FT_CC_CACHE *ft_cc_cache = NULL;
+SIE_FT_GLYPH_CACHE *Sie_FT_Cache_GlyphGet(SIE_FT_CACHE *ft_cache, FT_ULong charcode) {
+    SIE_FT_GLYPH_CACHE *glyph_cache = NULL;
     for (unsigned int i = 0; i < ft_cache->size; i++) {
-        ft_cc_cache = &(ft_cache->cache[i]);
-        if (ft_cc_cache->charcode == charcode) {
-            return ft_cc_cache;
+        glyph_cache = &(ft_cache->cache[i]);
+        if (glyph_cache->charcode == charcode) {
+            return glyph_cache;
         }
     }
     return NULL;
 }
 
-SIE_FT_CC_CACHE *Sie_FT_Cache_CCAdd(FT_Face *face, SIE_FT_CACHE *ft_cache, FT_ULong charcode) {
+SIE_FT_GLYPH_CACHE *Sie_FT_Cache_GlyphAdd(FT_Face *face, SIE_FT_CACHE *ft_cache, FT_ULong charcode) {
     FT_UInt glyph_index;
     FT_Bitmap *bitmap;
 
@@ -62,7 +62,7 @@ SIE_FT_CC_CACHE *Sie_FT_Cache_CCAdd(FT_Face *face, SIE_FT_CACHE *ft_cache, FT_UL
     IMGHDR *img = malloc(sizeof(IMGHDR));
     img->w = bitmap->width;
     img->h = bitmap->rows;
-    img->bpnum = 0x0A;
+    img->bpnum = IMGHDR_TYPE_RGB8888;
     img->bitmap = malloc(img->w * img->h * 4);
 
     uint8_t im[img->h][img->w];
@@ -86,9 +86,9 @@ SIE_FT_CC_CACHE *Sie_FT_Cache_CCAdd(FT_Face *face, SIE_FT_CACHE *ft_cache, FT_UL
     v_advance = ((*face)->glyph->metrics.vertAdvance >> 6);
     y_offset = -((*face)->glyph->bitmap_top) + max_ascender;
 
-    ft_cache->cache = realloc(ft_cache->cache, sizeof(SIE_FT_CC_CACHE) * (ft_cache->size + 1));
-    SIE_FT_CC_CACHE *cc_cache = &(ft_cache->cache[ft_cache->size]);
-    zeromem(cc_cache, sizeof(SIE_FT_CC_CACHE));
+    ft_cache->cache = realloc(ft_cache->cache, sizeof(SIE_FT_GLYPH_CACHE) * (ft_cache->size + 1));
+    SIE_FT_GLYPH_CACHE *cc_cache = &(ft_cache->cache[ft_cache->size]);
+    zeromem(cc_cache, sizeof(SIE_FT_GLYPH_CACHE));
     cc_cache->charcode = charcode;
     cc_cache->img = img;
     cc_cache->y_offset = y_offset;
@@ -99,11 +99,11 @@ SIE_FT_CC_CACHE *Sie_FT_Cache_CCAdd(FT_Face *face, SIE_FT_CACHE *ft_cache, FT_UL
     return cc_cache;
 }
 
-SIE_FT_CC_CACHE *Sie_FT_Cache_CCGetOrAdd(FT_Face *face, SIE_FT_CACHE *ft_cache, FT_ULong charcode) {
-    SIE_FT_CC_CACHE *cc_cache = NULL;
-    cc_cache = Sie_FT_Cache_CCGet(ft_cache, charcode);
-    if (!cc_cache) {
-        cc_cache = Sie_FT_Cache_CCAdd(face, ft_cache, charcode);
+SIE_FT_GLYPH_CACHE *Sie_FT_Cache_GlyphGetOrAdd(FT_Face *face, SIE_FT_CACHE *cache, FT_ULong charcode) {
+    SIE_FT_GLYPH_CACHE *glyph_cache = NULL;
+    glyph_cache = Sie_FT_Cache_GlyphGet(cache, charcode);
+    if (!glyph_cache) {
+        glyph_cache = Sie_FT_Cache_GlyphAdd(face, cache, charcode);
     }
-    return cc_cache;
+    return glyph_cache;
 }

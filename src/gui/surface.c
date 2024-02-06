@@ -28,10 +28,10 @@ void Sie_GUI_Surface_Destroy(SIE_GUI_SURFACE *surface) {
 
 void Sie_GUI_Surface_DoScrot(SIE_GUI_SURFACE *surface) {
     LockSched();
-    size_t size = ScreenW() * ScreenH() * 2;
+    size_t size = CalcBitmapSize((short)ScreenW(), (short)ScreenH(), IMGHDR_TYPE_RGB565);
     surface->scrot.w = ScreenW();
     surface->scrot.h = ScreenH();
-    surface->scrot.bpnum = 8;
+    surface->scrot.bpnum = IMGHDR_TYPE_RGB565;
     surface->scrot.bitmap = malloc(size);
     memcpy(surface->scrot.bitmap, RamScreenBuffer(), size);
     UnlockSched();

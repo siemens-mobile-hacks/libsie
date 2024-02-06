@@ -8,7 +8,7 @@ extern IMGHDR *BrushGlyphIMGHDR(IMGHDR *img, const char *color);
 
 static SIE_FT_RENDER *Render(WSHDR *ws, int x, int x2, int font_size) {
     FT_Face *face = FT_FACE_REGULAR;
-    SIE_FT_CACHE *ft_cache = Sie_FT_Cache_GetOrCreate(face, font_size);
+    SIE_FT_CACHE *cache = Sie_FT_Cache_GetOrCreate(face, font_size);
     FT_Set_Pixel_Sizes(*face, 0, font_size);
 
     int line_id = 0;
@@ -23,8 +23,8 @@ static SIE_FT_RENDER *Render(WSHDR *ws, int x, int x2, int font_size) {
     render->lines = malloc(sizeof(SIE_FT_RENDER_LINE) * max_lines);
     for (int i = 0; i < wstrlen(ws); i++) {
         unsigned short charcode = ws->wsbody[1 + i];
-        SIE_FT_CC_CACHE *cache = Sie_FT_Cache_CCGetOrAdd(face, ft_cache, charcode);
-        word_width += cache->h_advance;
+        SIE_FT_GLYPH_CACHE *glyph_cache = Sie_FT_Cache_GlyphGetOrAdd(face, cache, charcode);
+        word_width += glyph_cache->h_advance;
         if (x + word_width > x2 - x) { // break line
             if (line_id > max_lines / 2) {
                 max_lines *= 2;
@@ -37,7 +37,7 @@ static SIE_FT_RENDER *Render(WSHDR *ws, int x, int x2, int font_size) {
                 last_space = 0;
             } else {
                 line->break_point = i;
-                line_width = word_width - cache->h_advance;
+                line_width = word_width - glyph_cache->h_advance;
                 i--;
             }
             line->width = line_width;
@@ -47,7 +47,7 @@ static SIE_FT_RENDER *Render(WSHDR *ws, int x, int x2, int font_size) {
             last_space = i;
             line_width = word_width;
         } else {
-            max_v_advance = MAX(max_v_advance, cache->v_advance);
+            max_v_advance = MAX(max_v_advance, glyph_cache->v_advance);
         }
     }
     render->lines[line_id].width = word_width;
@@ -77,8 +77,8 @@ SIE_FT_RENDER *DrawText(WSHDR *ws, int x, int y, int x2, int y2, int font_size, 
     int max_v_advance = 0;
     for (int i = 0; i < wstrlen(ws); i++) {
         unsigned short charcode = ws->wsbody[1 + i];
-        SIE_FT_CC_CACHE *ft_cc_cache = Sie_FT_Cache_CCGetOrAdd(face, ft_cache, charcode);
-        max_v_advance = MAX(max_v_advance, ft_cc_cache->v_advance);
+        SIE_FT_GLYPH_CACHE *glyph_cache = Sie_FT_Cache_GlyphGetOrAdd(face, ft_cache, charcode);
+        max_v_advance = MAX(max_v_advance, glyph_cache->v_advance);
 
         SIE_FT_RENDER_LINE *line = (render->lines) ? &(render->lines[line_id]) : NULL;
         if (line) {
@@ -94,13 +94,13 @@ SIE_FT_RENDER *DrawText(WSHDR *ws, int x, int y, int x2, int y2, int font_size, 
                 continue;
             }
         }
-        const int x_img = _x + ft_cc_cache->h_bearing_x + x_offset;
-        const int y_img = _y + ft_cc_cache->y_offset;
-        IMGHDR *img = BrushGlyphIMGHDR(ft_cc_cache->img, rgb);
+        const int x_img = _x + glyph_cache->h_bearing_x + x_offset;
+        const int y_img = _y + glyph_cache->y_offset;
+        IMGHDR *img = BrushGlyphIMGHDR(glyph_cache->img, rgb);
         Sie_GUI_DrawIMGHDR(img, x_img, y_img, img->w, img->h);
         mfree(img->bitmap);
         mfree(img);
-        _x += ft_cc_cache->h_advance;
+        _x += glyph_cache->h_advance;
     }
     return render;
 }
