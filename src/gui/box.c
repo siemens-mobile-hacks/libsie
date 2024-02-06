@@ -38,27 +38,34 @@ static void OnRedraw(SIE_GUI_BOX *data) {
     const int y2 = y + h_window;
     DrawRectangle(x, y, x2, y2, 0,color_border, color_bg);
 
+    const int x_msg = x + 5;
+    const int y_msg = y + 5;
+    const int x2_msg = x2 - 5;
+    int y2_msg = y2 - 5;
     const int y2_sk = y2 - 5;
-    const int y2_msg = y2 - 5;
-    Sie_FT_DrawBoundingString(data->msg_ws, x, y, x2, y2_msg,FONT_SIZE_MSG,
-                              SIE_FT_TEXT_ALIGN_CENTER + SIE_FT_TEXT_VALIGN_MIDDLE, NULL);
 
     if (data->type <= SIE_GUI_BOX_TYPE_QUESTION) {
-        int x_img = 0;
-        int x2_img = 0;
+        unsigned int w_sk = 0;
+        unsigned int h_left_sk = 0;
+        unsigned int h_right_sk = 0;
+        unsigned int max_h_sk = 0;
+        int x_img = 0, x2_img = 0;
+        if (data->left_sk_ws) {
+            Sie_FT_GetStringSize(data->left_sk_ws, FONT_SIZE_SOFT_KEYS, &w_sk, &h_left_sk);
+        }
+        if (data->right_sk_ws) {
+            Sie_FT_GetStringSize(data->right_sk_ws, FONT_SIZE_SOFT_KEYS, &w_sk, &h_right_sk);
+        }
+        max_h_sk = MAX(h_left_sk, h_right_sk);
+        if (max_h_sk) {
+            y2_msg -= (int)max_h_sk;
+        }
+
         if (IMG_YES) {
             int y_img = 0;
-            unsigned int w, h = 0, h1 = 0, h2 = 0;
-            if (data->left_sk_ws) {
-                Sie_FT_GetStringSize(data->left_sk_ws, FONT_SIZE_SOFT_KEYS, &w, &h1);
-            }
-            if (data->right_sk_ws) {
-                Sie_FT_GetStringSize(data->right_sk_ws, FONT_SIZE_SOFT_KEYS, &w, &h2);
-            }
-            h = MAX(h1, h2);
-            if (h) {
+            if (max_h_sk) {
                 x_img = 4 + (w_window / 2) - IMG_YES->w / 2;
-                y_img = y2_sk - (int) h / 2 - IMG_YES->h / 2;
+                y_img = y2_sk - (int) max_h_sk / 2 - IMG_YES->h / 2;
                 x2_img = x_img + IMG_YES->w;
                 Sie_GUI_DrawIMGHDR(IMG_YES, x_img, y_img, IMG_YES->w, IMG_YES->h);
             }
@@ -84,6 +91,8 @@ static void OnRedraw(SIE_GUI_BOX *data) {
                                       SIE_FT_TEXT_ALIGN_RIGHT + SIE_FT_TEXT_VALIGN_BOTTOM, NULL);
         }
     }
+    Sie_FT_DrawText(data->msg_ws, x_msg, y_msg, x2_msg, y2_msg,
+                    FONT_SIZE_MSG,SIE_FT_TEXT_ALIGN_CENTER + SIE_FT_TEXT_VALIGN_MIDDLE, NULL);
 }
 
 static void OnAfterDrawIconBar() {
