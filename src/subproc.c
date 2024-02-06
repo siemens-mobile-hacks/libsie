@@ -20,20 +20,26 @@ void Sie_SubProc_Init() {
             0x8000,
             2,
     };
+    int pg_id;
+    short cepid;
     for (int i = 0; i < SUBPROC_MAX_PG; i++) {
-        int pg_id = SUBPROC_START_PG_ID + i;
-        short cepid = GetCepID(pg_id);
+        pg_id = SUBPROC_START_PG_ID + i;
+        cepid = GetCepID(pg_id);
         if (!GetGBSProcAddress(cepid)) {
             pg.id = pg_id;
             CreateICL(&pg);
             CreateGBSproc(cepid, SUBPROC_NAME, OnMsg, 0x100, 0);
         }
     }
-    zeromem(SLOTS, sizeof(unsigned int) * 10);
     for (unsigned int i = 0; i < SUBPROC_MAX_PG; i++) {
-        CreateGBSproc(GetCepID(SUBPROC_START_PG_ID + i) + 1, SUBPROC_NAME, OnMsg,
-                      0x80, 0);
+        pg_id = SUBPROC_START_PG_ID + i;
+        cepid = GetCepID(pg_id) + 1;
+        if (!GetGBSProcAddress(cepid)) {
+            CreateGBSproc(cepid, SUBPROC_NAME, OnMsg,
+                          0x80, 0);
+        }
     }
+    zeromem(SLOTS, sizeof(unsigned int) * 10);
 }
 
 void Sie_SubProc_Destroy() {
