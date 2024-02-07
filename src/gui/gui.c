@@ -43,6 +43,19 @@ void Sie_GUI_SetRGB(char *rgb, char r, char g, char b) {
     rgb[2] = b;
 }
 
+IMGHDR *Sie_GUI_TakeScrot() {
+    LockSched();
+    IMGHDR *scrot = malloc(sizeof(IMGHDR));
+    size_t size = CalcBitmapSize((short) ScreenW(), (short) ScreenH(), IMGHDR_TYPE_RGB565);
+    scrot->w = ScreenW();
+    scrot->h = ScreenH();
+    scrot->bpnum = IMGHDR_TYPE_RGB565;
+    scrot->bitmap = malloc(size);
+    memcpy(scrot->bitmap, RamScreenBuffer(), size);
+    UnlockSched();
+    return scrot;
+}
+
 void Sie_GUI_DrawIMGHDR(IMGHDR *img, int x, int y, int w, int h) {
     RECT rc;
     DRWOBJ drwobj;
@@ -108,9 +121,8 @@ void Sie_GUI_DrawIconBar() {
     if (ls) {
         strcat(img_name, "-charging");
     }
-    SIE_RESOURCES_IMG *res = Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_STATUS, 24, img_name);
-    if (res) {
-        IMGHDR *img = res->icon;
+    IMGHDR *img = Sie_Resources_LoadIMGHDR(SIE_RESOURCES_TYPE_STATUS, 24, img_name);
+    if (img) {
         x = SCREEN_X2 - PADDING_ICONBAR - img->w;
         y = 0 + (YDISP - img->h) / 2;
         Sie_GUI_DrawIMGHDR(img, x, y, img->w, img->h);

@@ -35,11 +35,11 @@ typedef struct {
     SIE_GUI_BOX_CALLBACK callback;
 } SIE_GUI_BOX;
 
-SIE_GUI_BOX *Sie_GUI_Box(unsigned int type, SIE_GUI_BOX_TEXT *text, SIE_GUI_BOX_CALLBACK *callback);
-SIE_GUI_BOX *Sie_GUI_MsgBox(const char *msg);
-SIE_GUI_BOX *Sie_GUI_MsgBoxOk(const char *msg);
-SIE_GUI_BOX *Sie_GUI_MsgBoxError(const char *msg);
-SIE_GUI_BOX *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_BOX_CALLBACK *callback);
-SIE_GUI_BOX *Sie_GUI_WaitBox(const char *msg);
+SIE_GUI_BOX *Sie_GUI_Box(unsigned int type, SIE_GUI_BOX_TEXT *text, SIE_GUI_BOX_CALLBACK *callback, IMGHDR *scrot);
+SIE_GUI_BOX *Sie_GUI_MsgBox(const char *msg, IMGHDR *scrot);
+SIE_GUI_BOX *Sie_GUI_MsgBoxOk(const char *msg, IMGHDR *scrot);
+SIE_GUI_BOX *Sie_GUI_MsgBoxError(const char *msg, IMGHDR *scrot);
+SIE_GUI_BOX *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_BOX_CALLBACK *callback, IMGHDR *scrot);
+SIE_GUI_BOX *Sie_GUI_WaitBox(const char *msg, IMGHDR *scrot);
 
 #endif

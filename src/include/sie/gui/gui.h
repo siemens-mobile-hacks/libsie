@@ -18,7 +18,10 @@ typedef struct {
 
 SIE_GUI_SURFACE *Sie_GUI_Surface_Init(int type, const SIE_GUI_SURFACE_HANDLERS *handlers, unsigned int gui_id);
 void Sie_GUI_Surface_Destroy(SIE_GUI_SURFACE *surface);
-void Sie_GUI_Surface_DoScrot(SIE_GUI_SURFACE *surface);
+
+void Sie_GUI_Surface_TakeScrot(SIE_GUI_SURFACE *surface);
+void Sie_GUI_Surface_DestroyScrot(SIE_GUI_SURFACE *surface);
+
 void Sie_GUI_Surface_Draw(const SIE_GUI_SURFACE *surface);
 void Sie_GUI_Surface_OnFocus(SIE_GUI_SURFACE *surface);
 void Sie_GUI_Surface_OnUnFocus(SIE_GUI_SURFACE *surface);
@@ -36,6 +39,7 @@ void Sie_GUI_FocusGUI(GBSTMR *tmr, SIE_GUI_FOCUS_DATA *data);
 
 void Sie_GUI_InitCanvas(RECT *canvas);
 void Sie_GUI_SetRGB(char *rgb, char r, char g, char b);
+IMGHDR *Sie_GUI_TakeScrot();
 
 void Sie_GUI_DrawIMGHDR(IMGHDR *img, int x, int y, int w, int h);
 void Sie_GUI_DrawBleedIMGHDR(IMGHDR  *img, int x, int y, int x2, int y2, int bleed_x, int bleed_y);

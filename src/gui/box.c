@@ -6,9 +6,6 @@
 
 #define FONT_SIZE_MSG 20
 #define FONT_SIZE_SOFT_KEYS 18
-#define COLOR_BG {0x00, 0x00, 0x00, 0x64}
-#define COLOR_BORDER {0x18, 0x18, 0x18, 0x64}
-#define COLOR_SURFACE_BG {0x00, 0x00, 0x00, 0x20}
 
 RECT canvas;
 IMGHDR *IMG_YES;
@@ -20,16 +17,17 @@ static void Close(GBSTMR *tmr) {
 }
 
 static void OnRedraw(SIE_GUI_BOX *data) {
-    const char color_bg[] = COLOR_BG;
-    const char color_border[] = COLOR_BORDER;
-    const char color_surface_bg[] = COLOR_SURFACE_BG;
+    const char color_bg[] = COLOR_BOX_BG;
+    const char color_border[] = COLOR_BOX_BORDER;
+    const char color_surface[] = COLOR_BOX_SURFACE;
 
-    IMGHDR *scrot = &(data->surface->scrot);
-
-    Sie_GUI_DrawIMGHDR(scrot, 0, 0, scrot->w, scrot->h);
+    IMGHDR *scrot = (data->surface->scrot_p) ? data->surface->scrot_p : data->surface->scrot;
+    if (scrot) {
+        Sie_GUI_DrawIMGHDR(scrot, 0, 0, scrot->w, scrot->h);
+    }
     Sie_GUI_DrawIconBar();
     DrawRectangle(0, YDISP, SCREEN_X2, SCREEN_Y2, 0,
-                  GetPaletteAdrByColorIndex(23), color_surface_bg);
+                  GetPaletteAdrByColorIndex(23), color_surface);
 
     const int w_window = ScreenW() - 8;
     const int h_window = 170;
@@ -60,7 +58,7 @@ static void OnRedraw(SIE_GUI_BOX *data) {
         }
         max_h_sk = MAX(h_left_sk, h_right_sk);
         if (max_h_sk) {
-            y2_msg -= (int)max_h_sk;
+            y2_msg -= (int)max_h_sk + 5;
         }
 
         if (IMG_YES) {
@@ -102,6 +100,7 @@ static void OnRedraw(SIE_GUI_BOX *data) {
                 break;
             case SIE_GUI_BOX_TYPE_QUESTION:
                 img = IMG_MSG_QUESTION;
+                break;
         }
         if (img) {
             const int x_icon = x_msg + 10;
@@ -117,7 +116,7 @@ static void OnRedraw(SIE_GUI_BOX *data) {
 }
 
 static void OnAfterDrawIconBar() {
-    const char color_surface_bg[] = COLOR_SURFACE_BG;
+    const char color_surface_bg[] = COLOR_BOX_SURFACE;
     DrawRectangle(0, 0, SCREEN_X2, YDISP, 0,
                   GetPaletteAdrByColorIndex(23), color_surface_bg);
 }
@@ -136,7 +135,7 @@ static void OnCreate(SIE_GUI_BOX *data, void *(*malloc_adr)(int)) {
             IMG_MSG_ERROR = Sie_Resources_LoadIMGHDR(SIE_RESOURCES_TYPE_ACTIONS, 48, "msg-error");
             break;
         case SIE_GUI_BOX_TYPE_QUESTION:
-            IMG_MSG_QUESTION = Sie_Resources_LoadIMGHDR(SIE_RESOURCES_TYPE_ACTIONS, 48, "msg-error");
+            IMG_MSG_QUESTION = Sie_Resources_LoadIMGHDR(SIE_RESOURCES_TYPE_ACTIONS, 48, "msg-question");
             break;
     }
     data->gui.state = 1;
@@ -214,7 +213,7 @@ static const void *const gui_methods[11] = {
         0
 };
 
-SIE_GUI_BOX *Sie_GUI_Box(unsigned int type, SIE_GUI_BOX_TEXT *text, SIE_GUI_BOX_CALLBACK *callback) {
+SIE_GUI_BOX *Sie_GUI_Box(unsigned int type, SIE_GUI_BOX_TEXT *text, SIE_GUI_BOX_CALLBACK *callback, IMGHDR *scrot) {
     SIE_GUI_BOX *gui = malloc(sizeof(SIE_GUI_BOX));
     const SIE_GUI_SURFACE_HANDLERS surface_handlers = {
             OnAfterDrawIconBar,
@@ -222,7 +221,7 @@ SIE_GUI_BOX *Sie_GUI_Box(unsigned int type, SIE_GUI_BOX_TEXT *text, SIE_GUI_BOX_
     };
     zeromem(gui, sizeof(SIE_GUI_BOX));
     gui->type = type;
-    gui->msg_ws = AllocWS(128);
+    gui->msg_ws = AllocWS(strlen(text->msg));
     wsprintf(gui->msg_ws, "%t", text->msg);
     if (type <= SIE_GUI_BOX_TYPE_QUESTION) {
         if (text->left_sk) {
@@ -244,32 +243,32 @@ SIE_GUI_BOX *Sie_GUI_Box(unsigned int type, SIE_GUI_BOX_TEXT *text, SIE_GUI_BOX_
     gui->gui.item_ll.data_mfree = (void (*)(void *))mfree_adr();
     gui->surface = Sie_GUI_Surface_Init(SIE_GUI_SURFACE_TYPE_DEFAULT, &surface_handlers,
                                         CreateGUI(gui));
-    Sie_GUI_Surface_DoScrot(gui->surface);
+    gui->surface->scrot_p = scrot;
     UnlockSched();
     return gui;
 }
 
-SIE_GUI_BOX *Sie_GUI_MsgBox(const char *msg) {
+SIE_GUI_BOX *Sie_GUI_MsgBox(const char *msg, IMGHDR *scrot) {
     SIE_GUI_BOX_TEXT text = {msg, "Ok", NULL};
-    return Sie_GUI_Box(SIE_GUI_BOX_TYPE_STANDARD, &text, NULL);
+    return Sie_GUI_Box(SIE_GUI_BOX_TYPE_STANDARD, &text, NULL, scrot);
 }
 
-SIE_GUI_BOX *Sie_GUI_MsgBoxOk(const char *msg) {
+SIE_GUI_BOX *Sie_GUI_MsgBoxOk(const char *msg, IMGHDR *scrot) {
     SIE_GUI_BOX_TEXT text = {msg,"Ok", NULL};
-    return Sie_GUI_Box(SIE_GUI_BOX_TYPE_OK, &text, NULL);
+    return Sie_GUI_Box(SIE_GUI_BOX_TYPE_OK, &text, NULL, scrot);
 }
 
-SIE_GUI_BOX *Sie_GUI_MsgBoxError(const char *msg) {
+SIE_GUI_BOX *Sie_GUI_MsgBoxError(const char *msg, IMGHDR *scrot) {
     SIE_GUI_BOX_TEXT text = {msg,"Ok", NULL};
-    return Sie_GUI_Box(SIE_GUI_BOX_TYPE_ERROR, &text, NULL);
+    return Sie_GUI_Box(SIE_GUI_BOX_TYPE_ERROR, &text, NULL, scrot);
 }
 
-SIE_GUI_BOX *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_BOX_CALLBACK *callback) {
+SIE_GUI_BOX *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_BOX_CALLBACK *callback, IMGHDR *scrot) {
     SIE_GUI_BOX_TEXT text = {msg, "Yes", "No"};
-    return Sie_GUI_Box(SIE_GUI_BOX_TYPE_QUESTION, &text, callback);
+    return Sie_GUI_Box(SIE_GUI_BOX_TYPE_QUESTION, &text, callback, scrot);
 }
 
-SIE_GUI_BOX *Sie_GUI_WaitBox(const char *msg) {
+SIE_GUI_BOX *Sie_GUI_WaitBox(const char *msg, IMGHDR *scrot) {
     SIE_GUI_BOX_TEXT text = {(msg) ? msg : "Wait...", NULL, NULL};
-    return Sie_GUI_Box(SIE_GUI_BOX_TYPE_WAIT, &text, NULL);
+    return Sie_GUI_Box(SIE_GUI_BOX_TYPE_WAIT, &text, NULL, scrot);
 }

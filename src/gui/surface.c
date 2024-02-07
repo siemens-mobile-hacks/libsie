@@ -1,7 +1,6 @@
 #include <swilib.h>
 #include <stdlib.h>
 #include "../include/sie/gui/gui.h"
-#include "../include/sie/resources.h"
 
 GBSTMR TMR_REDRAW_ICONBAR;
 extern IMGHDR *SIE_RES_IMG_WALLPAPER;
@@ -20,20 +19,22 @@ SIE_GUI_SURFACE *Sie_GUI_Surface_Init(int type, const SIE_GUI_SURFACE_HANDLERS *
 
 void Sie_GUI_Surface_Destroy(SIE_GUI_SURFACE *surface) {
     FreeWS(surface->hdr_ws);
-    if (surface->scrot.bitmap) {
-        mfree(surface->scrot.bitmap);
-    }
+    Sie_GUI_Surface_DestroyScrot(surface);
     mfree(surface);
 }
 
-void Sie_GUI_Surface_DoScrot(SIE_GUI_SURFACE *surface) {
+void Sie_GUI_Surface_TakeScrot(SIE_GUI_SURFACE *surface) {
+    Sie_GUI_Surface_DestroyScrot(surface);
+    surface->scrot = Sie_GUI_TakeScrot();
+}
+
+void Sie_GUI_Surface_DestroyScrot(SIE_GUI_SURFACE *surface) {
     LockSched();
-    size_t size = CalcBitmapSize((short)ScreenW(), (short)ScreenH(), IMGHDR_TYPE_RGB565);
-    surface->scrot.w = ScreenW();
-    surface->scrot.h = ScreenH();
-    surface->scrot.bpnum = IMGHDR_TYPE_RGB565;
-    surface->scrot.bitmap = malloc(size);
-    memcpy(surface->scrot.bitmap, RamScreenBuffer(), size);
+    if (surface->scrot) {
+        mfree(surface->scrot->bitmap);
+        mfree(surface->scrot);
+        surface->scrot = NULL;
+    }
     UnlockSched();
 }
 

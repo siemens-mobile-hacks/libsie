@@ -15,7 +15,9 @@ typedef struct {
     SIE_GUI_SURFACE_HANDLERS handlers;
     unsigned int gui_id;
     WSHDR *hdr_ws;
-    IMGHDR scrot;
+
+    IMGHDR *scrot;    // use for making screenshot
+    IMGHDR *scrot_p; // use if screenshot is already taken
 } SIE_GUI_SURFACE;
 
 #endif

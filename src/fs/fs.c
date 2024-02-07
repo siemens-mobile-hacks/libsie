@@ -312,11 +312,11 @@ unsigned int Sie_FS_CreateFile(const char *path, unsigned int *err) {
 }
 
 unsigned int Sie_FS_CreateDir(const char *path, unsigned int *err) {
-    return (_mkdir(path, err) == -1) ? 0 : 1;
+    return _mkdir(path, err);
 }
 
 unsigned int Sie_FS_CreateDirs(const char *path, unsigned int *err) {
-    char *p1 = (char*)path;
+    char *p1 = (char*)path + 3;
     while (1) {
         p1 = strchr(p1, '\\');
         if (p1) {
@@ -325,7 +325,7 @@ unsigned int Sie_FS_CreateDirs(const char *path, unsigned int *err) {
             char *dir = malloc(len);
             strncpy(dir, path, len);
             dir[len] = '\0';
-            if (!Sie_FS_IsDir(dir, &_err)) {
+            if (!Sie_FS_FileExists(dir)) {
                 if (!Sie_FS_CreateDir(dir, &_err)) {
                     *err = _err;
                     return 0;
@@ -402,8 +402,9 @@ unsigned int Sie_FS_CopyDir(const char *src, const char *dest, unsigned int *err
     SIE_FILE *files = Sie_FS_FindFilesRecursive(mask);
     mfree(mask);
 
-    unsigned int wb = 0;
-    if (_mkdir(dest, err) != -1) {
+    unsigned int result = 0;
+    if (Sie_FS_CreateDir(dest, err)) {
+        result = 1;
         SIE_FILE *file = files;
         while (file) {
             char *relative = file->dir_name + strlen(src);
@@ -416,61 +417,62 @@ unsigned int Sie_FS_CopyDir(const char *src, const char *dest, unsigned int *err
             sprintf(d, "%s%s%s", dest, relative, file->file_name);
             if (file->file_attr & SIE_FS_FA_DIRECTORY) {
                 if (!Sie_FS_CreateDir(d, err)) {
-                    break;
+                    result = 0;
                 }
             } else {
-                wb += Sie_FS_CopyFile(s, d, err);
-                if (*err) {
-                    break;
+                if (!Sie_FS_CopyFile(s, d, err)) {
+                    result = 0;
                 }
             }
             mfree(s);
             mfree(d);
+            if (!result) {
+                break;
+            }
             file = file->next;
         }
         Sie_FS_DestroyFiles(files);
     }
-    return wb;
+    return result;
 }
 
 unsigned int Sie_FS_MoveFile(const char *src, const char *dest, unsigned int *err) {
     if (src[0] == dest[0]) { // check disk number
-        return (fmove(src, dest, err) == -1) ? 0 : 1;
+        return fmove(src, dest, err);
     } else {
-        unsigned int res = 0, err1 = 0;
+        unsigned int result = 0, err1 = 0;
         if (!Sie_FS_IsDir(src, &err1)) {
-            Sie_FS_CopyFile(src, dest, &err1);
-            if (!err1) {
-                res = Sie_FS_DeleteFile(src, &err1);
+            if (Sie_FS_CopyFile(src, dest, &err1)) {
+                result = Sie_FS_DeleteFile(src, &err1);
             }
-            if (err1) {
-                *err = err1;
-            }
+            *err = err1;
         } else {
-            Sie_FS_CopyDir(src, dest, &err1);
-            if (!err1) {
-                res = Sie_FS_DeleteDirRecursive(src, &err1);
+            if (Sie_FS_CopyDir(src, dest, &err1)) {
+                result = Sie_FS_DeleteDirRecursive(src, &err1);
             }
-            if (err1) {
-                *err = err1;
-            }
+            *err = err1;
         }
-        return res;
+        return result;
     }
 }
 
 unsigned int Sie_FS_DeleteFile(const char *path, unsigned int *err) {
-    return (_unlink(path, err) == -1) ? 0 : 1;
+    return _unlink(path, err);
 }
 
 unsigned int Sie_FS_DeleteDir(const char *path, unsigned int *err) {
-    return (_rmdir(path, err) == -1) ? 0 : 1;
+    return _rmdir(path, err);
 }
 
 unsigned Sie_FS_DeleteDirRecursive(const char *path, unsigned int *err) {
     int result = 1;
-    char *mask = malloc(strlen(path) + 1 + 1);
-    sprintf(mask, "%s*", path);
+    size_t len = strlen(path);
+    char *mask = malloc(len + 2 + 1);
+    if (path[len - 1] == '\\') {
+        sprintf(mask, "%s*", path);
+    } else {
+        sprintf(mask, "%s\\*", path);
+    }
     SIE_FILE *files = Sie_FS_FindFilesRecursive(mask);
     mfree(mask);
 
@@ -484,11 +486,11 @@ unsigned Sie_FS_DeleteDirRecursive(const char *path, unsigned int *err) {
                 char *p = Sie_FS_GetPathByFile(file);
                 if (!Sie_FS_DeleteFile(p, err)) {
                     result = 0;
-                    mfree(p);
-                    break;
-                } else {
-                    mfree(p);
                 }
+                mfree(p);
+            }
+            if (!result) {
+                break;
             }
             file = file->next;
             if (file) {
@@ -503,11 +505,11 @@ unsigned Sie_FS_DeleteDirRecursive(const char *path, unsigned int *err) {
                 char *p = Sie_FS_GetPathByFile(file);
                 if (!Sie_FS_DeleteDir(p, err)) {
                     result = 0;
-                    mfree(p);
-                    break;
-                } else {
-                    mfree(p);
                 }
+                mfree(p);
+            }
+            if (!result) {
+                break;
             }
             file = file->prev;
         }

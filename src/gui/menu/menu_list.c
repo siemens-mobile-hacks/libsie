@@ -49,10 +49,7 @@ void LoadIcon2(SIE_MENU_LIST_ITEM *item) {
             break;
     }
     if (name[0]) {
-        SIE_RESOURCES_IMG *res_img = Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_ACTIONS, 24, name);
-        if (res_img) {
-            item->icon2 = res_img->icon;
-        }
+        item->icon2 = Sie_Resources_LoadIMGHDR(SIE_RESOURCES_TYPE_ACTIONS, 24, name);
     }
 }
 
