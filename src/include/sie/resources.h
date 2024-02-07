@@ -22,6 +22,7 @@ void Sie_Resources_SetWallpaper(WSHDR *ws, void (*proc)());
 IMGHDR *Sie_Resources_GetWallpaper();
 
 SIE_RESOURCES_IMG *Sie_Resources_LoadImage(unsigned int type, unsigned int size, const char *name);
+IMGHDR *Sie_Resources_LoadIMGHDR(unsigned int type, unsigned int size, const char *name);
 HObj Sie_Resources_CreateHObjFromImgFile(const char *path);
 void Sie_Resources_DestroyHObj(HObj hobj);
 IMGHDR *Sie_Resources_HObj2IMGHDR(HObj hobj, int width, int height);

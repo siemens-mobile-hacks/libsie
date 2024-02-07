@@ -139,6 +139,11 @@ SIE_RESOURCES_IMG *Sie_Resources_LoadImage(unsigned int type, unsigned int size,
     return res_ext;
 }
 
+IMGHDR *Sie_Resources_LoadIMGHDR(unsigned int type, unsigned int size, const char *name) {
+    SIE_RESOURCES_IMG *res_img = Sie_Resources_LoadImage(type, size, name);
+    return (res_img) ? res_img->icon : NULL;
+}
+
 HObj Sie_Resources_CreateHObjFromImgFile(const char *path) {
     HObj hobj = 0;
     unsigned int err = 0;
