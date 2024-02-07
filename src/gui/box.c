@@ -12,6 +12,7 @@
 
 RECT canvas;
 IMGHDR *IMG_YES;
+IMGHDR *IMG_MSG_OK, *IMG_MSG_ERROR, *IMG_MSG_QUESTION;
 
 static void Close(GBSTMR *tmr) {
     Sie_GUI_CloseGUI_GBS(tmr->param6);
@@ -38,10 +39,11 @@ static void OnRedraw(SIE_GUI_BOX *data) {
     const int y2 = y + h_window;
     DrawRectangle(x, y, x2, y2, 0,color_border, color_bg);
 
-    const int x_msg = x + 5;
-    const int y_msg = y + 5;
-    const int x2_msg = x2 - 5;
+    int x_msg = x + 5;
+    int y_msg = y + 5;
+    int x2_msg = x2 - 5;
     int y2_msg = y2 - 5;
+    int attr_msg = SIE_FT_TEXT_ALIGN_CENTER + SIE_FT_TEXT_VALIGN_MIDDLE;
     const int y2_sk = y2 - 5;
 
     if (data->type <= SIE_GUI_BOX_TYPE_QUESTION) {
@@ -71,7 +73,7 @@ static void OnRedraw(SIE_GUI_BOX *data) {
             }
         }
         if (data->left_sk_ws) {
-            int x_left_sk = x + 10;
+            const int x_left_sk = x + 10;
             int x2_left_sk = x + (x2 - x) / 2 - 5;
             if (x_img) {
                 x2_left_sk -= IMG_YES->w / 2;
@@ -82,7 +84,7 @@ static void OnRedraw(SIE_GUI_BOX *data) {
         }
         if (data->right_sk_ws) {
             int x_right_sk = x + (x2 - x) / 2 + 5;
-            int x2_right_sk = x2 - 10;
+            const int x2_right_sk = x2 - 10;
             if (x2_img) {
                 x_right_sk += IMG_YES->w / 2;
             }
@@ -90,9 +92,28 @@ static void OnRedraw(SIE_GUI_BOX *data) {
                                       FONT_SIZE_SOFT_KEYS,
                                       SIE_FT_TEXT_ALIGN_RIGHT + SIE_FT_TEXT_VALIGN_BOTTOM, NULL);
         }
+        IMGHDR *img = NULL;
+        switch (data->type) {
+            case SIE_GUI_BOX_TYPE_OK:
+                img = IMG_MSG_OK;
+                break;
+            case SIE_GUI_BOX_TYPE_ERROR:
+                img = IMG_MSG_ERROR;
+                break;
+            case SIE_GUI_BOX_TYPE_QUESTION:
+                img = IMG_MSG_QUESTION;
+        }
+        if (img) {
+            const int x_icon = x_msg + 10;
+            const int y_icon = y_msg + (y2_msg - y_msg) / 2 - img->h / 2;
+            x_msg = x_icon + img->w + 10;
+            attr_msg -= SIE_FT_TEXT_ALIGN_CENTER;
+            Sie_GUI_DrawIMGHDR(img, x_icon, y_icon, img->w, img->h);
+        }
     }
+
     Sie_FT_DrawText(data->msg_ws, x_msg, y_msg, x2_msg, y2_msg,
-                    FONT_SIZE_MSG,SIE_FT_TEXT_ALIGN_CENTER + SIE_FT_TEXT_VALIGN_MIDDLE, NULL);
+                    FONT_SIZE_MSG,attr_msg, NULL);
 }
 
 static void OnAfterDrawIconBar() {
@@ -102,11 +123,23 @@ static void OnAfterDrawIconBar() {
 }
 
 static void OnCreate(SIE_GUI_BOX *data, void *(*malloc_adr)(int)) {
-    data->gui.state = 1;
     if (data->type <= SIE_GUI_BOX_TYPE_ERROR) {
         data->tmr_close.param6 = (int)(data->surface->gui_id);
         GBS_StartTimerProc(&(data->tmr_close), 216 * 3, Close);
     }
+    IMG_YES = Sie_Resources_LoadIMGHDR(SIE_RESOURCES_TYPE_ACTIONS, 24, "yes");
+    switch (data->type) {
+        case SIE_GUI_BOX_TYPE_OK:
+            IMG_MSG_OK = Sie_Resources_LoadIMGHDR(SIE_RESOURCES_TYPE_ACTIONS, 48, "msg-ok");
+            break;
+        case SIE_GUI_BOX_TYPE_ERROR:
+            IMG_MSG_ERROR = Sie_Resources_LoadIMGHDR(SIE_RESOURCES_TYPE_ACTIONS, 48, "msg-error");
+            break;
+        case SIE_GUI_BOX_TYPE_QUESTION:
+            IMG_MSG_QUESTION = Sie_Resources_LoadIMGHDR(SIE_RESOURCES_TYPE_ACTIONS, 48, "msg-error");
+            break;
+    }
+    data->gui.state = 1;
 }
 
 static void OnClose(SIE_GUI_BOX *data, void (*mfree_adr)(void *)) {
@@ -192,10 +225,6 @@ SIE_GUI_BOX *Sie_GUI_Box(unsigned int type, SIE_GUI_BOX_TEXT *text, SIE_GUI_BOX_
     gui->msg_ws = AllocWS(128);
     wsprintf(gui->msg_ws, "%t", text->msg);
     if (type <= SIE_GUI_BOX_TYPE_QUESTION) {
-        SIE_RESOURCES_IMG *res_img = Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_ACTIONS, 24, "yes");
-        if (res_img) {
-            IMG_YES = res_img->icon;
-        }
         if (text->left_sk) {
             gui->left_sk_ws = AllocWS((int)strlen(text->left_sk));
             wsprintf(gui->left_sk_ws, "%t", text->left_sk);
@@ -232,7 +261,7 @@ SIE_GUI_BOX *Sie_GUI_MsgBoxOk(const char *msg) {
 
 SIE_GUI_BOX *Sie_GUI_MsgBoxError(const char *msg) {
     SIE_GUI_BOX_TEXT text = {msg,"Ok", NULL};
-    return Sie_GUI_Box(SIE_GUI_BOX_TYPE_OK, &text, NULL);
+    return Sie_GUI_Box(SIE_GUI_BOX_TYPE_ERROR, &text, NULL);
 }
 
 SIE_GUI_BOX *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_BOX_CALLBACK *callback) {
