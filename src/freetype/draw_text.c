@@ -25,7 +25,7 @@ static SIE_FT_RENDER *Render(WSHDR *ws, int x, int x2, int font_size) {
         unsigned short charcode = ws->wsbody[1 + i];
         SIE_FT_GLYPH_CACHE *glyph_cache = Sie_FT_Cache_GlyphGetOrAdd(face, cache, charcode);
         word_width += glyph_cache->h_advance;
-        if (x + word_width > x2 - x) { // break line
+        if (word_width > x2 - x) { // break line
             if (line_id > max_lines / 2) {
                 max_lines *= 2;
                 render->lines = realloc(render->lines, sizeof(SIE_FT_RENDER_LINE) * max_lines);
