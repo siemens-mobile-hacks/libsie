@@ -23,6 +23,10 @@ void Sie_GUI_Surface_Destroy(SIE_GUI_SURFACE *surface) {
     mfree(surface);
 }
 
+void Sie_GUI_Surface_SetHeader(SIE_GUI_SURFACE *surface, const char *header) {
+    wsprintf(surface->hdr_ws, "%t", header);
+}
+
 void Sie_GUI_Surface_TakeScrot(SIE_GUI_SURFACE *surface) {
     Sie_GUI_Surface_DestroyScrot(surface);
     surface->scrot = Sie_GUI_TakeScrot();

@@ -19,6 +19,7 @@ typedef struct {
 SIE_GUI_SURFACE *Sie_GUI_Surface_Init(int type, const SIE_GUI_SURFACE_HANDLERS *handlers, unsigned int gui_id);
 void Sie_GUI_Surface_Destroy(SIE_GUI_SURFACE *surface);
 
+void Sie_GUI_Surface_SetHeader(SIE_GUI_SURFACE *surface, const char *header);
 void Sie_GUI_Surface_TakeScrot(SIE_GUI_SURFACE *surface);
 void Sie_GUI_Surface_DestroyScrot(SIE_GUI_SURFACE *surface);
 
