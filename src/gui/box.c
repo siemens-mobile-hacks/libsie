@@ -17,9 +17,9 @@ static void Close(GBSTMR *tmr) {
 }
 
 static void OnRedraw(SIE_GUI_BOX *data) {
-    const char color_bg[] = COLOR_BOX_BG;
-    const char color_border[] = COLOR_BOX_BORDER;
-    const char color_surface[] = COLOR_BOX_SURFACE;
+    const char color_bg[] = SIE_COLOR_BOX_BG;
+    const char color_border[] = SIE_COLOR_BOX_BORDER;
+    const char color_surface[] = SIE_COLOR_BOX_SURFACE;
 
     IMGHDR *scrot = (data->surface->scrot_p) ? data->surface->scrot_p : data->surface->scrot;
     if (scrot) {
@@ -116,7 +116,7 @@ static void OnRedraw(SIE_GUI_BOX *data) {
 }
 
 static void OnAfterDrawIconBar() {
-    const char color_surface_bg[] = COLOR_BOX_SURFACE;
+    const char color_surface_bg[] = SIE_COLOR_BOX_SURFACE;
     DrawRectangle(0, 0, SCREEN_X2, YDISP, 0,
                   GetPaletteAdrByColorIndex(23), color_surface_bg);
 }

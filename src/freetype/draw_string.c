@@ -10,7 +10,7 @@ extern FT_Face *FT_FACE_REGULAR;
 extern IMGHDR *BrushGlyphIMGHDR(IMGHDR *img, const char *color);
 
 static void DrawStr(WSHDR *ws, int x, int y, int x2, int y2, int x_offset, int font_size, const char *color) {
-    char rgb[3] = COLOR_TEXT_PRIMARY;
+    char rgb[3] = SIE_COLOR_TEXT_PRIMARY;
     FT_Face *face = FT_FACE_REGULAR;
     SIE_FT_CACHE *cache = Sie_FT_Cache_GetOrCreate(face, font_size);
     SIE_FT_GLYPH_CACHE *glyph_cache = NULL;

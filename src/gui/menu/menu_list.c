@@ -164,7 +164,7 @@ void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
             for (unsigned int j = 0; j < menu->n_separators; j++) {
                 separator = &(menu->separators[j]);
                 if (separator->row == (menu->offset + i)) {
-                    const char color[] = COLOR_MENU_SEPARATOR;
+                    const char color[] = SIE_COLOR_MENU_SEPARATOR;
                     DrawLine(x + 2, (int)(y2 + 2), x2 - 2, (int)(y2 + 2), 1,color);
                     break;
                 }

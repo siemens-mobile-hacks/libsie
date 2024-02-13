@@ -57,7 +57,7 @@ static SIE_FT_RENDER *Render(WSHDR *ws, int x, int x2, int font_size) {
 }
 
 SIE_FT_RENDER *DrawText(WSHDR *ws, int x, int y, int x2, int y2, int font_size, int attr, const char *color) {
-    char rgb[] = COLOR_TEXT_PRIMARY;
+    char rgb[] = SIE_COLOR_TEXT_PRIMARY;
     FT_Face *face = FT_FACE_REGULAR;
     SIE_FT_CACHE *ft_cache = Sie_FT_Cache_GetOrCreate(face, font_size);
     FT_Set_Pixel_Sizes(*face, 0, font_size);
