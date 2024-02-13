@@ -2,6 +2,7 @@
 #define __SIE_H__
 
 #include "ext.h"
+#include "exec.h"
 #include "strings.h"
 #include "subproc.h"
 #include "settings.h"
