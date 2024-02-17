@@ -11,12 +11,6 @@ unsigned int SIE_RES_CLIENTS;
 
 void Sie_Resources_Init() {
     SIE_RES_IMG_WALLPAPER = GetIMGHDRFromCanvasCache(0);
-    Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_STATUS, 24, "battery-00");
-    Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_STATUS, 24, "battery-20");
-    Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_STATUS, 24, "battery-40");
-    Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_STATUS, 24, "battery-60");
-    Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_STATUS, 24, "battery-80");
-    Sie_Resources_LoadImage(SIE_RESOURCES_TYPE_STATUS, 24, "battery-100");
     SIE_RES_CLIENTS++;
 }
 
