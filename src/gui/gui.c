@@ -77,28 +77,36 @@ void Sie_GUI_DrawBleedIMGHDR(IMGHDR *img, int x, int y, int x2, int y2, int blee
 
 void Sie_GUI_DrawIconBar() {
     const SIE_GUI_SURFACE *surface = NULL;
+    char color_text_warning[] = SIE_COLOR_TEXT_WARNING;
+    char color_text_error[] = SIE_COLOR_TEXT_ERROR;
+
     if (TMR_REDRAW_ICONBAR.param6) {
         surface = (SIE_GUI_SURFACE*)TMR_REDRAW_ICONBAR.param6;
     }
     if (IsTimerProc(&TMR_REDRAW_ICONBAR)) {
         GBS_StopTimer(&TMR_REDRAW_ICONBAR);
     }
-//    if (surface) {
-//        TMR_REDRAW_ICONBAR.param6 = (unsigned int)surface;
-//    }
 
     Sie_GUI_DrawIMGHDR(SIE_RES_IMG_WALLPAPER, 0, 0, ScreenW(), YDISP);
 
     int x = 0, y = 0;
     unsigned int w = 0, h = 0;
     WSHDR *ws = AllocWS(64);
+    char *color = NULL;
 
     // battery
-    wsprintf(ws, "%d%%", *RamCap());
+    int cap = *RamCap();
+    if (cap < 20) {
+        color = color_text_warning;
+    }
+    else if (cap < 10) {
+        color = color_text_error;
+    }
+    wsprintf(ws, "%d%%", cap);
     Sie_FT_GetStringSize(ws, FONT_SIZE_ICONBAR, &w, &h);
     x = SCREEN_X2 - PADDING_ICONBAR - w;
     y = 0 + (YDISP - (int)h) / 2;
-    Sie_FT_DrawString(ws, x, y, FONT_SIZE_ICONBAR, NULL);
+    Sie_FT_DrawString(ws, x, y, FONT_SIZE_ICONBAR, color);
 
     // clock
     TTime time;
@@ -108,7 +116,7 @@ void Sie_GUI_DrawIconBar() {
     x = x - PADDING_ICONBAR - (int)w;
     y = 0 + (YDISP - (int)h) / 2;
     Sie_FT_DrawString(ws,  x, y, FONT_SIZE_ICONBAR, NULL);
-    
+
     FreeWS(ws);
     if (surface) {
         if (surface->handlers.OnAfterDrawIconBar) {
