@@ -42,28 +42,20 @@ void Sie_Resources_Destroy() {
 /**********************************************************************************************************************/
 
 void SetWallpaper_Proc(void (*proc)()) {
-    IMGHDR *old = SIE_RES_IMG_WALLPAPER;
-    unsigned int i = 0;
-    while (1) {
-        IMGHDR *new = GetIMGHDRFromCanvasCache(0);
-        if (new) {
-            if (!old || new != old) {
-                SIE_RES_IMG_WALLPAPER = new;
-                proc();
-                break;
-            }
-        }
-        i++;
-        if (i == 5) {
-            proc();
+    for (int i = 0; i < 5; i++) {
+        IMGHDR *img = GetIMGHDRFromCanvasCache(0);
+        if (img) {
+            SIE_RES_IMG_WALLPAPER = img;
             break;
         }
         NU_Sleep(50);
     }
+    proc();
 }
 
 void Sie_Resources_SetWallpaper(WSHDR *ws, void (*proc)()) {
     int hmi_key_id = Registry_GetHMIKeyID("Wallpaper");
+    MMI_CanvasBuffer_FlushV(0);
     Registry_SetResourcePath(hmi_key_id, 3, ws);
     if (proc) {
         Sie_SubProc_Run(SetWallpaper_Proc, proc);
