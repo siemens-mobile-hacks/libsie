@@ -7,13 +7,13 @@
 #define FONT_SIZE_MSG 20
 #define FONT_SIZE_SOFT_KEYS 18
 
-RECT canvas;
+static RECT canvas;
 IMGHDR *IMG_YES;
 IMGHDR *IMG_MSG_OK, *IMG_MSG_ERROR, *IMG_MSG_QUESTION;
 
 static void Close(GBSTMR *tmr) {
-    Sie_GUI_CloseGUI_GBS(tmr->param6);
-    Sie_GUI_CloseGUI(tmr->param6);
+    SIE_GUI_BOX *box = (SIE_GUI_BOX*)tmr->param6;
+    Sie_GUI_BoxClose(box);
 }
 
 static void OnRedraw(SIE_GUI_BOX *data) {
@@ -123,7 +123,7 @@ static void OnAfterDrawIconBar() {
 
 static void OnCreate(SIE_GUI_BOX *data, void *(*malloc_adr)(int)) {
     if (data->type <= SIE_GUI_BOX_TYPE_ERROR) {
-        data->tmr_close.param6 = (int)(data->surface->gui_id);
+        data->tmr_close.param6 = (int)data;
         GBS_StartTimerProc(&(data->tmr_close), 216 * 3, Close);
     }
     IMG_YES = Sie_Resources_LoadIMGHDR(SIE_RESOURCES_TYPE_ACTIONS, 24, "yes");
@@ -224,8 +224,7 @@ SIE_GUI_BOX *Sie_GUI_Box(unsigned int type, SIE_GUI_BOX_TEXT *text, SIE_GUI_BOX_
     };
     zeromem(gui, sizeof(SIE_GUI_BOX));
     gui->type = type;
-    gui->msg_ws = AllocWS(strlen(text->msg));
-    wsprintf(gui->msg_ws, "%t", text->msg);
+    Sie_GUI_BoxUpdate(gui, text->msg);
     if (type <= SIE_GUI_BOX_TYPE_QUESTION) {
         if (text->left_sk) {
             gui->left_sk_ws = AllocWS((int)strlen(text->left_sk));
@@ -274,4 +273,19 @@ SIE_GUI_BOX *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_BOX_CALLBACK *callback
 SIE_GUI_BOX *Sie_GUI_WaitBox(const char *msg, IMGHDR *scrot) {
     SIE_GUI_BOX_TEXT text = {(msg) ? msg : "Wait...", NULL, NULL};
     return Sie_GUI_Box(SIE_GUI_BOX_TYPE_WAIT, &text, NULL, scrot);
+}
+
+void Sie_GUI_BoxUpdate(SIE_GUI_BOX *box, const char *msg) {
+    size_t len = strlen(msg);
+    if (box->msg_ws) {
+        FreeWS(box->msg_ws);
+    }
+    box->msg_ws = AllocWS((int)len);
+    wsprintf(box->msg_ws, "%t", msg);
+    PendedRedrawGUI();
+}
+
+void Sie_GUI_BoxClose(SIE_GUI_BOX *box) {
+    Sie_GUI_CloseGUI(box->surface->gui_id);
+    Sie_GUI_CloseGUI_GBS(box->surface->gui_id);
 }

@@ -41,5 +41,7 @@ SIE_GUI_BOX *Sie_GUI_MsgBoxOk(const char *msg, IMGHDR *scrot);
 SIE_GUI_BOX *Sie_GUI_MsgBoxError(const char *msg, IMGHDR *scrot);
 SIE_GUI_BOX *Sie_GUI_MsgBoxYesNo(const char *msg, SIE_GUI_BOX_CALLBACK *callback, IMGHDR *scrot);
 SIE_GUI_BOX *Sie_GUI_WaitBox(const char *msg, IMGHDR *scrot);
+void Sie_GUI_BoxUpdate(SIE_GUI_BOX *box, const char *msg);
+void Sie_GUI_BoxClose(SIE_GUI_BOX *box);
 
 #endif
