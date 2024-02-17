@@ -98,7 +98,7 @@ SIE_RESOURCES_IMG *Sie_Resources_LoadImage(unsigned int type, unsigned int size,
         case SIE_RESOURCES_TYPE_DEVICES:
             strcpy(_type, "devices");
             break;
-        default:
+        case SIE_RESOURCES_TYPE_APPS: default:
             strcpy(_type, "apps");
     }
 

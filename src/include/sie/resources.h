@@ -8,6 +8,7 @@
 #define SIE_RESOURCES_TYPE_STATUS  0x02
 #define SIE_RESOURCES_TYPE_ACTIONS 0x03
 #define SIE_RESOURCES_TYPE_DEVICES 0x04
+#define SIE_RESOURCES_TYPE_APPS    0x05
 
 typedef struct {
     void *prev;
