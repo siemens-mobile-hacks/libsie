@@ -129,13 +129,16 @@ static void OnCreate(SIE_GUI_BOX *data, void *(*malloc_adr)(int)) {
     IMG_YES = Sie_Resources_LoadIMGHDR(SIE_RESOURCES_TYPE_ACTIONS, 24, "yes");
     switch (data->type) {
         case SIE_GUI_BOX_TYPE_OK:
-            IMG_MSG_OK = Sie_Resources_LoadIMGHDR(SIE_RESOURCES_TYPE_ACTIONS, 48, "msg-ok");
+            IMG_MSG_OK = Sie_Resources_LoadIMGHDR(SIE_RESOURCES_TYPE_ACTIONS, 48,
+                                                  "dialog-ok");
             break;
         case SIE_GUI_BOX_TYPE_ERROR:
-            IMG_MSG_ERROR = Sie_Resources_LoadIMGHDR(SIE_RESOURCES_TYPE_ACTIONS, 48, "msg-error");
+            IMG_MSG_ERROR = Sie_Resources_LoadIMGHDR(SIE_RESOURCES_TYPE_ACTIONS, 48,
+                                                     "dialog-error");
             break;
         case SIE_GUI_BOX_TYPE_QUESTION:
-            IMG_MSG_QUESTION = Sie_Resources_LoadIMGHDR(SIE_RESOURCES_TYPE_ACTIONS, 48, "msg-question");
+            IMG_MSG_QUESTION = Sie_Resources_LoadIMGHDR(SIE_RESOURCES_TYPE_ACTIONS, 48,
+                                                        "dialog-question");
             break;
     }
     data->gui.state = 1;
