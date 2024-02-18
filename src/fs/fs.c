@@ -338,11 +338,11 @@ unsigned int Sie_FS_CreateDirs(const char *path, unsigned int *err) {
     return 1;
 }
 
-unsigned int Sie_FS_CopyFile(const char *src, const char *dest, unsigned int *err) {
+int Sie_FS_CopyFile(const char *src, const char *dest, unsigned int *err) {
+    int result = -1;
     int in = -1, out = -1;
     unsigned int err1 = 0, err2 = 0;
     unsigned int wb = 0;
-    unsigned int result = 0;
 
     in = _open(src, A_ReadOnly, P_READ, &err1);
     if (in == -1) {
@@ -381,11 +381,10 @@ unsigned int Sie_FS_CopyFile(const char *src, const char *dest, unsigned int *er
         }
     } while (wb < fstats_in.size);
     EXIT:
-        result = 0;
         if (err1) {
             *err = err1;
         } else {
-            result = wb;
+            result = (int)wb;
         }
         if (in != -1) {
             _close(in, &err1);
@@ -420,7 +419,7 @@ unsigned int Sie_FS_CopyDir(const char *src, const char *dest, unsigned int *err
                     result = 0;
                 }
             } else {
-                if (!Sie_FS_CopyFile(s, d, err)) {
+                if (Sie_FS_CopyFile(s, d, err) < 0) {
                     result = 0;
                 }
             }
@@ -442,7 +441,7 @@ unsigned int Sie_FS_MoveFile(const char *src, const char *dest, unsigned int *er
     } else {
         unsigned int result = 0, err1 = 0;
         if (!Sie_FS_IsDir(src, &err1)) {
-            if (Sie_FS_CopyFile(src, dest, &err1)) {
+            if (Sie_FS_CopyFile(src, dest, &err1) >= 0) {
                 result = Sie_FS_DeleteFile(src, &err1);
             }
             *err = err1;
