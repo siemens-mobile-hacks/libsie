@@ -96,11 +96,10 @@ void Sie_GUI_DrawIconBar() {
 
     // battery
     int cap = *RamCap();
-    if (cap < 20) {
-        color = color_text_warning;
-    }
-    else if (cap < 10) {
+    if (cap < 10) {
         color = color_text_error;
+    } else if (cap < 20) {
+        color = color_text_warning;
     }
     wsprintf(ws, "%d%%", cap);
     Sie_FT_GetStringSize(ws, FONT_SIZE_ICONBAR, &w, &h);
