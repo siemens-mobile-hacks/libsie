@@ -136,9 +136,6 @@ void Sie_GUI_DrawHeader(WSHDR *ws) {
                             0, YDISP);
     DrawRectangle(header_x, header_y, header_x2, header_y2 - 1, 0, color_bg, color_bg);
 
-    int text_x = 0;
-    int text_y = 0;
-
     char str[64];
     WSHDR *ws_left = AllocWS(64);
     WSHDR *ws_right = AllocWS(64);
@@ -153,15 +150,18 @@ void Sie_GUI_DrawHeader(WSHDR *ws) {
     } else {
         wstrcpy(ws_left, ws);
     }
-    text_x = 0 + PADDING_HEADER;
-    text_y = YDISP + (HeaderH() - Sie_FT_GetMaxHeight(FONT_SIZE_HEADER)) / 2;
+    unsigned int w, h;
+    int text_x, text_y;
     if (wstrlen(ws_left)) {
+        Sie_FT_GetStringSize(ws_left, FONT_SIZE_HEADER, &w, &h);
+        text_x = 0 + PADDING_HEADER;
+        text_y = YDISP + (HeaderH() - h) / 2;
         Sie_FT_DrawString(ws_left, text_x, text_y, FONT_SIZE_HEADER, NULL);
     }
     if (wstrlen(ws_right)) {
-        unsigned int w = 0, h = 0;
         Sie_FT_GetStringSize(ws_right,  FONT_SIZE_HEADER, &w, &h);
         text_x = SCREEN_X2 - 1 - PADDING_HEADER - w;
+        text_y = YDISP + (HeaderH() - h) / 2;
         Sie_FT_DrawString(ws_right, text_x, text_y, FONT_SIZE_HEADER, NULL);
     }
     FreeWS(ws_left);

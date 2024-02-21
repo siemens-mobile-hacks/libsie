@@ -9,7 +9,17 @@
 extern FT_Face *FT_FACE_REGULAR;
 extern IMGHDR *BrushGlyphIMGHDR(IMGHDR *img, const char *color);
 
-static void DrawStr(WSHDR *ws, int x, int y, int x2, int y2, int x_offset, int font_size, const char *color) {
+static int GetTextY(int y, int y2, unsigned int h, int attr) {
+    if (attr & SIE_FT_TEXT_VALIGN_MIDDLE) {
+        return y + ((y2 - y) - (int)h) / 2;
+    } else if (attr & SIE_FT_TEXT_VALIGN_BOTTOM) {
+        return y2 - (int)h;
+    } else {
+        return y;
+    }
+}
+
+static void DrawStr(WSHDR *ws, int x, int y, int x2, int x_offset, int font_size, const char *color) {
     char rgb[3] = SIE_COLOR_TEXT_PRIMARY;
     FT_Face *face = FT_FACE_REGULAR;
     SIE_FT_CACHE *cache = Sie_FT_Cache_GetOrCreate(face, font_size);
@@ -107,13 +117,8 @@ static void DrawBoundingString(WSHDR *ws, int x, int y, int x2, int y2,
             }
         }
     }
-    if (attr & SIE_FT_TEXT_VALIGN_MIDDLE) {
-        y_text = y + (y2 - y) / 2 - (int)h / 2;
-    }
-    else if (attr & SIE_FT_TEXT_VALIGN_BOTTOM) {
-        y_text = y2 - (int)h;
-    }
-    DrawStr(copy_ws, x_text, y_text, x2, y2, 0, font_size, color);
+    y_text = GetTextY(y, y2, h, attr);
+    DrawStr(copy_ws, x_text, y_text, x2, 0, font_size, color);
     FreeWS(copy_ws);
 }
 
@@ -126,9 +131,9 @@ static void DrawBoundingScrollString(GBSTMR *tmr) {
     unsigned int w, h;
     Sie_FT_GetStringSize(ss->ws, ss->font_size, &w, &h);
     if (ss->OnBeforeDraw) {
-        ss->OnBeforeDraw(ss->x, ss->y, ss->x2, ss->y + (int)h);
+        ss->OnBeforeDraw(ss->x, ss->y, ss->x2, ss->y2);
     }
-    DrawStr(ss->ws, ss->x, ss->y, ss->x2, ss->y2, ss->offset, ss->font_size, ss->color);
+    DrawStr(ss->ws, ss->x, ss->y, ss->x2, ss->offset, ss->font_size, ss->color);
 
     int tmr_ms = SS_TMR_MS_START;
     if (!ss->offset) {
@@ -145,7 +150,7 @@ static void DrawBoundingScrollString(GBSTMR *tmr) {
 }
 
 void Sie_FT_DrawString(WSHDR *ws, int x, int y, int font_size, const char *color) {
-    DrawStr(ws, x, y, 0, 0, 0, font_size, color);
+    DrawStr(ws, x, y, 0, 0, font_size, color);
 }
 
 void Sie_FT_DrawBoundingString(WSHDR *ws, int x, int y, int x2, int y2, int font_size, int attr, const char *color) {
@@ -156,6 +161,8 @@ void Sie_FT_DrawBoundingScrollString(SIE_FT_SCROLL_STRING *ss, GBSTMR *tmr) {
     unsigned int w, h;
     Sie_FT_GetStringSize(ss->ws, ss->font_size, &w, &h);
     if (w > ss->x2 - ss->x) {
+        ss->y = GetTextY(ss->y, ss->y2, h, ss->attr);
+        ss->y2 = ss->y + (int)h;
         ss->offset = 0;
         tmr->param6 = (unsigned int)ss;
         DrawBoundingScrollString(tmr);

@@ -172,8 +172,9 @@ void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
         }
 
         int text_x = x + 8;
-        int text_x2 = x2 - 8;
-        int text_y = (int)y + ((int)item_h - Sie_FT_GetMaxHeight(FONT_SIZE)) / 2;
+        const int text_y = (int)y;
+        const int text_x2 = x2 - 8;
+        const int text_y2 = (int)y2;
         IMGHDR *img = (item->type == SIE_MENU_LIST_ITEM_TYPE_DEFAULT) ? item->icon : item->icon2;
         if (is_select) {
             DrawRoundedFrame(x, (int)y - 1, x2, (int)y2 + 1,
@@ -194,12 +195,13 @@ void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
             ss->x = text_x;
             ss->y = text_y;
             ss->x2 = text_x2;
-            ss->y2 = 0;
+            ss->y2 = text_y2;
+            ss->attr = SIE_FT_TEXT_VALIGN_MIDDLE;
             ss->color = item->color;
             Sie_FT_DrawBoundingScrollString(menu->ss, &(ss->tmr));
         } else {
-            Sie_FT_DrawBoundingString(item->ws, text_x, text_y, text_x2, 0,
-                                      FONT_SIZE, SIE_FT_TEXT_ALIGN_LEFT, item->color);
+            Sie_FT_DrawBoundingString(item->ws, text_x, text_y, text_x2, text_y2,
+                                      FONT_SIZE, SIE_FT_TEXT_VALIGN_MIDDLE, item->color);
         }
         y_start += item_h + (float)v_offset;
     }
