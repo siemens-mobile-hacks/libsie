@@ -4,19 +4,17 @@
 #include "../include/sie/gui/gui.h"
 #include "../include/sie/freetype/freetype_cache.h"
 
-FT_Library *FT_LIBRARY = NULL;
-FT_Face *FT_FACE_REGULAR = NULL;
-unsigned int FT_CLIENTS_COUNT = 0;
+extern char CFG_FONT_REGULAR_PATH[];
+
+FT_Library *FT_LIBRARY;
+FT_Face *FT_FACE_REGULAR;
+unsigned int FT_CLIENTS_COUNT;
 
 void Sie_FT_Init() {
     if (!FT_LIBRARY) {
         FT_LIBRARY = malloc(sizeof(FT_Library));
         FT_Init_FreeType(FT_LIBRARY);
-        if (!FT_FACE_REGULAR) {
-            FT_FACE_REGULAR = malloc(sizeof(FT_Face));
-            FT_New_Face(*FT_LIBRARY, "0:\\ZBin\\fonts\\Roboto-Regular.ttf",
-                        0, FT_FACE_REGULAR);
-        }
+        Sie_FT_LoadFaces();
     }
     FT_CLIENTS_COUNT++;
 }
@@ -27,17 +25,27 @@ void Sie_FT_Destroy() {
     }
     if (!FT_CLIENTS_COUNT) {
         if (FT_LIBRARY) {
-            if (FT_FACE_REGULAR) {
-                FT_Done_Face(*FT_FACE_REGULAR);
-                mfree(FT_FACE_REGULAR);
-                FT_FACE_REGULAR = NULL;
-            }
+            Sie_FT_UnloadFaces();
             FT_Done_FreeType(*FT_LIBRARY);
             mfree(FT_LIBRARY);
             FT_LIBRARY = NULL;
             Sie_FT_Cache_Destroy();
         }
     }
+}
+
+void Sie_FT_UnloadFaces() {
+    if (FT_FACE_REGULAR) {
+        FT_Done_Face(*FT_FACE_REGULAR);
+        mfree(FT_FACE_REGULAR);
+        FT_FACE_REGULAR = NULL;
+    }
+}
+
+void Sie_FT_LoadFaces() {
+    FT_FACE_REGULAR = malloc(sizeof(FT_Face));
+    FT_New_Face(*FT_LIBRARY, CFG_FONT_REGULAR_PATH,
+                SIE_FT_FACE_REGULAR_ID, FT_FACE_REGULAR);
 }
 
 int Sie_FT_GetMaxHeight(int font_size) {

@@ -1,10 +1,11 @@
-#include <swilib.h>
+#include "include/sie/bcfg.h"
 
 __attribute__((constructor))
 void InitLibrary() {
     extern void Sie_FT_Init();
     extern void Sie_SubProc_Init();
     extern void Sie_Resources_Init();
+    Sie_BCFG_Load();
     Sie_FT_Init();
     Sie_SubProc_Init();
     Sie_Resources_Init();

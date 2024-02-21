@@ -72,8 +72,8 @@ static void DrawBoundingString(WSHDR *ws, int x, int y, int x2, int y2,
     unsigned int w = 0, h = 0;
     WSHDR *copy_ws = AllocWS(len);
     wstrcpy(copy_ws, ws);
+    Sie_FT_GetStringSize(copy_ws, font_size, &w, &h);
     if (attr & SIE_FT_TEXT_ALIGN_CENTER) {
-        Sie_FT_GetStringSize(copy_ws, font_size, &w, &h);
         if (w <= x2 - x) {
             x_text = x + (x2 - x - (int)w) / 2;
         } else {
@@ -85,7 +85,6 @@ static void DrawBoundingString(WSHDR *ws, int x, int y, int x2, int y2,
             if (len <= 1) {
                 break;
             } else {
-                Sie_FT_GetStringSize(copy_ws, font_size, &w, &h);
                 x_text = x2 - (int)w;
                 if (w > x2 -x) {
                     wsRemoveChars(copy_ws, 1, 2);
@@ -101,7 +100,6 @@ static void DrawBoundingString(WSHDR *ws, int x, int y, int x2, int y2,
             if (len <= 1) {
                 break;
             } else {
-                Sie_FT_GetStringSize(copy_ws, font_size, &w, &h);
                 if (w > x2 - x) {
                     wsRemoveChars(copy_ws, len - 1, len);
                     len -= 1;
