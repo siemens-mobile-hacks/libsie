@@ -2,7 +2,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include "../include/sie/gui/gui.h"
-#include "../include/sie/freetype/freetype_cache.h"
+#include "../include/sie/freetype/cache.h"
 
 extern char CFG_FONT_REGULAR_PATH[];
 
@@ -29,7 +29,7 @@ void Sie_FT_Destroy() {
             FT_Done_FreeType(*FT_LIBRARY);
             mfree(FT_LIBRARY);
             FT_LIBRARY = NULL;
-            Sie_FT_Cache_Destroy();
+            Sie_FT_DestroyCache();
         }
     }
 }
@@ -48,6 +48,23 @@ void Sie_FT_LoadFaces() {
                 SIE_FT_FACE_REGULAR_ID, FT_FACE_REGULAR);
 }
 
+void Sie_FT_DestroyCache() {
+    extern SIE_FT_CACHE *FT_CACHE;
+    extern unsigned int FT_CACHE_SIZE;
+    for (int i = 0; i < FT_CACHE_SIZE; i++) {
+        SIE_FT_CACHE ft_cache = FT_CACHE[i];
+        for (unsigned int j = 0; j < ft_cache.size; j++) {
+            SIE_FT_GLYPH_CACHE ft_wc_cache = ft_cache.cache[j];
+            mfree(ft_wc_cache.img->bitmap);
+            mfree(ft_wc_cache.img);
+        }
+        mfree(ft_cache.cache);
+    }
+    mfree(FT_CACHE);
+    FT_CACHE = NULL;
+    FT_CACHE_SIZE = 0;
+}
+
 int Sie_FT_GetMaxHeight(int font_size) {
     FT_Face *face = FT_FACE_REGULAR;
     FT_Set_Pixel_Sizes(*face, 0, font_size);
@@ -58,14 +75,14 @@ int Sie_FT_GetMaxHeight(int font_size) {
 
 void Sie_FT_GetStringSize(WSHDR *ws, int font_size, unsigned int *w, unsigned int *h) {
     FT_Face *face = FT_FACE_REGULAR;
-    SIE_FT_CACHE *cache = Sie_FT_Cache_GetOrCreate(face, font_size);
+    SIE_FT_CACHE *cache = FT_GetOrCreateCache(face, font_size);
     SIE_FT_GLYPH_CACHE *glyph_cache = NULL;
 
     unsigned int width = 0, height = Sie_FT_GetMaxHeight(font_size);
     FT_ULong charcode;
     for (unsigned int i = 0; i < wstrlen(ws); i++) {
         charcode = ws->wsbody[1 + i];
-        glyph_cache = Sie_FT_Cache_GlyphGetOrAdd(face, cache, charcode);
+        glyph_cache = FT_GlyphGetOrAddCache(face, cache, charcode);
         width += glyph_cache->h_advance;
     }
     *w = width;

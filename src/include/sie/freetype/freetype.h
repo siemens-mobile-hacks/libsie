@@ -31,6 +31,7 @@ typedef struct {
 
 void Sie_FT_UnloadFaces();
 void Sie_FT_LoadFaces();
+void Sie_FT_DestroyCache();
 
 int Sie_FT_GetMaxHeight(int font_size);
 void Sie_FT_GetStringSize(WSHDR *ws, int font_size, unsigned int *w, unsigned int *h);

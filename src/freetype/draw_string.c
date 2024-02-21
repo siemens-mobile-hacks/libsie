@@ -1,6 +1,6 @@
 #include <swilib.h>
 #include "../include/sie/gui/gui.h"
-#include "../include/sie/freetype/freetype_cache.h"
+#include "../include/sie/freetype/cache.h"
 
 #define SS_TMR_MS_START (216 / 1.5)
 #define SS_TMR_MS       (16)
@@ -22,7 +22,7 @@ static int GetTextY(int y, int y2, unsigned int h, int attr) {
 static void DrawStr(WSHDR *ws, int x, int y, int x2, int x_offset, int font_size, const char *color) {
     char rgb[3] = SIE_COLOR_TEXT_PRIMARY;
     FT_Face *face = FT_FACE_REGULAR;
-    SIE_FT_CACHE *cache = Sie_FT_Cache_GetOrCreate(face, font_size);
+    SIE_FT_CACHE *cache = FT_GetOrCreateCache(face, font_size);
     SIE_FT_GLYPH_CACHE *glyph_cache = NULL;
 
     FT_Set_Pixel_Sizes(*face, 0, font_size);
@@ -35,7 +35,7 @@ static void DrawStr(WSHDR *ws, int x, int y, int x2, int x_offset, int font_size
     unsigned int width = 0;
     for (int i = 0; i < wstrlen(ws); i++) {
         unsigned short charcode = ws->wsbody[1 + i];
-        glyph_cache = Sie_FT_Cache_GlyphGetOrAdd(face, cache, charcode);
+        glyph_cache = FT_GlyphGetOrAddCache(face, cache, charcode);
         width += glyph_cache->h_advance;
 
         if (x_offset) {

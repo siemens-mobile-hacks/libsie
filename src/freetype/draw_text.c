@@ -1,14 +1,14 @@
 #include <swilib.h>
 #include <sys/param.h>
 #include "../include/sie/gui/gui.h"
-#include "../include/sie/freetype/freetype_cache.h"
+#include "../include/sie/freetype/cache.h"
 
 extern FT_Face *FT_FACE_REGULAR;
 extern IMGHDR *BrushGlyphIMGHDR(IMGHDR *img, const char *color);
 
 static SIE_FT_RENDER *Render(WSHDR *ws, int x, int x2, int font_size) {
     FT_Face *face = FT_FACE_REGULAR;
-    SIE_FT_CACHE *cache = Sie_FT_Cache_GetOrCreate(face, font_size);
+    SIE_FT_CACHE *cache = FT_GetOrCreateCache(face, font_size);
     FT_Set_Pixel_Sizes(*face, 0, font_size);
 
     int line_id = 0;
@@ -23,7 +23,7 @@ static SIE_FT_RENDER *Render(WSHDR *ws, int x, int x2, int font_size) {
     render->lines = malloc(sizeof(SIE_FT_RENDER_LINE) * max_lines);
     for (int i = 0; i < wstrlen(ws); i++) {
         unsigned short charcode = ws->wsbody[1 + i];
-        SIE_FT_GLYPH_CACHE *glyph_cache = Sie_FT_Cache_GlyphGetOrAdd(face, cache, charcode);
+        SIE_FT_GLYPH_CACHE *glyph_cache = FT_GlyphGetOrAddCache(face, cache, charcode);
         word_width += glyph_cache->h_advance;
         if (word_width > x2 - x) { // break line
             if (line_id > max_lines / 2) {
@@ -59,7 +59,7 @@ static SIE_FT_RENDER *Render(WSHDR *ws, int x, int x2, int font_size) {
 SIE_FT_RENDER *DrawText(WSHDR *ws, int x, int y, int x2, int y2, int font_size, int attr, const char *color) {
     char rgb[] = SIE_COLOR_TEXT_PRIMARY;
     FT_Face *face = FT_FACE_REGULAR;
-    SIE_FT_CACHE *ft_cache = Sie_FT_Cache_GetOrCreate(face, font_size);
+    SIE_FT_CACHE *ft_cache = FT_GetOrCreateCache(face, font_size);
     FT_Set_Pixel_Sizes(*face, 0, font_size);
     if (color) {
         memcpy(rgb, color, 3);
@@ -77,7 +77,7 @@ SIE_FT_RENDER *DrawText(WSHDR *ws, int x, int y, int x2, int y2, int font_size, 
     int max_v_advance = 0;
     for (int i = 0; i < wstrlen(ws); i++) {
         unsigned short charcode = ws->wsbody[1 + i];
-        SIE_FT_GLYPH_CACHE *glyph_cache = Sie_FT_Cache_GlyphGetOrAdd(face, ft_cache, charcode);
+        SIE_FT_GLYPH_CACHE *glyph_cache = FT_GlyphGetOrAddCache(face, ft_cache, charcode);
         max_v_advance = MAX(max_v_advance, glyph_cache->v_advance);
 
         SIE_FT_RENDER_LINE *line = (render->lines) ? &(render->lines[line_id]) : NULL;

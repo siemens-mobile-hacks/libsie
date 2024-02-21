@@ -1,9 +1,9 @@
-#include "../include/sie/freetype/freetype_cache.h"
+#include "../include/sie/freetype/cache.h"
 
 SIE_FT_CACHE *FT_CACHE;
 unsigned int FT_CACHE_SIZE;
 
-SIE_FT_CACHE *Sie_FT_Cache_GetOrCreate(const FT_Face *face, int font_size) {
+SIE_FT_CACHE *FT_GetOrCreateCache(const FT_Face *face, int font_size) {
     SIE_FT_CACHE *ft_cache = NULL;
     for (unsigned int i = 0; i < FT_CACHE_SIZE; i++) {
         if (FT_CACHE[i].face == face && FT_CACHE[i].font_size == font_size) {
@@ -24,22 +24,7 @@ SIE_FT_CACHE *Sie_FT_Cache_GetOrCreate(const FT_Face *face, int font_size) {
     }
 }
 
-void Sie_FT_Cache_Destroy() {
-    for (int i = 0; i < FT_CACHE_SIZE; i++) {
-        SIE_FT_CACHE ft_cache = FT_CACHE[i];
-        for (unsigned int j = 0; j < ft_cache.size; j++) {
-            SIE_FT_GLYPH_CACHE ft_wc_cache = ft_cache.cache[j];
-            mfree(ft_wc_cache.img->bitmap);
-            mfree(ft_wc_cache.img);
-        }
-        mfree(ft_cache.cache);
-    }
-    mfree(FT_CACHE);
-    FT_CACHE = NULL;
-    FT_CACHE_SIZE = 0;
-}
-
-SIE_FT_GLYPH_CACHE *Sie_FT_Cache_GlyphGet(SIE_FT_CACHE *ft_cache, FT_ULong charcode) {
+static SIE_FT_GLYPH_CACHE *GetGlyphCache(SIE_FT_CACHE *ft_cache, FT_ULong charcode) {
     SIE_FT_GLYPH_CACHE *glyph_cache = NULL;
     for (unsigned int i = 0; i < ft_cache->size; i++) {
         glyph_cache = &(ft_cache->cache[i]);
@@ -50,7 +35,7 @@ SIE_FT_GLYPH_CACHE *Sie_FT_Cache_GlyphGet(SIE_FT_CACHE *ft_cache, FT_ULong charc
     return NULL;
 }
 
-SIE_FT_GLYPH_CACHE *Sie_FT_Cache_GlyphAdd(FT_Face *face, SIE_FT_CACHE *ft_cache, FT_ULong charcode) {
+static SIE_FT_GLYPH_CACHE *AddGlyphCache(FT_Face *face, SIE_FT_CACHE *ft_cache, FT_ULong charcode) {
     FT_UInt glyph_index;
     FT_Bitmap *bitmap;
 
@@ -99,11 +84,11 @@ SIE_FT_GLYPH_CACHE *Sie_FT_Cache_GlyphAdd(FT_Face *face, SIE_FT_CACHE *ft_cache,
     return cc_cache;
 }
 
-SIE_FT_GLYPH_CACHE *Sie_FT_Cache_GlyphGetOrAdd(FT_Face *face, SIE_FT_CACHE *cache, FT_ULong charcode) {
+SIE_FT_GLYPH_CACHE *FT_GlyphGetOrAddCache(FT_Face *face, SIE_FT_CACHE *cache, FT_ULong charcode) {
     SIE_FT_GLYPH_CACHE *glyph_cache = NULL;
-    glyph_cache = Sie_FT_Cache_GlyphGet(cache, charcode);
+    glyph_cache = GetGlyphCache(cache, charcode);
     if (!glyph_cache) {
-        glyph_cache = Sie_FT_Cache_GlyphAdd(face, cache, charcode);
+        glyph_cache = AddGlyphCache(face, cache, charcode);
     }
     return glyph_cache;
 }
