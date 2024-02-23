@@ -3,7 +3,6 @@
 #include "../include/sie/gui/gui.h"
 
 GBSTMR TMR_REDRAW_ICONBAR;
-extern IMGHDR *SIE_RES_IMG_WALLPAPER;
 
 SIE_GUI_SURFACE *Sie_GUI_Surface_Init(int type, const SIE_GUI_SURFACE_HANDLERS *handlers, unsigned int gui_id) {
     SIE_GUI_SURFACE *surface = malloc(sizeof(SIE_GUI_SURFACE));
@@ -50,11 +49,12 @@ void Sie_GUI_Surface_Draw(const SIE_GUI_SURFACE *surface) {
 }
 
 void Sie_GUI_Surface_OnFocus(SIE_GUI_SURFACE *surface) {
+    extern IMGHDR *SIE_RES_IMG_WALLPAPER;
 #ifdef ELKA
     DisableIconBar(1);
 #endif
     SIE_RES_IMG_WALLPAPER = GetIMGHDRFromCanvasCache(0);
-    TMR_REDRAW_ICONBAR.param6 = (unsigned int)surface;
+    TMR_REDRAW_ICONBAR.param6 = (int)surface;
     GBS_StartTimerProc(&TMR_REDRAW_ICONBAR, 216, Sie_GUI_DrawIconBar);
 }
 

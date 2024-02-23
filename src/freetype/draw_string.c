@@ -92,7 +92,7 @@ static void DrawBoundingString(WSHDR *ws, int x, int y, int x2, int y2,
     }
     else if (attr & SIE_FT_TEXT_ALIGN_RIGHT) {
         while (1) {
-            if (len <= 1) {
+            if (len < 1) {
                 break;
             } else {
                 x_text = x2 - (int)w;

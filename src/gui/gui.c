@@ -6,7 +6,6 @@
 #define TMR_MS_FOCUS (216 / 8)
 #define COLOR_HEADER_BG {0x00, 0x00, 0x00, 0x35}
 
-extern IMGHDR *SIE_RES_IMG_WALLPAPER;
 extern GBSTMR TMR_REDRAW_ICONBAR;
 
 extern int CFG_FONT_SIZE_ICONBAR, CFG_FONT_SIZE_HEADER;
@@ -87,7 +86,7 @@ void Sie_GUI_DrawIconBar() {
         GBS_StopTimer(&TMR_REDRAW_ICONBAR);
     }
 
-    Sie_GUI_DrawIMGHDR(SIE_RES_IMG_WALLPAPER, 0, 0, ScreenW(), YDISP);
+    Sie_GUI_DrawIMGHDR(Sie_Resources_GetWallpaperIMGHDR(), 0, 0, ScreenW(), YDISP);
 
     int x = 0, y = 0;
     unsigned int w = 0, h = 0;
@@ -131,7 +130,7 @@ void Sie_GUI_DrawHeader(WSHDR *ws) {
     const int header_x2 = SCREEN_X2;
     const int header_y2 = header_y + HeaderH();
     const char color_bg[] = COLOR_HEADER_BG;
-    Sie_GUI_DrawBleedIMGHDR(SIE_RES_IMG_WALLPAPER,
+    Sie_GUI_DrawBleedIMGHDR(Sie_Resources_GetWallpaperIMGHDR(),
                             header_x, header_y, header_x2, header_y2,
                             0, YDISP);
     DrawRectangle(header_x, header_y, header_x2, header_y2 - 1, 0, color_bg, color_bg);

@@ -4,7 +4,6 @@
 #include "../../include/sie/gui/gui.h"
 #include "../../include/sie/resources.h"
 
-extern IMGHDR *SIE_RES_IMG_WALLPAPER;
 extern int CFG_FONT_SIZE_MENU_LIST_ITEM;
 
 #define COLOR_SELECT_BG {0x00, 0x00, 0x00, 0x35}
@@ -127,7 +126,7 @@ void Sie_Menu_List_DrawIndicator(SIE_MENU_LIST *menu) {
 
 static void DrawSSBG(int x, int y, int x2, int y2) {
     const char color_bg[] = COLOR_SELECT_BG;
-    Sie_GUI_DrawBleedIMGHDR(SIE_RES_IMG_WALLPAPER, x, y, x2, y2, x, y);
+    Sie_GUI_DrawBleedIMGHDR(Sie_Resources_GetWallpaperIMGHDR(), x, y, x2, y2, x, y);
     DrawRectangle(x, y, x2, y2, 0, color_bg, color_bg);
 }
 
@@ -145,7 +144,7 @@ void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
     const float item_h = (float)height / SIE_MENU_LIST_MAX_ITEMS - (float)v_offset;
     const int item_w = (show_indicator) ? width - 6 - 1 - h_offset : width - 1 - h_offset;
 
-    Sie_GUI_DrawBleedIMGHDR(SIE_RES_IMG_WALLPAPER, 0, 0 + YDISP + header_h, SCREEN_X2, SCREEN_Y2,
+    Sie_GUI_DrawBleedIMGHDR(Sie_Resources_GetWallpaperIMGHDR(), 0, 0 + YDISP + header_h, SCREEN_X2, SCREEN_Y2,
                             0, YDISP + header_h);
 
     float y_start = YDISP + (float)header_h + 1;
@@ -211,7 +210,7 @@ void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
 }
 
 void Sie_Menu_List_DrawEmpty() {
-    Sie_GUI_DrawBleedIMGHDR(SIE_RES_IMG_WALLPAPER, 0, YDISP, SCREEN_X2, SCREEN_Y2, 0, YDISP);
+    Sie_GUI_DrawBleedIMGHDR(Sie_Resources_GetWallpaperIMGHDR(), 0, YDISP, SCREEN_X2, SCREEN_Y2, 0, YDISP);
 
     const int font_size = CFG_FONT_SIZE_MENU_LIST_ITEM + 4;
     const char color[] = COLOR_EMPTY_TEXT;

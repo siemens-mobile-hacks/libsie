@@ -49,6 +49,7 @@ void SetWallpaper_Proc(void (*proc)()) {
 
 void Sie_Resources_SetWallpaper(WSHDR *ws, void (*proc)()) {
     int hmi_key_id = Registry_GetHMIKeyID("Wallpaper");
+    SIE_RES_IMG_WALLPAPER = NULL;
     MMI_CanvasBuffer_FlushV(0);
     Registry_SetResourcePath(hmi_key_id, 3, ws);
     if (proc) {
@@ -56,7 +57,7 @@ void Sie_Resources_SetWallpaper(WSHDR *ws, void (*proc)()) {
     }
 }
 
-IMGHDR *Sie_Resources_GetWallpaper() {
+IMGHDR *Sie_Resources_GetWallpaperIMGHDR() {
     return SIE_RES_IMG_WALLPAPER;
 }
 
