@@ -4,12 +4,12 @@
 #include "../include/sie/gui/gui.h"
 
 #define TMR_MS_FOCUS (216 / 8)
-#define FONT_SIZE_ICONBAR 14
-#define FONT_SIZE_HEADER 20
 #define COLOR_HEADER_BG {0x00, 0x00, 0x00, 0x35}
 
 extern IMGHDR *SIE_RES_IMG_WALLPAPER;
 extern GBSTMR TMR_REDRAW_ICONBAR;
+
+extern int CFG_FONT_SIZE_ICONBAR, CFG_FONT_SIZE_HEADER;
 
 void Focus_GUI(GBSTMR *tmr) {
     SIE_GUI_FOCUS_DATA *data = (SIE_GUI_FOCUS_DATA*)tmr->param6;
@@ -102,19 +102,19 @@ void Sie_GUI_DrawIconBar() {
         color = color_text_warning;
     }
     wsprintf(ws, "%d%%", cap);
-    Sie_FT_GetStringSize(ws, FONT_SIZE_ICONBAR, &w, &h);
+    Sie_FT_GetStringSize(ws, CFG_FONT_SIZE_ICONBAR, &w, &h);
     x = SCREEN_X2 - PADDING_ICONBAR - w;
     y = 0 + (YDISP - (int)h) / 2;
-    Sie_FT_DrawString(ws, x, y, FONT_SIZE_ICONBAR, color);
+    Sie_FT_DrawString(ws, x, y, CFG_FONT_SIZE_ICONBAR, color);
 
     // clock
     TTime time;
     GetDateTime(NULL, &time);
     wsprintf(ws, "%02d:%02d", time.hour, time.min);
-    Sie_FT_GetStringSize(ws, FONT_SIZE_ICONBAR, &w, &h);
+    Sie_FT_GetStringSize(ws, CFG_FONT_SIZE_ICONBAR, &w, &h);
     x = x - PADDING_ICONBAR - (int)w;
     y = 0 + (YDISP - (int)h) / 2;
-    Sie_FT_DrawString(ws,  x, y, FONT_SIZE_ICONBAR, NULL);
+    Sie_FT_DrawString(ws,  x, y, CFG_FONT_SIZE_ICONBAR, NULL);
 
     FreeWS(ws);
     if (surface) {
@@ -126,11 +126,11 @@ void Sie_GUI_DrawIconBar() {
 }
 
 void Sie_GUI_DrawHeader(WSHDR *ws) {
-    const char color_bg[] = COLOR_HEADER_BG;
     const int header_x = 0;
     const int header_y = YDISP;
     const int header_x2 = SCREEN_X2;
     const int header_y2 = header_y + HeaderH();
+    const char color_bg[] = COLOR_HEADER_BG;
     Sie_GUI_DrawBleedIMGHDR(SIE_RES_IMG_WALLPAPER,
                             header_x, header_y, header_x2, header_y2,
                             0, YDISP);
@@ -150,19 +150,18 @@ void Sie_GUI_DrawHeader(WSHDR *ws) {
     } else {
         wstrcpy(ws_left, ws);
     }
-    unsigned int w, h;
-    int text_x, text_y;
+    const int y = YDISP;
+    const int y2 = YDISP + HeaderH();
     if (wstrlen(ws_left)) {
-        Sie_FT_GetStringSize(ws_left, FONT_SIZE_HEADER, &w, &h);
-        text_x = 0 + PADDING_HEADER;
-        text_y = YDISP + (HeaderH() - h) / 2;
-        Sie_FT_DrawString(ws_left, text_x, text_y, FONT_SIZE_HEADER, NULL);
+        Sie_FT_DrawBoundingString(ws_left, 0 + PADDING_HEADER, y, ScreenW() / 2 - PADDING_HEADER, y2,
+                                  CFG_FONT_SIZE_HEADER,
+                                  SIE_FT_TEXT_ALIGN_LEFT | SIE_FT_TEXT_VALIGN_MIDDLE, NULL);
     }
     if (wstrlen(ws_right)) {
-        Sie_FT_GetStringSize(ws_right,  FONT_SIZE_HEADER, &w, &h);
-        text_x = SCREEN_X2 - 1 - PADDING_HEADER - w;
-        text_y = YDISP + (HeaderH() - h) / 2;
-        Sie_FT_DrawString(ws_right, text_x, text_y, FONT_SIZE_HEADER, NULL);
+        Sie_FT_DrawBoundingString(ws_right,
+                                  ScreenW() / 2 + PADDING_HEADER, y,ScreenW() - PADDING_HEADER, y2,
+                                  CFG_FONT_SIZE_HEADER,
+                                  SIE_FT_TEXT_ALIGN_RIGHT | SIE_FT_TEXT_VALIGN_MIDDLE, NULL);
     }
     FreeWS(ws_left);
     FreeWS(ws_right);

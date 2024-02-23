@@ -5,9 +5,8 @@
 #include "../../include/sie/resources.h"
 
 extern IMGHDR *SIE_RES_IMG_WALLPAPER;
+extern int CFG_FONT_SIZE_MENU_LIST_ITEM;
 
-#define FONT_SIZE 18
-#define FONT_SIZE_EMPTY 22
 #define COLOR_SELECT_BG {0x00, 0x00, 0x00, 0x35}
 #define COLOR_INDICATOR_BG {0x00, 0x00, 0x00, 0x35}
 #define COLOR_INDICATOR {0xFF, 0xFF, 0x00, 0x64}
@@ -20,7 +19,6 @@ SIE_MENU_LIST *Sie_Menu_List_Init(unsigned int gui_id) {
     zeromem(menu, sizeof(SIE_MENU_LIST));
     SIE_FT_SCROLL_STRING *ss = malloc(sizeof(SIE_FT_SCROLL_STRING));
     zeromem(ss, sizeof(SIE_FT_SCROLL_STRING));
-    ss->font_size = FONT_SIZE;
     ss->attr = SIE_FT_TEXT_ALIGN_LEFT;
     ss->color = NULL;
     ss->gui_id = gui_id;
@@ -196,12 +194,14 @@ void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
             ss->y = text_y;
             ss->x2 = text_x2;
             ss->y2 = text_y2;
+            ss->font_size = CFG_FONT_SIZE_MENU_LIST_ITEM;
             ss->attr = SIE_FT_TEXT_VALIGN_MIDDLE;
             ss->color = item->color;
             Sie_FT_DrawBoundingScrollString(menu->ss, &(ss->tmr));
         } else {
             Sie_FT_DrawBoundingString(item->ws, text_x, text_y, text_x2, text_y2,
-                                      FONT_SIZE, SIE_FT_TEXT_VALIGN_MIDDLE, item->color);
+                                      CFG_FONT_SIZE_MENU_LIST_ITEM, SIE_FT_TEXT_VALIGN_MIDDLE,
+                                      item->color);
         }
         y_start += item_h + (float)v_offset;
     }
@@ -213,14 +213,13 @@ void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
 void Sie_Menu_List_DrawEmpty() {
     Sie_GUI_DrawBleedIMGHDR(SIE_RES_IMG_WALLPAPER, 0, YDISP, SCREEN_X2, SCREEN_Y2, 0, YDISP);
 
+    const int font_size = CFG_FONT_SIZE_MENU_LIST_ITEM + 4;
+    const char color[] = COLOR_EMPTY_TEXT;
+
     WSHDR *ws = AllocWS(16);
     wsprintf(ws, "%t", "<Empty>");
-    unsigned int w = 0, h = 0;
-    Sie_FT_GetStringSize(ws, FONT_SIZE_EMPTY, &w, &h);
-    const int x = ScreenW() / 2 - (int)w / 2;
-    const int y = YDISP + HeaderH() + (ScreenH() - YDISP - HeaderH()) / 2 - (int)w / 2;
-    const char color[] = COLOR_EMPTY_TEXT;
-    Sie_FT_DrawString(ws, x, y, FONT_SIZE_EMPTY, color);
+    Sie_FT_DrawText(ws, 0, 0, ScreenW() - 1, ScreenH() - 1, font_size,
+                    SIE_FT_TEXT_ALIGN_CENTER | SIE_FT_TEXT_VALIGN_MIDDLE, color);
     FreeWS(ws);
 }
 
