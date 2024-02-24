@@ -4,11 +4,11 @@
 #include "../include/sie/gui/gui.h"
 #include "../include/sie/resources.h"
 
+extern int SKIN_FONT_SIZE_MSG_BOX, SKIN_FONT_SIZE_MSG_BOX_SOFT_KEYS;
+
 static RECT canvas;
 IMGHDR *IMG_YES;
 IMGHDR *IMG_MSG_OK, *IMG_MSG_ERROR, *IMG_MSG_QUESTION;
-
-extern int CFG_FONT_SIZE_MSG_BOX, CFG_FONT_SIZE_MSG_BOX_SOFT_KEYS;
 
 static void Close(GBSTMR *tmr) {
     SIE_GUI_BOX *box = (SIE_GUI_BOX*)tmr->param6;
@@ -50,11 +50,11 @@ static void OnRedraw(SIE_GUI_BOX *data) {
         unsigned int max_h_sk = 0;
         int x_img = 0, x2_img = 0;
         if (data->left_sk_ws) {
-            Sie_FT_GetStringSize(data->left_sk_ws, CFG_FONT_SIZE_MSG_BOX_SOFT_KEYS,
+            Sie_FT_GetStringSize(data->left_sk_ws, SKIN_FONT_SIZE_MSG_BOX_SOFT_KEYS,
                                  &w_sk, &h_left_sk);
         }
         if (data->right_sk_ws) {
-            Sie_FT_GetStringSize(data->right_sk_ws, CFG_FONT_SIZE_MSG_BOX_SOFT_KEYS,
+            Sie_FT_GetStringSize(data->right_sk_ws, SKIN_FONT_SIZE_MSG_BOX_SOFT_KEYS,
                                  &w_sk, &h_right_sk);
         }
         max_h_sk = MAX(h_left_sk, h_right_sk);
@@ -78,7 +78,7 @@ static void OnRedraw(SIE_GUI_BOX *data) {
                 x2_left_sk -= IMG_YES->w / 2;
             }
             Sie_FT_DrawBoundingString(data->left_sk_ws, x_left_sk, y, x2_left_sk, y2_sk,
-                                      CFG_FONT_SIZE_MSG_BOX_SOFT_KEYS,
+                                      SKIN_FONT_SIZE_MSG_BOX_SOFT_KEYS,
                                       SIE_FT_TEXT_ALIGN_LEFT + SIE_FT_TEXT_VALIGN_BOTTOM, NULL);
         }
         if (data->right_sk_ws) {
@@ -88,7 +88,7 @@ static void OnRedraw(SIE_GUI_BOX *data) {
                 x_right_sk += IMG_YES->w / 2;
             }
             Sie_FT_DrawBoundingString(data->right_sk_ws, x_right_sk, y, x2_right_sk, y2_sk,
-                                      CFG_FONT_SIZE_MSG_BOX_SOFT_KEYS,
+                                      SKIN_FONT_SIZE_MSG_BOX_SOFT_KEYS,
                                       SIE_FT_TEXT_ALIGN_RIGHT + SIE_FT_TEXT_VALIGN_BOTTOM, NULL);
         }
         IMGHDR *img = NULL;
@@ -113,7 +113,7 @@ static void OnRedraw(SIE_GUI_BOX *data) {
     }
 
     Sie_FT_DrawText(data->msg_ws, x_msg, y_msg, x2_msg, y2_msg,
-                    CFG_FONT_SIZE_MSG_BOX, attr_msg, NULL);
+                    SKIN_FONT_SIZE_MSG_BOX, attr_msg, NULL);
 }
 
 static void OnAfterDrawIconBar() {

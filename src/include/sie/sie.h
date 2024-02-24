@@ -3,7 +3,7 @@
 
 #include "ext.h"
 #include "exec.h"
-#include "bcfg.h"
+#include "cfg/cfg.h"
 #include "strings.h"
 #include "subproc.h"
 #include "settings.h"
@@ -11,6 +11,7 @@
 #include "config_loader.h"
 #include "fs/fs.h"
 #include "gui/gui.h"
+#include "skin/skin.h"
 #include "freetype/freetype.h"
 
 #endif

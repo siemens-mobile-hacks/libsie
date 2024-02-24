@@ -4,12 +4,12 @@
 #include "../../include/sie/gui/gui.h"
 #include "../../include/sie/resources.h"
 
-extern int CFG_FONT_SIZE_MENU_LIST_ITEM;
-
 #define COLOR_SELECT_BG {0x00, 0x00, 0x00, 0x35}
 #define COLOR_INDICATOR_BG {0x00, 0x00, 0x00, 0x35}
 #define COLOR_INDICATOR {0xFF, 0xFF, 0x00, 0x64}
 #define COLOR_EMPTY_TEXT {0xFF, 0xFF, 0xFF}
+
+extern int SKIN_FONT_SIZE_MENU_LIST_ITEM;
 
 static void DrawSSBG(int x, int y, int x2, int y2);
 
@@ -193,13 +193,13 @@ void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
             ss->y = text_y;
             ss->x2 = text_x2;
             ss->y2 = text_y2;
-            ss->font_size = CFG_FONT_SIZE_MENU_LIST_ITEM;
+            ss->font_size = SKIN_FONT_SIZE_MENU_LIST_ITEM;
             ss->attr = SIE_FT_TEXT_VALIGN_MIDDLE;
             ss->color = item->color;
             Sie_FT_DrawBoundingScrollString(menu->ss, &(ss->tmr));
         } else {
             Sie_FT_DrawBoundingString(item->ws, text_x, text_y, text_x2, text_y2,
-                                      CFG_FONT_SIZE_MENU_LIST_ITEM, SIE_FT_TEXT_VALIGN_MIDDLE,
+                                      SKIN_FONT_SIZE_MENU_LIST_ITEM, SIE_FT_TEXT_VALIGN_MIDDLE,
                                       item->color);
         }
         y_start += item_h + (float)v_offset;
@@ -212,7 +212,7 @@ void Sie_Menu_List_DrawMenu(SIE_MENU_LIST *menu) {
 void Sie_Menu_List_DrawEmpty() {
     Sie_GUI_DrawBleedIMGHDR(Sie_Resources_GetWallpaperIMGHDR(), 0, YDISP, SCREEN_X2, SCREEN_Y2, 0, YDISP);
 
-    const int font_size = CFG_FONT_SIZE_MENU_LIST_ITEM + 4;
+    const int font_size = SKIN_FONT_SIZE_MENU_LIST_ITEM + 4;
     const char color[] = COLOR_EMPTY_TEXT;
 
     WSHDR *ws = AllocWS(16);

@@ -8,7 +8,7 @@
 
 extern GBSTMR TMR_REDRAW_ICONBAR;
 
-extern int CFG_FONT_SIZE_ICONBAR, CFG_FONT_SIZE_HEADER;
+extern int SKIN_FONT_SIZE_ICONBAR, SKIN_FONT_SIZE_HEADER;
 
 void Focus_GUI(GBSTMR *tmr) {
     SIE_GUI_FOCUS_DATA *data = (SIE_GUI_FOCUS_DATA*)tmr->param6;
@@ -101,19 +101,19 @@ void Sie_GUI_DrawIconBar() {
         color = color_text_warning;
     }
     wsprintf(ws, "%d%%", cap);
-    Sie_FT_GetStringSize(ws, CFG_FONT_SIZE_ICONBAR, &w, &h);
+    Sie_FT_GetStringSize(ws, SKIN_FONT_SIZE_ICONBAR, &w, &h);
     x = SCREEN_X2 - PADDING_ICONBAR - w;
     y = 0 + (YDISP - (int)h) / 2;
-    Sie_FT_DrawString(ws, x, y, CFG_FONT_SIZE_ICONBAR, color);
+    Sie_FT_DrawString(ws, x, y, SKIN_FONT_SIZE_ICONBAR, color);
 
     // clock
     TTime time;
     GetDateTime(NULL, &time);
     wsprintf(ws, "%02d:%02d", time.hour, time.min);
-    Sie_FT_GetStringSize(ws, CFG_FONT_SIZE_ICONBAR, &w, &h);
+    Sie_FT_GetStringSize(ws, SKIN_FONT_SIZE_ICONBAR, &w, &h);
     x = x - PADDING_ICONBAR - (int)w;
     y = 0 + (YDISP - (int)h) / 2;
-    Sie_FT_DrawString(ws,  x, y, CFG_FONT_SIZE_ICONBAR, NULL);
+    Sie_FT_DrawString(ws, x, y, SKIN_FONT_SIZE_ICONBAR, NULL);
 
     FreeWS(ws);
     if (surface) {
@@ -153,13 +153,13 @@ void Sie_GUI_DrawHeader(WSHDR *ws) {
     const int y2 = YDISP + HeaderH();
     if (wstrlen(ws_left)) {
         Sie_FT_DrawBoundingString(ws_left, 0 + PADDING_HEADER, y, ScreenW() / 2 - PADDING_HEADER, y2,
-                                  CFG_FONT_SIZE_HEADER,
+                                  SKIN_FONT_SIZE_HEADER,
                                   SIE_FT_TEXT_ALIGN_LEFT | SIE_FT_TEXT_VALIGN_MIDDLE, NULL);
     }
     if (wstrlen(ws_right)) {
         Sie_FT_DrawBoundingString(ws_right,
                                   ScreenW() / 2 + PADDING_HEADER, y,ScreenW() - PADDING_HEADER, y2,
-                                  CFG_FONT_SIZE_HEADER,
+                                  SKIN_FONT_SIZE_HEADER,
                                   SIE_FT_TEXT_ALIGN_RIGHT | SIE_FT_TEXT_VALIGN_MIDDLE, NULL);
     }
     FreeWS(ws_left);
