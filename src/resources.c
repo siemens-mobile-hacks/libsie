@@ -6,6 +6,8 @@
 
 extern int CFG_ICONS_CACHE_SIZE;
 
+MUTEX mtx_res_img;
+
 int RES_IMG_COUNT;
 IMGHDR *SIE_RES_IMG_WALLPAPER;
 SIE_RESOURCES_IMG *SIE_RES_IMG_FIRST, *SIE_RES_IMG_LAST;
@@ -21,6 +23,7 @@ void DestroyElement(SIE_RESOURCES_IMG *res_img) {
 /**********************************************************************************************************************/
 
 void Sie_Resources_Init() {
+    MutexCreate(&mtx_res_img);
     SIE_RES_IMG_WALLPAPER = GetIMGHDRFromCanvasCache(0);
     SIE_RES_CLIENTS++;
 }
@@ -38,6 +41,7 @@ void Sie_Resources_Destroy() {
             p = prev;
         }
         SIE_RES_IMG_FIRST = SIE_RES_IMG_LAST = NULL;
+        MutexDestroy(&mtx_res_img);
     }
 }
 
@@ -105,6 +109,7 @@ SIE_RESOURCES_IMG *Sie_Resources_LoadImage(unsigned int type, unsigned int size,
             strcpy(_type, "apps");
     }
 
+    MutexLock(&mtx_res_img);
     SIE_RESOURCES_IMG *res_img = Sie_Resources_GetImage(type, size, name);
     if (!res_img) {
         size_t len_type = strlen(_type);
@@ -144,6 +149,7 @@ SIE_RESOURCES_IMG *Sie_Resources_LoadImage(unsigned int type, unsigned int size,
             RES_IMG_COUNT++;
         }
     }
+    MutexUnlock(&mtx_res_img);
     return res_img;
 }
 
