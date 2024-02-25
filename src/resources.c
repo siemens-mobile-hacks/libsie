@@ -7,11 +7,11 @@
 extern int CFG_ICONS_CACHE_SIZE;
 
 MUTEX mtx_res_img;
+unsigned int CLIENTS;
 
 int RES_IMG_COUNT;
-IMGHDR *SIE_RES_IMG_WALLPAPER;
-SIE_RESOURCES_IMG *SIE_RES_IMG_FIRST, *SIE_RES_IMG_LAST;
-unsigned int SIE_RES_CLIENTS;
+IMGHDR *IMG_WALLPAPER;
+SIE_RESOURCES_IMG *RES_IMG_FIRST, *RES_IMG_LAST;
 
 void DestroyElement(SIE_RESOURCES_IMG *res_img) {
     mfree(res_img->name);
@@ -24,23 +24,23 @@ void DestroyElement(SIE_RESOURCES_IMG *res_img) {
 
 void Sie_Resources_Init() {
     MutexCreate(&mtx_res_img);
-    SIE_RES_IMG_WALLPAPER = GetIMGHDRFromCanvasCache(0);
-    SIE_RES_CLIENTS++;
+    IMG_WALLPAPER = GetIMGHDRFromCanvasCache(0);
+    CLIENTS++;
 }
 
 void Sie_Resources_Destroy() {
-    if (SIE_RES_CLIENTS) {
-        SIE_RES_CLIENTS--;
+    if (CLIENTS) {
+        CLIENTS--;
     }
-    if (!SIE_RES_CLIENTS) {
-        SIE_RES_IMG_WALLPAPER = NULL;
-        SIE_RESOURCES_IMG *p = SIE_RES_IMG_LAST;
+    if (!CLIENTS) {
+        IMG_WALLPAPER = NULL;
+        SIE_RESOURCES_IMG *p = RES_IMG_LAST;
         while (p) {
             SIE_RESOURCES_IMG *prev = p->prev;
             DestroyElement(p);
             p = prev;
         }
-        SIE_RES_IMG_FIRST = SIE_RES_IMG_LAST = NULL;
+        RES_IMG_FIRST = RES_IMG_LAST = NULL;
         MutexDestroy(&mtx_res_img);
     }
 }
@@ -51,7 +51,7 @@ void SetWallpaper_Proc(void (*proc)()) {
     for (int i = 0; i < 5; i++) {
         IMGHDR *img = GetIMGHDRFromCanvasCache(0);
         if (img) {
-            SIE_RES_IMG_WALLPAPER = img;
+            IMG_WALLPAPER = img;
             break;
         }
         NU_Sleep(50);
@@ -61,7 +61,7 @@ void SetWallpaper_Proc(void (*proc)()) {
 
 void Sie_Resources_SetWallpaper(WSHDR *ws, void (*proc)()) {
     int hmi_key_id = Registry_GetHMIKeyID("Wallpaper");
-    SIE_RES_IMG_WALLPAPER = NULL;
+    IMG_WALLPAPER = NULL;
     MMI_CanvasBuffer_FlushV(0);
     Registry_SetResourcePath(hmi_key_id, 3, ws);
     if (proc) {
@@ -70,13 +70,13 @@ void Sie_Resources_SetWallpaper(WSHDR *ws, void (*proc)()) {
 }
 
 IMGHDR *Sie_Resources_GetWallpaperIMGHDR() {
-    return SIE_RES_IMG_WALLPAPER;
+    return IMG_WALLPAPER;
 }
 
 /**********************************************************************************************************************/
 
 SIE_RESOURCES_IMG *Sie_Resources_GetImage(unsigned int type, unsigned int size, const char *name) {
-    SIE_RESOURCES_IMG *p = SIE_RES_IMG_LAST;
+    SIE_RESOURCES_IMG *p = RES_IMG_LAST;
     while (p) {
         if (p->type == type && p->size == size && strcmp(p->name, name) == 0) {
             return p;
@@ -127,24 +127,24 @@ SIE_RESOURCES_IMG *Sie_Resources_LoadImage(unsigned int type, unsigned int size,
             res_img->name = malloc(len_name + 1);
             strcpy(res_img->name, name);
             res_img->icon = img;
-            if (!SIE_RES_IMG_LAST) {
-                SIE_RES_IMG_FIRST = SIE_RES_IMG_LAST = res_img;
+            if (!RES_IMG_LAST) {
+                RES_IMG_FIRST = RES_IMG_LAST = res_img;
             } else {
                 int diff = RES_IMG_COUNT - CFG_ICONS_CACHE_SIZE;
                 if (diff > 0) {
-                    SIE_RESOURCES_IMG *p = SIE_RES_IMG_FIRST;
+                    SIE_RESOURCES_IMG *p = RES_IMG_FIRST;
                     for (int i = 0; i < diff; i++) {
                         SIE_RESOURCES_IMG *next = p->next;
                         DestroyElement(p);
                         next->prev = NULL;
                         p = next;
                         RES_IMG_COUNT--;
-                        SIE_RES_IMG_FIRST = p;
+                        RES_IMG_FIRST = p;
                     }
                 }
-                SIE_RES_IMG_LAST->next = res_img;
-                res_img->prev = SIE_RES_IMG_LAST;
-                SIE_RES_IMG_LAST = res_img;
+                RES_IMG_LAST->next = res_img;
+                res_img->prev = RES_IMG_LAST;
+                RES_IMG_LAST = res_img;
             }
             RES_IMG_COUNT++;
         }

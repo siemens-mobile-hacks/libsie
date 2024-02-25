@@ -49,11 +49,11 @@ void Sie_GUI_Surface_Draw(const SIE_GUI_SURFACE *surface) {
 }
 
 void Sie_GUI_Surface_OnFocus(SIE_GUI_SURFACE *surface) {
-    extern IMGHDR *SIE_RES_IMG_WALLPAPER;
+    extern IMGHDR *IMG_WALLPAPER;
 #ifdef ELKA
     DisableIconBar(1);
 #endif
-    SIE_RES_IMG_WALLPAPER = GetIMGHDRFromCanvasCache(0);
+    IMG_WALLPAPER = GetIMGHDRFromCanvasCache(0);
     TMR_REDRAW_ICONBAR.param6 = (int)surface;
     GBS_StartTimerProc(&TMR_REDRAW_ICONBAR, 216, Sie_GUI_DrawIconBar);
 }

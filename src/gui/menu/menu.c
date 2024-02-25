@@ -1,6 +1,7 @@
 #include <swilib.h>
 #include <stdlib.h>
 #include <sys/param.h>
+#include "../../include/sie/resources.h"
 #include "../../include/sie/gui/gui.h"
 
 SIE_MENU *Sie_Menu_Init(SIE_MENU_ITEM *items, int n_items, int col, int row) {
@@ -30,14 +31,14 @@ void Sie_Menu_Destroy(SIE_MENU *menu) {
 }
 
 void Sie_Menu_Draw(SIE_MENU *menu) {
-    extern IMGHDR *SIE_RES_IMG_WALLPAPER;
-
     const int width = ScreenW();
     const int height = ScreenH() - YDISP - HeaderH();
     const int icon_area_width = width / SIE_MENU_MAX_COLS;
     const int icon_area_height = height / SIE_MENU_MAX_ROWS;
 
-    Sie_GUI_DrawBleedIMGHDR(SIE_RES_IMG_WALLPAPER, 0, YDISP + HeaderH(), ScreenW(), ScreenH(), 0, YDISP + HeaderH());
+    Sie_GUI_DrawBleedIMGHDR(Sie_Resources_GetWallpaperIMGHDR(),
+                            0, YDISP + HeaderH(), ScreenW(), ScreenH(),
+                            0, YDISP + HeaderH());
 
     int x = 0;
     int y = 0;
