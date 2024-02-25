@@ -4,10 +4,21 @@
 #include "include/sie/subproc.h"
 #include "include/sie/resources.h"
 
+extern int CFG_ICONS_CACHE_SIZE;
+
+int RES_IMG_COUNT;
 IMGHDR *SIE_RES_IMG_WALLPAPER;
-SIE_RESOURCES_IMG *SIE_RES_IMG;
+SIE_RESOURCES_IMG *SIE_RES_IMG_FIRST, *SIE_RES_IMG_LAST;
 unsigned int SIE_RES_CLIENTS;
 
+void DestroyElement(SIE_RESOURCES_IMG *res_img) {
+    mfree(res_img->name);
+    mfree(res_img->icon->bitmap);
+    mfree(res_img->icon);
+    mfree(res_img);
+}
+
+/**********************************************************************************************************************/
 
 void Sie_Resources_Init() {
     SIE_RES_IMG_WALLPAPER = GetIMGHDRFromCanvasCache(0);
@@ -20,16 +31,13 @@ void Sie_Resources_Destroy() {
     }
     if (!SIE_RES_CLIENTS) {
         SIE_RES_IMG_WALLPAPER = NULL;
-        SIE_RESOURCES_IMG *p = SIE_RES_IMG;
+        SIE_RESOURCES_IMG *p = SIE_RES_IMG_LAST;
         while (p) {
             SIE_RESOURCES_IMG *prev = p->prev;
-            mfree(p->name);
-            mfree(p->icon->bitmap);
-            mfree(p->icon);
-            mfree(p);
+            DestroyElement(p);
             p = prev;
         }
-        SIE_RES_IMG = NULL;
+        SIE_RES_IMG_FIRST = SIE_RES_IMG_LAST = NULL;
     }
 }
 
@@ -64,7 +72,7 @@ IMGHDR *Sie_Resources_GetWallpaperIMGHDR() {
 /**********************************************************************************************************************/
 
 SIE_RESOURCES_IMG *Sie_Resources_GetImage(unsigned int type, unsigned int size, const char *name) {
-    SIE_RESOURCES_IMG *p = SIE_RES_IMG;
+    SIE_RESOURCES_IMG *p = SIE_RES_IMG_LAST;
     while (p) {
         if (p->type == type && p->size == size && strcmp(p->name, name) == 0) {
             return p;
@@ -97,8 +105,8 @@ SIE_RESOURCES_IMG *Sie_Resources_LoadImage(unsigned int type, unsigned int size,
             strcpy(_type, "apps");
     }
 
-    SIE_RESOURCES_IMG *res_ext = Sie_Resources_GetImage(type, size, name);
-    if (!res_ext) {
+    SIE_RESOURCES_IMG *res_img = Sie_Resources_GetImage(type, size, name);
+    if (!res_img) {
         size_t len_type = strlen(_type);
         size_t len_name = strlen(name);
 
@@ -107,23 +115,36 @@ SIE_RESOURCES_IMG *Sie_Resources_LoadImage(unsigned int type, unsigned int size,
         IMGHDR *img = CreateIMGHDRFromPngFile(path, 0);
         mfree(path);
         if (img) {
-            res_ext = malloc(sizeof(SIE_RESOURCES_IMG));
-            zeromem(res_ext, sizeof(SIE_RESOURCES_IMG));
-            res_ext->type = type;
-            res_ext->size = size;
-            res_ext->name = malloc(len_name + 1);
-            strcpy(res_ext->name, name);
-            res_ext->icon = img;
-            if (!SIE_RES_IMG) {
-                SIE_RES_IMG = res_ext;
+            res_img = malloc(sizeof(SIE_RESOURCES_IMG));
+            zeromem(res_img, sizeof(SIE_RESOURCES_IMG));
+            res_img->type = type;
+            res_img->size = size;
+            res_img->name = malloc(len_name + 1);
+            strcpy(res_img->name, name);
+            res_img->icon = img;
+            if (!SIE_RES_IMG_LAST) {
+                SIE_RES_IMG_FIRST = SIE_RES_IMG_LAST = res_img;
             } else {
-                SIE_RES_IMG->next = res_ext;
-                res_ext->prev = SIE_RES_IMG;
-                SIE_RES_IMG = res_ext;
+                int diff = RES_IMG_COUNT - CFG_ICONS_CACHE_SIZE;
+                if (diff > 0) {
+                    SIE_RESOURCES_IMG *p = SIE_RES_IMG_FIRST;
+                    for (int i = 0; i < diff; i++) {
+                        SIE_RESOURCES_IMG *next = p->next;
+                        DestroyElement(p);
+                        next->prev = NULL;
+                        p = next;
+                        RES_IMG_COUNT--;
+                        SIE_RES_IMG_FIRST = p;
+                    }
+                }
+                SIE_RES_IMG_LAST->next = res_img;
+                res_img->prev = SIE_RES_IMG_LAST;
+                SIE_RES_IMG_LAST = res_img;
             }
+            RES_IMG_COUNT++;
         }
     }
-    return res_ext;
+    return res_img;
 }
 
 IMGHDR *Sie_Resources_LoadIMGHDR(unsigned int type, unsigned int size, const char *name) {
@@ -136,7 +157,7 @@ HObj Sie_Resources_CreateHObjFromImgFile(const char *path) {
     unsigned int err = 0;
 
     size_t len = strlen(path);
-    WSHDR *ws = AllocWS(len);
+    WSHDR *ws = AllocWS((int)len);
     str_2ws(ws, path, len);
     int uid = GetExtUidByFileName_ws(ws);
     if (!uid) {

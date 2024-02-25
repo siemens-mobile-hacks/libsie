@@ -7,10 +7,10 @@ extern char CFG_SKIN_PATH[];
 char CFG_PATH[64] = "0:\\zbin\\etc\\SieLibrary.bcfg";
 
 void Sie_CFG_Load() {
-    __CONFIG_EXTERN(0, cfghdr_gui_b);
-    if (!Sie_Config_Load(CFG_PATH, __CONFIG(0, cfghdr_gui_b))) {
+    __CONFIG_EXTERN(0, cfghdr_0);
+    if (!Sie_Config_Load(CFG_PATH, __CONFIG(0, cfghdr_0))) {
         CFG_PATH[0] = '4';
-        if (!Sie_Config_Load(CFG_PATH, __CONFIG(0, cfghdr_gui_b))) {
+        if (!Sie_Config_Load(CFG_PATH, __CONFIG(0, cfghdr_0))) {
             CFG_PATH[0] = '\0';
             return;
         }
