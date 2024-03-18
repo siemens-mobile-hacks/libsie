@@ -1,5 +1,6 @@
 #include <swilib.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef void (*ExecProc)();
 
