@@ -1,5 +1,6 @@
 #include <swilib.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../include/sie/resources.h"
 #include "../include/sie/gui/gui.h"
 

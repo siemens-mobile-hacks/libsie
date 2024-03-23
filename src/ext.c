@@ -1,5 +1,6 @@
 #include <swilib.h>
 #include <stdlib.h>
+#include <string.h>
 
 char *Sie_Ext_GetExtByFileName(const char *file_name) {
     char *p = strrchr(file_name, '.');
