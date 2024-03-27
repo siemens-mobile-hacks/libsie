@@ -1,5 +1,6 @@
 #include <swilib.h>
 #include <stdlib.h>
+#include <string.h>
 #include <cfg_items.h>
 
 static size_t GetSize(CFG_HDR *cfghdr0, const int *config_begin, const int *config_end) {

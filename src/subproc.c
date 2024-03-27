@@ -8,7 +8,7 @@ unsigned int SLOTS[SUBPROC_MAX_PG];
 
 static void OnMsg(void);
 
-inline short GetCepID(int pg) {
+static inline short GetCepID(int pg) {
     return pg * 0x100;
 }
 

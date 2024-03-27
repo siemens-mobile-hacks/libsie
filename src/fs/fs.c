@@ -1,5 +1,7 @@
 #include <swilib.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 #include "../include/sie/fs/fs.h"
 
 #define COPY_BUFFER_SIZE 4096

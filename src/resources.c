@@ -1,6 +1,8 @@
 #include <swilib.h>
+#include <swilib/nucleus.h>
 #include <stdlib.h>
-#include <nu_swilib.h>
+#include <string.h>
+#include <stdio.h>
 #include "include/sie/subproc.h"
 #include "include/sie/resources.h"
 
