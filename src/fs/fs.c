@@ -324,7 +324,7 @@ unsigned int Sie_FS_CreateDirs(const char *path, unsigned int *err) {
         if (p1) {
             unsigned int _err;
             size_t len = p1 - path;
-            char *dir = malloc(len);
+            char *dir = malloc(len + 1);
             strncpy(dir, path, len);
             dir[len] = '\0';
             if (!Sie_FS_FileExists(dir)) {
