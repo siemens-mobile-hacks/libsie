@@ -110,6 +110,7 @@ static void DrawBoundingString(WSHDR *ws, int x, int y, int x2, int y2,
             if (len <= 1) {
                 break;
             } else {
+                Sie_FT_GetStringSize(copy_ws, font_size, &w, &h);
                 if (w > x2 - x) {
                     wsRemoveChars(copy_ws, len - 1, len);
                     len -= 1;
