@@ -2,6 +2,7 @@
 #define __SIE_H__
 
 #include "ext.h"
+#include "csm.h"
 #include "exec.h"
 #include "cfg/cfg.h"
 #include "strings.h"
