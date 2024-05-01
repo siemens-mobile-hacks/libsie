@@ -39,6 +39,8 @@ int Sie_GUI_Surface_OnKey(SIE_GUI_SURFACE *surface, void *data, GUI_MSG *msg);
 void Sie_GUI_FocusGUI(GBSTMR *tmr, SIE_GUI_FOCUS_DATA *data);
 
 void Sie_GUI_InitCanvas(RECT *canvas);
+void Sie_GUI_InitHeader(HEADER_DESC *header_desc);
+void Sie_GUI_InitHeaderSmall(HEADER_DESC *header_desc);
 void Sie_GUI_SetRGB(char *rgb, char r, char g, char b);
 IMGHDR *Sie_GUI_TakeScrot();
 
