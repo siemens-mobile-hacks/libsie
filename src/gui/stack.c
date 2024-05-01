@@ -2,11 +2,10 @@
 #include <stdlib.h>
 #include "../include/sie/gui/gui.h"
 
-SIE_GUI_STACK *Sie_GUI_Stack_Add(SIE_GUI_STACK *top, GUI *gui, unsigned int gui_id) {
+SIE_GUI_STACK *Sie_GUI_Stack_Add(SIE_GUI_STACK *top, int gui_id) {
     SIE_GUI_STACK *stack = malloc(sizeof(SIE_GUI_STACK));
     zeromem(stack, sizeof(SIE_GUI_STACK));
     stack->prev = top;
-    stack->gui = gui;
     stack->gui_id = gui_id;
     if (top) {
         top->next = stack;
@@ -23,7 +22,7 @@ void Sie_GUI_Stack_Destroy(SIE_GUI_STACK *stack) {
     }
 }
 
-SIE_GUI_STACK *Sie_GUI_Stack_FindByGuiID(const SIE_GUI_STACK *top, unsigned int gui_id) {
+SIE_GUI_STACK *Sie_GUI_Stack_FindByGuiID(const SIE_GUI_STACK *top, int gui_id) {
     SIE_GUI_STACK *p = (SIE_GUI_STACK*)top;
     while (p) {
         if (p->gui_id == gui_id) {
@@ -34,7 +33,7 @@ SIE_GUI_STACK *Sie_GUI_Stack_FindByGuiID(const SIE_GUI_STACK *top, unsigned int 
     return NULL;
 }
 
-SIE_GUI_STACK *Sie_GUI_Stack_Delete(SIE_GUI_STACK *top, unsigned int gui_id) {
+SIE_GUI_STACK *Sie_GUI_Stack_Delete(SIE_GUI_STACK *top, int gui_id) {
     SIE_GUI_STACK *gui = Sie_GUI_Stack_FindByGuiID(top, gui_id);
     if (gui) {
         SIE_GUI_STACK *prev = gui->prev;
@@ -53,7 +52,7 @@ SIE_GUI_STACK *Sie_GUI_Stack_Delete(SIE_GUI_STACK *top, unsigned int gui_id) {
     return NULL;
 }
 
-SIE_GUI_STACK *Sie_GUI_Stack_CloseChildren(SIE_GUI_STACK *top, unsigned int gui_id) {
+SIE_GUI_STACK *Sie_GUI_Stack_CloseChildren(SIE_GUI_STACK *top, int gui_id) {
     SIE_GUI_STACK *stack = Sie_GUI_Stack_FindByGuiID(top, gui_id);
     int *ids = NULL;
     unsigned int i = 0;
@@ -64,7 +63,7 @@ SIE_GUI_STACK *Sie_GUI_Stack_CloseChildren(SIE_GUI_STACK *top, unsigned int gui_
     }
     if (ids) {
         for (unsigned int j = 0; j < i; j++) {
-            Sie_GUI_CloseGUI_GBS(ids[j]);
+            Sie_GUI_CloseGUI(ids[j]);
         }
         mfree(ids);
     }
