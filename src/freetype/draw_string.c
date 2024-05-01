@@ -1,6 +1,6 @@
 #include <swilib.h>
 #include "../include/sie/gui/gui.h"
-#include "../include/sie/freetype/cache.h"
+#include "../include/sie/freetype/freetype.h"
 
 #define SS_TMR_MS_START (216 / 1.5)
 #define SS_TMR_MS       (16)

@@ -1,8 +1,8 @@
-#ifndef __SIE_FREETYPE_H__
-#define __SIE_FREETYPE_H__
+#pragma once
 
 #include <wchar.h>
 #include <swilib.h>
+#include "cache.h"
 #include "draw_text.h"
 #include "draw_string.h"
 
@@ -38,5 +38,3 @@ void Sie_FT_GetStringSize(WSHDR *ws, int font_size, unsigned int *w, unsigned in
 
 void Sie_FT_DrawBoundingString(WSHDR *ws, int x, int y, int x2, int y2, int font_size, int attr, const char *color);
 void Sie_FT_DrawBoundingScrollString(SIE_FT_SCROLL_STRING *ss, GBSTMR *tmr);
-
-#endif

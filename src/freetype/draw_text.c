@@ -1,7 +1,7 @@
 #include <swilib.h>
 #include <sys/param.h>
 #include "../include/sie/gui/gui.h"
-#include "../include/sie/freetype/cache.h"
+#include "../include/sie/freetype/freetype.h"
 
 extern FT_Face *FT_FACE_REGULAR;
 extern IMGHDR *BrushGlyphIMGHDR(IMGHDR *img, const char *color);

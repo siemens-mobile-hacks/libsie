@@ -1,8 +1,8 @@
 #include <swilib.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include "../include/sie/gui/gui.h"
 #include "../include/sie/freetype/cache.h"
+#include "../include/sie/freetype/freetype.h"
 
 extern char SKIN_FONT_REGULAR_PATH[];
 

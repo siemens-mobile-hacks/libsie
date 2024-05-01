@@ -1,5 +1,4 @@
-#ifndef __CACHE_H__
-#define __CACHE_H__
+#pragma once
 
 #include <swilib.h>
 #include <wchar.h>
@@ -24,5 +23,3 @@ typedef struct {
 
 SIE_FT_CACHE *FT_GetOrCreateCache(const FT_Face *face, int font_size);
 SIE_FT_GLYPH_CACHE *FT_GlyphGetOrAddCache(FT_Face *face, SIE_FT_CACHE *cache, FT_ULong charcode);
-
-#endif
