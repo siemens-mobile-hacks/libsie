@@ -32,6 +32,7 @@ SIE_FILE *Sie_FS_GetFileByID(SIE_FILE *top, unsigned int id);
 SIE_FILE *Sie_FS_GetFileByFileName(SIE_FILE *top, const char *file_name);
 SIE_FILE *Sie_FS_GetFileByAlias(SIE_FILE *top, const char *alias);
 SIE_FILE *Sie_FS_GetUniqueFile(SIE_FILE *file);
+int Sie_FS_GetIDByFileName(SIE_FILE *top, const char *file_name);
 char *Sie_FS_GetPathByFile(SIE_FILE *file);
 
 SIE_FILE *Sie_FS_CopyFileElement(SIE_FILE *file);

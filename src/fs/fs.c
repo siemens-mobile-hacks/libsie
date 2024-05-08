@@ -208,11 +208,25 @@ SIE_FILE *Sie_FS_GetUniqueFile(SIE_FILE *file) {
     }
 }
 
+int Sie_FS_GetIDByFileName(SIE_FILE *top, const char *file_name) {
+    int i = 0;
+    while (top) {
+        if (strcmpi(top->file_name, file_name) == 0) {
+            return i;
+        }
+        top = top->next;
+        i++;
+    }
+    return -1;
+}
+
 char *Sie_FS_GetPathByFile(SIE_FILE *file) {
     char *path = malloc(strlen(file->dir_name) + strlen(file->file_name) + 1);
     sprintf(path, "%s%s", file->dir_name, file->file_name);
     return path;
 }
+
+/**********************************************************************************************************************/
 
 SIE_FILE *Sie_FS_CopyFileElement(SIE_FILE *file) {
     SIE_FILE *new = malloc(sizeof(SIE_FILE));

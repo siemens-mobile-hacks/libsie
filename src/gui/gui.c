@@ -24,6 +24,11 @@ void Sie_GUI_FocusGUI(GBSTMR *tmr, SIE_GUI_FOCUS_DATA *data) {
     Focus_GUI(tmr);
 }
 
+void Sie_GUI_FocusGUI_Sync(unsigned int gui_id) {
+    FocusGUI((int)gui_id);
+    while (!IsGuiOnTop((int)gui_id)) {NU_Sleep(50);}
+}
+
 void Sie_GUI_InitCanvas(RECT *canvas) {
     canvas->x = 0;
     canvas->y = 0;
@@ -35,12 +40,12 @@ void Sie_GUI_InitHeader(HEADER_DESC *header_desc) {
     header_desc->rc.x = 0;
     header_desc->rc.y = YDISP;
     header_desc->rc.x2 = (short)(ScreenW() - 1);
-    header_desc->rc.y2 = (short)(HeaderH() + YDISP - 1);
+    header_desc->rc.y2 = (short)(YDISP + HeaderH() - 1);
 }
 
 void Sie_GUI_InitHeaderSmall(HEADER_DESC *header_desc) {
     header_desc->rc.x = 0;
-    header_desc->rc.y = (short)(HeaderH() + YDISP);
+    header_desc->rc.y = (short)(YDISP + HeaderH());
     header_desc->rc.x2 = (short)(ScreenW() - 1);
 #ifdef ELKA
     header_desc->rc.y += 4;
@@ -48,6 +53,13 @@ void Sie_GUI_InitHeaderSmall(HEADER_DESC *header_desc) {
 #else
     header_des->rc.y2 = HeaderH() + 0x11;
 #endif
+}
+
+void Sie_GUI_InitInput(INPUTDIA_DESC *input_desc) {
+    input_desc->rc.x = 0;
+    input_desc->rc.y = YDISP + HeaderH() + 1;
+    input_desc->rc.x2 = (short)(ScreenW() - 1);
+    input_desc->rc.y2 = (short)(ScreenH() - SoftkeyH() - 1);
 }
 
 void Sie_GUI_SetRGB(char *rgb, char r, char g, char b) {

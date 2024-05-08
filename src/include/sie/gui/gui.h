@@ -13,10 +13,12 @@ typedef struct {
 
 #define Sie_GUI_CloseGUI(id) GeneralFunc_flag1((int)id, 1);
 void Sie_GUI_FocusGUI(GBSTMR *tmr, SIE_GUI_FOCUS_DATA *data);
+void Sie_GUI_FocusGUI_Sync(unsigned int gui_id);
 
 void Sie_GUI_InitCanvas(RECT *canvas);
 void Sie_GUI_InitHeader(HEADER_DESC *header_desc);
 void Sie_GUI_InitHeaderSmall(HEADER_DESC *header_desc);
+void Sie_GUI_InitInput(INPUTDIA_DESC *input_desc);
 void Sie_GUI_SetRGB(char *rgb, char r, char g, char b);
 IMGHDR *Sie_GUI_TakeScrot();
 
