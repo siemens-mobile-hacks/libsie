@@ -12,7 +12,7 @@ typedef struct {
 } SIE_GUI_FOCUS_DATA;
 
 #define Sie_GUI_CloseGUI(id) GeneralFunc_flag1((int)id, 1);
-void Sie_GUI_FocusGUI(GBSTMR *tmr, SIE_GUI_FOCUS_DATA *data);
+void Sie_GUI_FocusGUI_Async(GBSTMR *tmr, SIE_GUI_FOCUS_DATA *data);
 void Sie_GUI_FocusGUI_Sync(unsigned int gui_id);
 
 void Sie_GUI_InitCanvas(RECT *canvas);

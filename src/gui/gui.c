@@ -1,14 +1,14 @@
 #include <swilib.h>
 #include <stdlib.h>
 #include <string.h>
+#include <swilib/nucleus.h>
 #include "../include/sie/gui/gui.h"
 
-#define TMR_MS_FOCUS (216 / 8)
+#define TMR_MS_FOCUS (5)
 
 void Focus_GUI(GBSTMR *tmr) {
     SIE_GUI_FOCUS_DATA *data = (SIE_GUI_FOCUS_DATA*)tmr->param6;
     unsigned int gui_id = data->gui_id;
-    FocusGUI((int)gui_id);
     if (IsGuiOnTop((int)gui_id)) {
         GBS_DelTimer(tmr);
         if (data->proc) {
@@ -19,8 +19,9 @@ void Focus_GUI(GBSTMR *tmr) {
     }
 }
 
-void Sie_GUI_FocusGUI(GBSTMR *tmr, SIE_GUI_FOCUS_DATA *data) {
+void Sie_GUI_FocusGUI_Async(GBSTMR *tmr, SIE_GUI_FOCUS_DATA *data) {
     tmr->param6 = (int)data;
+    FocusGUI((int)data->gui_id);
     Focus_GUI(tmr);
 }
 
