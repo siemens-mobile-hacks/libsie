@@ -411,7 +411,7 @@ int Sie_FS_CopyFile(const char *src, const char *dest, unsigned int *err) {
         return result;
 }
 
-unsigned int Sie_FS_CopyDir(const char *src, const char *dest, unsigned int *err) {
+unsigned int Sie_FS_CopyDir(const char *src, const char *dest, unsigned int *err, int (*get_cancel_flag)()) {
     char *mask = malloc(strlen(src) + 2 + 1);
     sprintf(mask, "%s\\*", src);
     SIE_FILE *files = Sie_FS_FindFilesRecursive(mask);
@@ -422,6 +422,9 @@ unsigned int Sie_FS_CopyDir(const char *src, const char *dest, unsigned int *err
         result = 1;
         SIE_FILE *file = files;
         while (file) {
+            if (get_cancel_flag && get_cancel_flag()) {
+                break;
+            }
             char *relative = file->dir_name + strlen(src);
             size_t len_relative = strlen(relative);
             size_t len_file_name = strlen(file->file_name);
@@ -451,7 +454,7 @@ unsigned int Sie_FS_CopyDir(const char *src, const char *dest, unsigned int *err
     return result;
 }
 
-unsigned int Sie_FS_MoveFile(const char *src, const char *dest, unsigned int *err) {
+unsigned int Sie_FS_MoveFile(const char *src, const char *dest, unsigned int *err, int (*get_cancel_flag)()) {
     if (src[0] == dest[0]) { // check disk number
         return fmove(src, dest, err);
     } else {
@@ -462,7 +465,7 @@ unsigned int Sie_FS_MoveFile(const char *src, const char *dest, unsigned int *er
             }
             *err = err1;
         } else {
-            if (Sie_FS_CopyDir(src, dest, &err1)) {
+            if (Sie_FS_CopyDir(src, dest, &err1, get_cancel_flag)) {
                 result = Sie_FS_DeleteDirRecursive(src, &err1);
             }
             *err = err1;
