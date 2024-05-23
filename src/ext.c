@@ -25,3 +25,18 @@ int Sie_Ext_GetExtUidByFileName(const char *file_name) {
     FreeWS(ws);
     return uid;
 }
+
+int Sie_Ext_MimeTypeCompare(const char *file_name, const char *type) {
+    WSHDR *mime_type = AllocWS(32);
+    if (GetMimeType(Sie_Ext_GetExtUidByFileName(file_name), mime_type, 0)) {
+        size_t len = strlen(type);
+        WSHDR *ws = AllocWS((ssize_t)len);
+        wsprintf(ws, type);
+        if (wstrncmp(mime_type, ws, len) == 0) {
+            return 1;
+        }
+        FreeWS(ws);
+    }
+    FreeWS(mime_type);
+    return 0;
+}
