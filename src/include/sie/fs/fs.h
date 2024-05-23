@@ -1,5 +1,4 @@
-#ifndef __SIE_FS_H__
-#define __SIE_FS_H__
+#pragma once
 
 #include <swilib.h>
 
@@ -57,5 +56,3 @@ unsigned int Sie_FS_MoveFile(const char *src, const char *dest, unsigned int *er
 unsigned int Sie_FS_DeleteFile(const char *path, unsigned int *err);
 unsigned int Sie_FS_DeleteDir(const char *path, unsigned int *err);
 unsigned Sie_FS_DeleteDirRecursive(const char *path, unsigned int *err);
-
-#endif

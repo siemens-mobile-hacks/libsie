@@ -1,7 +1,7 @@
 #include <swilib.h>
 #include "../include/sie/fs/fs.h"
 
-SIE_FILE *Sie_FS_SortFiles(SIE_FILE *files, int cmp(SIE_FILE*, SIE_FILE*), int keep_dirs_on_top) {
+SIE_FILE *Sie_FS_SortFiles(SIE_FILE *files, int (*cmp)(SIE_FILE*, SIE_FILE*), int keep_dirs_on_top) {
     SIE_FILE *p = files;
     SIE_FILE *prev = NULL;
     SIE_FILE *next = NULL;
