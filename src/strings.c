@@ -1,6 +1,4 @@
 #include <ctype.h>
-#include <swilib.h>
-#include <stdlib.h>
 #include <string.h>
 
 void Sie_Strings_ToLower(char *str) {

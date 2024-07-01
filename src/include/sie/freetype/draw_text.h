@@ -1,5 +1,4 @@
-#ifndef __SIE_FREETYPE_DRAW_TEXT_H__
-#define __SIE_FREETYPE_DRAW_TEXT_H__
+#pragma once
 
 typedef struct {
     int width;
@@ -12,5 +11,3 @@ typedef struct {
 } SIE_FT_RENDER;
 
 void Sie_FT_DrawText(WSHDR *ws, int x, int y, int x2, int y2, int font_size, int attr, const char *color);
-
-#endif

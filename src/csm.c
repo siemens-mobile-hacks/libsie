@@ -2,13 +2,17 @@
 #include <stdlib.h>
 
 CSM_RAM *FindCSMByConstr(CSM_RAM *csm, void *constr) {
+    CSM_RAM *csm_ram = NULL;
+    LockSched();
     while (csm) {
         if (csm->constr == constr) {
-            return csm;
+            csm_ram = csm;
+            break;
         }
         csm = csm->next;
     }
-    return NULL;
+    UnlockSched();
+    return csm_ram;
 }
 
 CSM_RAM *Sie_CSM_FindByAddr(const char *addr) {

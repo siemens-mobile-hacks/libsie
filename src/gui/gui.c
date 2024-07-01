@@ -52,7 +52,7 @@ void Sie_GUI_InitHeaderSmall(HEADER_DESC *header_desc) {
     header_desc->rc.y += 4;
     header_desc->rc.y2 = (short)(header_desc->rc.y + HeaderH() - 1);
 #else
-    header_des->rc.y2 = HeaderH() + 0x11;
+    header_desc->rc.y2 = (short)(HeaderH() + 0x11);
 #endif
 }
 
