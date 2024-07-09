@@ -59,12 +59,11 @@ static void DrawStr(WSHDR *ws, int x, int y, int x2, int x_offset, int font_size
             last = 1;
         }
         if (bleed_x < 0) {
-            Sie_GUI_DrawBleedIMGHDR(img, x_img, y_img, x_img + img->w, y_img + img->h,
-                                    bleed_x * -1, 0);
+            DrawCroppedIMGHDR(x_img, y_img, bleed_x * -1, 0, img->w, img->h, 0, img);
             x += bleed_x;
             bleed_x = 1; // stop
         } else {
-            Sie_GUI_DrawIMGHDR(img, x_img, y_img, w_img, h_img);
+            DrawCroppedIMGHDR(x_img, y_img, 0, 0, w_img, h_img, 0, img);
         }
         mfree(img->bitmap);
         mfree(img);

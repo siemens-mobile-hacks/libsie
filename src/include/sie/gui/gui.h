@@ -21,6 +21,3 @@ void Sie_GUI_InitHeaderSmall(HEADER_DESC *header_desc);
 void Sie_GUI_InitInput(INPUTDIA_DESC *input_desc);
 void Sie_GUI_SetRGB(char *rgb, char r, char g, char b);
 IMGHDR *Sie_GUI_TakeScrot();
-
-void Sie_GUI_DrawIMGHDR(IMGHDR *img, int x, int y, int w, int h);
-void Sie_GUI_DrawBleedIMGHDR(IMGHDR  *img, int x, int y, int x2, int y2, int bleed_x, int bleed_y);

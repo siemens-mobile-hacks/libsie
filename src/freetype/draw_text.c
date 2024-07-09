@@ -97,7 +97,7 @@ SIE_FT_RENDER *DrawText(WSHDR *ws, int x, int y, int x2, int y2, int font_size, 
         const int x_img = _x + glyph_cache->h_bearing_x + x_offset;
         const int y_img = _y + glyph_cache->y_offset;
         IMGHDR *img = BrushGlyphIMGHDR(glyph_cache->img, rgb);
-        Sie_GUI_DrawIMGHDR(img, x_img, y_img, img->w, img->h);
+        DrawIMGHDR(x_img, y_img, img);
         mfree(img->bitmap);
         mfree(img);
         _x += glyph_cache->h_advance;
