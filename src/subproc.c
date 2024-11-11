@@ -8,53 +8,38 @@ unsigned int SLOTS[SUBPROC_MAX_PG];
 
 static void OnMsg(void);
 
-static inline short GetCepID(int pg) {
+static inline int GetCepID(int pg) {
     return pg * 0x100;
 }
 
 void Sie_SubProc_Init() {
-    #ifdef NEWSGOLD
-        PGROUP pg = {
-                0x00,
-                "T_SIE",
-                0x80,
-                0x8000,
-                2,
-        };
-    #else
-        PGROUP pg = {
-            0x00,
-            0x80,
-            0x8000,
-            2,
-        };
-    #endif
-
-    int pg_id;
-    short cepid;
+    PGROUP pg = {
+        0x00,
+        #ifdef NEWSGOLD
+            "T_SIE",
+        #endif
+        0x80,
+        0x8000,
+        1,
+    };
     for (int i = 0; i < SUBPROC_MAX_PG; i++) {
-        pg_id = SUBPROC_START_PG_ID + i;
-        cepid = GetCepID(pg_id);
+        int pg_id = SUBPROC_START_PG_ID + i;
+        unsigned short cepid = GetCepID(pg_id);
         if (!GetGBSProcAddress(cepid)) {
             pg.id = pg_id;
             CreateICL(&pg);
             CreateGBSproc(cepid, SUBPROC_NAME, OnMsg, 0x100, 0);
         }
     }
-    for (unsigned int i = 0; i < SUBPROC_MAX_PG; i++) {
-        pg_id = SUBPROC_START_PG_ID + i;
-        cepid = GetCepID(pg_id) + 1;
-        if (!GetGBSProcAddress(cepid)) {
-            CreateGBSproc(cepid, SUBPROC_NAME, OnMsg,
-                          0x80, 0);
-        }
-    }
-    zeromem(SLOTS, sizeof(unsigned int) * 10);
+    zeromem(SLOTS, sizeof(unsigned int) * SUBPROC_MAX_PG);
 }
 
 void Sie_SubProc_Destroy() {
-    for (unsigned int i = 0; i <= SUBPROC_MAX_PG; i++) {
-        KillGBSproc(GetCepID(SUBPROC_START_PG_ID + i) + 1);
+    for (unsigned int i = 0; i < SUBPROC_MAX_PG; i++) {
+        unsigned short cepid = GetCepID(SUBPROC_START_PG_ID + i);
+        if (GetGBSProcAddress(cepid)) {
+            KillGBSproc(cepid);
+        }
     }
 }
 
@@ -63,9 +48,8 @@ static void OnMsg() {
     if (GBS_RecActDstMessage(&msg))
     {
         unsigned int slot = msg.msg;
-        if (msg.data0)
-        {
-            void (*proc)(void *) = (void (*)(void *))msg.data0;
+        if (msg.data0) {
+            void (*proc)(void *) = msg.data0;
             proc(msg.data1);
             SLOTS[slot] = 0;
         }
@@ -75,8 +59,9 @@ static void OnMsg() {
 unsigned int Sie_SubProc_Run(void *proc, void *data) {
     for (unsigned int i = 0; i < SUBPROC_MAX_PG; i++) {
         if (!SLOTS[i]) {
+            unsigned short cepid = GetCepID(SUBPROC_START_PG_ID + i);
             SLOTS[i] = 1;
-            GBS_SendMessage(GetCepID(SUBPROC_START_PG_ID + i) + 1, i, 0, proc, data);
+            GBS_SendMessage(cepid, i, 0, proc, data);
             return 1;
         }
     }
