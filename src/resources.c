@@ -21,12 +21,17 @@ void DestroyElement(SIE_RESOURCES_IMG *res_img) {
     mfree(res_img->icon);
     mfree(res_img);
 }
+#ifdef NEWSGOLD
+    #define GetIMGHDRWallpaper() GetIMGHDRFromCanvasCache(0)
+#else
+    #define GetIMGHDRWallpaper() GetCanvasBufferPicPtr(0)
+#endif
 
 /**********************************************************************************************************************/
 
 void Sie_Resources_Init() {
     MutexCreate(&mtx_res_img);
-    IMG_WALLPAPER = GetIMGHDRFromCanvasCache(0);
+    IMG_WALLPAPER = GetIMGHDRWallpaper();
     CLIENTS++;
 }
 
@@ -51,7 +56,7 @@ void Sie_Resources_Destroy() {
 
 void SetWallpaper_Proc(void (*proc)()) {
     for (int i = 0; i < 5; i++) {
-        IMGHDR *img = GetIMGHDRFromCanvasCache(0);
+        IMGHDR *img = GetIMGHDRWallpaper();
         if (img) {
             IMG_WALLPAPER = img;
             break;

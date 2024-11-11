@@ -13,13 +13,23 @@ static inline short GetCepID(int pg) {
 }
 
 void Sie_SubProc_Init() {
-    PGROUP pg = {
+    #ifdef NEWSGOLD
+        PGROUP pg = {
+                0x00,
+                "T_SIE",
+                0x80,
+                0x8000,
+                2,
+        };
+    #else
+        PGROUP pg = {
             0x00,
-            "T_SIE",
             0x80,
             0x8000,
             2,
-    };
+        };
+    #endif
+
     int pg_id;
     short cepid;
     for (int i = 0; i < SUBPROC_MAX_PG; i++) {

@@ -18,8 +18,10 @@ CSM_RAM *FindCSMByConstr(CSM_RAM *csm, void *constr) {
 CSM_RAM *Sie_CSM_FindByAddr(const char *addr) {
     void *constr = (void*)strtoul(addr, NULL, 16);
     CSM_RAM *csm = FindCSMByConstr(CSM_root()->csm_q->csm.first, constr);
-    if (!csm) {
-        csm = FindCSMByConstr(CSM_root()->csm_q->csm_background.first, constr);
-    }
+    #ifdef NEWSGOLD
+        if (!csm) {
+            csm = FindCSMByConstr(CSM_root()->csm_q->csm_background.first, constr);
+        }
+    #endif
     return csm;
 }
