@@ -48,7 +48,7 @@ static SIE_FT_GLYPH_CACHE *AddGlyphCache(FT_Face *face, SIE_FT_CACHE *ft_cache, 
     img->w = bitmap->width;
     img->h = bitmap->rows;
     img->bpnum = IMGHDR_TYPE_BGRA8888;
-    img->bitmap = malloc(CalcBitmapSize(img->w, img->h, IMGHDR_TYPE_BGRA8888));
+    img->bitmap = malloc(CalcBitmapSize(img->w, img->h, IMGHDR_TYPE_BGRA8888)); // NOLINT
 
     uint8_t im[img->h][img->w];
     for (int _y = 0, j = 0; _y < img->h; _y++) {
@@ -63,16 +63,17 @@ static SIE_FT_GLYPH_CACHE *AddGlyphCache(FT_Face *face, SIE_FT_CACHE *ft_cache, 
         }
     }
 
-    int h_advance, v_advance;
-    int h_bearing_x = 0;
     int y_offset = 0;
+    int h_advance = 0, v_advance = 0;
+    int h_bearing_x = 0;
     const int max_ascender = ((*face)->size->metrics.ascender >> 6);
-    h_advance = ((*face)->glyph->metrics.horiAdvance >> 6);
-    h_bearing_x = ((*face)->glyph->metrics.horiBearingX >> 6);
-    v_advance = ((*face)->glyph->metrics.vertAdvance >> 6);
-    y_offset = -((*face)->glyph->bitmap_top) + max_ascender;
 
-    ft_cache->cache = realloc(ft_cache->cache, sizeof(SIE_FT_GLYPH_CACHE) * (ft_cache->size + 1));
+    y_offset = -((*face)->glyph->bitmap_top) + max_ascender;
+    h_advance = ((*face)->glyph->metrics.horiAdvance >> 6);
+    v_advance = ((*face)->glyph->metrics.vertAdvance >> 6);
+    h_bearing_x = ((*face)->glyph->metrics.horiBearingX >> 6);
+
+    ft_cache->cache = realloc(ft_cache->cache, sizeof(SIE_FT_GLYPH_CACHE) * (ft_cache->size + 1)); //NOLINT
     SIE_FT_GLYPH_CACHE *cc_cache = &(ft_cache->cache[ft_cache->size]);
     zeromem(cc_cache, sizeof(SIE_FT_GLYPH_CACHE));
     cc_cache->charcode = charcode;
