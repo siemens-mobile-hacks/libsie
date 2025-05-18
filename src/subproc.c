@@ -35,12 +35,12 @@ void Sie_SubProc_Init() {
 }
 
 void Sie_SubProc_Destroy() {
-    for (unsigned int i = 0; i < SUBPROC_MAX_PG; i++) {
-        unsigned short cepid = GetCepID(SUBPROC_START_PG_ID + i);
-        if (GetGBSProcAddress(cepid)) {
-            KillGBSproc(cepid);
-        }
-    }
+    // for (unsigned int i = 0; i < SUBPROC_MAX_PG; i++) {
+    //     unsigned short cepid = GetCepID(SUBPROC_START_PG_ID + i);
+    //     if (GetGBSProcAddress(cepid)) {
+    //         KillGBSproc(cepid);
+    //     }
+    // }
 }
 
 static void OnMsg() {
