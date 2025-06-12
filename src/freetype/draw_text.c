@@ -48,7 +48,7 @@ SIE_FT_RENDER *Sie_FT_Render(WSHDR *ws, int x, int x2, int font_size) {
                     line_width -= glyph_cache->h_advance;
                     i--;
                 }
-                line_width -= word_width;
+                // line_width -= word_width;
                 line->width = line_width;
                 line->v_advance = max_v_advance;
                 render->lines_count++;

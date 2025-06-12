@@ -22,7 +22,7 @@ int Sie_Exec_Shortcut(const char *shortcut) {
 #else
         ExecProc p = (ExecProc)addr;
 #endif
-        SUBPROC(p);
+        SUBPROC(p, NULL);
         return 1;
     }
     return 0;
@@ -32,7 +32,7 @@ int Sie_Exec_Entrypoint(const char *entrypoint) {
     unsigned int addr = strtoul(entrypoint, 0, 16);
     if (addr) {
         ExecProc p = (ExecProc)addr;
-        SUBPROC(p);
+        SUBPROC(p, NULL);
         return 1;
     }
     return 0;
