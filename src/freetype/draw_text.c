@@ -30,7 +30,9 @@ SIE_FT_RENDER *Sie_FT_Render(WSHDR *ws, int x, int x2, int font_size) {
 
         const SIE_FT_GLYPH_CACHE *glyph_cache = FT_GlyphGetOrAddCache(face, cache, charcode);
         max_v_advance = MAX(max_v_advance, glyph_cache->v_advance);
-        word_width += glyph_cache->h_advance;
+        if (last_space) {
+            word_width += glyph_cache->h_advance;
+        }
         line_width += glyph_cache->h_advance;
         if (line_width > x2 - x) {
             BREAK_LINE:
@@ -43,12 +45,12 @@ SIE_FT_RENDER *Sie_FT_Render(WSHDR *ws, int x, int x2, int font_size) {
                 if (last_space) {
                     line->break_point = last_space + 1;
                     i = last_space;
+                    line_width -= word_width;
                 } else {
                     line->break_point = i;
                     line_width -= glyph_cache->h_advance;
                     i--;
                 }
-                // line_width -= word_width;
                 line->width = line_width;
                 line->v_advance = max_v_advance;
                 render->lines_count++;
@@ -58,12 +60,12 @@ SIE_FT_RENDER *Sie_FT_Render(WSHDR *ws, int x, int x2, int font_size) {
         else if (charcode == '\n') {
             last_space = i;
             goto BREAK_LINE;
-        }
-        else if (charcode == ' ') {
+        } else if (charcode == ' ') {
             last_space = i;
+            word_width = 0;
         }
     }
-    render->lines[line_id].width = word_width;
+    render->lines[line_id].width = line_width;
     render->lines[line_id].v_advance = max_v_advance;
     render->lines[line_id].break_point = -1;
     render->height += max_v_advance;
