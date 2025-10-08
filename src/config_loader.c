@@ -11,12 +11,11 @@ static size_t GetSize(CFG_HDR *cfghdr0, const int *config_begin, const int *conf
 
 int Sie_Config_Save(const char *path, CFG_HDR *cfghdr0, const int *config_begin, const int *config_end) {
     unsigned int err;
-    int fp = _open(path, A_ReadWrite + A_Create + A_Truncate,
-                   P_READ + P_WRITE, &err);
+    int fp = sys_open(path, A_ReadWrite | A_Create | A_Truncate, P_READ | P_WRITE, &err);
     if (fp != -1) {
         size_t size = GetSize(cfghdr0, config_begin, config_end);
-        int write_size = _write(fp, cfghdr0, (int)size, &err);
-        _close(fp, &err);
+        int write_size = sys_write(fp, cfghdr0, (int)size, &err);
+        sys_close(fp, &err);
         if (size == write_size) {
             return 1;
         }
@@ -31,14 +30,14 @@ int Sie_Config_Load(const char *path, CFG_HDR *cfghdr0, const int *config_begin,
     char *buf = malloc(size);
     if (buf) {
         unsigned int err;
-        int fp = _open(path, A_ReadOnly + A_BIN, 0, &err);
+        int fp = sys_open(path, A_ReadOnly | A_BIN, 0, &err);
         if (fp != -1) {
-            if (_read(fp, buf, (int)size, &err) == size) {
+            if (sys_read(fp, buf, (int)size, &err) == size) {
                 memcpy(cfghdr0, buf, size);
-                _close(fp, &err);
+                sys_close(fp, &err);
                 result = 2;
             } else {
-                _close(fp, &err);
+                sys_close(fp, &err);
                 goto SAVE_NEW_CFG;
             }
         } else {

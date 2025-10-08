@@ -328,7 +328,7 @@ unsigned int Sie_FS_CreateFile(const char *path, unsigned int *err) {
 }
 
 unsigned int Sie_FS_CreateDir(const char *path, unsigned int *err) {
-    return _mkdir(path, err);
+    return sys_mkdir(path, err);
 }
 
 unsigned int Sie_FS_CreateDirs(const char *path, unsigned int *err) {
