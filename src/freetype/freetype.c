@@ -1,6 +1,7 @@
 #include <swilib.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include "../include/sie/fs/fs.h"
 #include "../include/sie/freetype/cache.h"
 #include "../include/sie/freetype/freetype.h"
 
@@ -43,9 +44,11 @@ void Sie_FT_UnloadFaces() {
 }
 
 void Sie_FT_LoadFaces() {
-    FT_FACE_REGULAR = malloc(sizeof(FT_Face));
-    FT_New_Face(*FT_LIBRARY, SKIN_FONT_REGULAR_PATH,
-                SIE_FT_FACE_REGULAR_ID, FT_FACE_REGULAR);
+    if (Sie_FS_FileExists(SKIN_FONT_REGULAR_PATH)) {
+        FT_FACE_REGULAR = malloc(sizeof(FT_Face));
+        FT_New_Face(*FT_LIBRARY, SKIN_FONT_REGULAR_PATH,
+                    SIE_FT_FACE_REGULAR_ID, FT_FACE_REGULAR);
+    }
 }
 
 void Sie_FT_DestroyCache() {
