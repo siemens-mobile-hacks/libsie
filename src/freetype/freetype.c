@@ -2,10 +2,9 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include "../include/sie/fs/fs.h"
+#include "../include/sie/skin/skin.h"
 #include "../include/sie/freetype/cache.h"
 #include "../include/sie/freetype/freetype.h"
-
-extern char SKIN_FONT_REGULAR_PATH[];
 
 FT_Library *FT_LIBRARY;
 FT_Face *FT_FACE_REGULAR;
@@ -44,9 +43,10 @@ void Sie_FT_UnloadFaces() {
 }
 
 void Sie_FT_LoadFaces() {
-    if (Sie_FS_FileExists(SKIN_FONT_REGULAR_PATH)) {
+    extern SIE_SKIN SKIN;
+    if (Sie_FS_FileExists(SKIN.font_regular_path)) {
         FT_FACE_REGULAR = malloc(sizeof(FT_Face));
-        FT_New_Face(*FT_LIBRARY, SKIN_FONT_REGULAR_PATH,
+        FT_New_Face(*FT_LIBRARY, SKIN.font_regular_path,
                     SIE_FT_FACE_REGULAR_ID, FT_FACE_REGULAR);
     }
 }

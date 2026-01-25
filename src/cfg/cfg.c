@@ -1,26 +1,23 @@
-#include "../include/sie/config_loader.h"
+#include <swilib.h>
+#include <stdio.h>
 #include "../include/sie/fs/fs.h"
+#include "../include/sie/cfg/cfg.h"
 #include "../include/sie/skin/skin.h"
 
-extern char CFG_SKIN_PATH[];
-
-char CFG_PATH[64] = "0:\\zbin\\etc\\SieLibrary.bcfg";
+SIE_CONFIG SIE_CFG = {
+    {CFG_LEVEL, "GUI", 1, 0},
+    {CFG_STR_UTF8, "Skin path", 3, 127},
+    "0:\\Skins\\default.skin",
+    {CFG_LEVEL, "", 0, 0}
+};
 
 void Sie_CFG_Load() {
-    __CONFIG_EXTERN(0, cfghdr_0);
-    if (!Sie_Config_Load(CFG_PATH, __CONFIG(0, cfghdr_0))) {
-        CFG_PATH[0] = '4';
-        if (!Sie_Config_Load(CFG_PATH, __CONFIG(0, cfghdr_0))) {
-            CFG_PATH[0] = '\0';
-            return;
-        }
+    char path[128];
+    sprintf(path, "%c:\\zbin\\etc\\SieLibrary.bcfg", BCFG_GetDefaultDisk());
+    if (BCFG_LoadConfig(path, &SIE_CFG, sizeof(SIE_CONFIG)  == -1)) {
+        BCFG_SaveConfig(path, &SIE_CFG, sizeof(SIE_CONFIG));
     }
-
     unsigned int err;
     Sie_FS_CreateDirs("0:\\Skins\\", &err);
-    Sie_Skin_Load(CFG_SKIN_PATH);
-}
-
-const char *Sie_CFG_GetPath() {
-    return CFG_PATH;
+    Sie_Skin_Load(SIE_CFG.skin_path);
 }
